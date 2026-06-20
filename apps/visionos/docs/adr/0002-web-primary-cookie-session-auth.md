@@ -1,6 +1,6 @@
 # 0002 — Web-primary cookie-session auth
 
-**Status:** accepted
+**Status:** superseded by ADR-0005 — cookie-from-webview is impossible here: production login is Google/GitHub OAuth, Google blocks OAuth inside embedded WKWebViews (`disallowed_useragent`), and `ASWebAuthenticationSession` uses an ephemeral cookie jar it never returns. The session cookie is also `httpOnly`. The auth simplification survives, but as a **bearer token**, not a cookie.
 
 The V1 app authenticates by running the web login flow in a webview and holding the better-auth **session cookie** natively (shared between `URLSession`'s `HTTPCookieStorage` and the WKWebView `WKHTTPCookieStore`), using cookies for tRPC and chat and minting short-lived JWTs from `/api/auth/token` for Electric/relay — exactly as the web app does — instead of a native OAuth 2.0 + PKCE bearer chain. We chose this because the tRPC context already accepts cookie sessions (`apps/api/src/trpc/context.ts` tries `getSession` before bearer) and the web app already mints Electric JWTs from its session (`apps/web/src/trpc/auth-token.ts`), so the webview panes and native shell can share one proven mechanism.
 

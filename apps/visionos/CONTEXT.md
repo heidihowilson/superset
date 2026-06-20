@@ -13,7 +13,7 @@ A view onto a Workspace or Project, not the thing itself. A `(sceneKind, domainI
 _Avoid_: tab, screen
 
 **Watch**:
-Observing an agent's activity in a Workspace — chat, thinking, tool calls, status — without driving execution. The host-resilient core loop (chat syncs via Electric even when the host sleeps).
+Observing an agent's activity in a Workspace — chat, thinking, tool calls, status — without driving execution. **Host-gated** in V1: chat lives on the Host (Electron IPC / Mastra memory; the cloud Durable Stream is unwired), so watching requires a reachable, awake Host.
 _Avoid_: monitor, view
 
 **Chat session**:
@@ -25,7 +25,7 @@ A GitHub-linked repository under an Organization that groups Workspaces.
 _Avoid_: repo (a Project is the Superset-side record, not the git repo itself)
 
 **Host**:
-A Mac/Linux machine running host-service where Workspaces physically live and agents execute. Reached only via a host-dialed relay tunnel, so it is frequently unreachable from a roaming headset.
+A Mac/Linux machine running host-service where Workspaces physically live and agents execute. Reached only via a host-dialed relay tunnel (paid/trial plan only). V1 assumes the Host is awake; when it is unreachable, only the cloud Workspace list is available.
 _Avoid_: server, machine, device
 
 **Spatial organization**:
