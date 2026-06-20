@@ -25,7 +25,7 @@ A GitHub-linked repository under an Organization that groups Workspaces.
 _Avoid_: repo (a Project is the Superset-side record, not the git repo itself)
 
 **Host**:
-A Mac/Linux machine running host-service where Workspaces physically live and agents execute. Reached only via a host-dialed relay tunnel (paid/trial plan only). V1 assumes the Host is awake; when it is unreachable, only the cloud Workspace list is available.
+A Mac/Linux machine running host-service where Workspaces physically live and agents execute — for visionOS, typically a **remote, always-on** Host (Superset Pro supports remote hosts). Reached only via a host-dialed relay tunnel (paid/trial plan only). V1 assumes the Host is awake; when unreachable, only the cloud Workspace list is available.
 _Avoid_: server, machine, device
 
 **Spatial organization**:

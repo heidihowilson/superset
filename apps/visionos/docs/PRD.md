@@ -46,7 +46,7 @@ Superset orchestrates coding agents across Hosts. Domain model: `Organization �
 - **G8 — Register as device type `visionos`.** Add `'visionos'` to **both** `deviceTypeValues` and `v2ClientTypeValues` (both currently `["desktop","mobile","web"]`), **appended last** (else Drizzle emits a destructive enum recreate). The live targeting path is **unsettled and needs platform-team confirmation**: `device.registerDevice` → `device_presence` is a v1 system its own code comments mark *"retired with the rest of v1,"* and `host.ensureClient` (→ `v2Clients`) currently has **no callers**. Don't hard-assume either is load-bearing until confirmed (`packages/db/src/schema/enums.ts`).
 
 ### Non-Goals (V1)
-- **NG1 — No web-hosted UI / WKWebView content panes** (except the auth handoff). Native UI only (ADR-0003).
+- **NG1 — No web-hosted UI / WKWebView content panes**, except (a) the auth handoff and (b) the transcript's rich-content rendering surface (markdown/syntax/diff, ADR-0009). Native UI everywhere else (ADR-0003).
 - **NG2 — No native Electric/TanStack-DB client, and the cloud Durable Stream is NOT used in V1** (it's unwired). Both are V2 (ADR-0004/0006).
 - **NG3 — No terminal.** Deferred to V1.1 (registered placeholder).
 - **NG4 — No code-review panes** (diff/file/comment). Deferred to V1.1 (registered placeholder).
@@ -67,7 +67,7 @@ Superset orchestrates coding agents across Hosts. Domain model: `Organization �
 3. **Manage parallel work** — open several Workspace windows, arrange them in space (the user arranges; the app cannot — PI-1), glance between them.
 4. **Set up / tear down** — create/delete Workspaces.
 
-**Host-reachability (R1):** the Host being unreachable is a **degraded state, not the operating assumption** (ADR-0006). When it happens, V1 shows the cloud Workspace/Project list + an explicit **"Host offline"** state that distinguishes *asleep* from *plan-gated 403* — and nothing else works. The roaming/host-asleep experience is out of V1 scope (a future host-wake or cloud-durable-stream path, §14).
+**Host-reachability (R1):** V1 targets **remote, always-on Hosts** — Superset Pro supports remote hosts, so the headset develops against an external machine kept running, **not** the wearer's sleeping Mac. Host-awake is therefore the *natural* model, not a compromise. When a Host is unreachable, V1 shows the cloud Workspace/Project list + an explicit **"Host offline"** state distinguishing *asleep* from *plan-gated 403*. Roaming against a sleeping personal Mac is out of V1 scope (a future host-wake / cloud-durable-stream path, §14).
 
 ---
 
@@ -122,12 +122,12 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 
 ### 7.2 V1 surfaces (all content surfaces are Host-gated except the list)
 - **Project/Workspace browser + switcher** — cloud tRPC `v2Workspace.list`, polled, cached for instant paint; the one Host-independent surface. Status distinguishes asleep vs plan-gated.
-- **Watch** — Chat session view from **host-service over the relay**, in **two presentations over one store**: an **ambient default** (glanceable narrative + status) and a **lean-in full-fidelity** mode (expandable thinking + tool-result renderers). Inline-result renderers (bounded set): markdown/text, file edit/diff, shell output, file read, search results, web fetch, **generic fallback** for other tool types. Oversized results show a summary + an explicit "open full" host fetch (never a scroll side-effect). The Swift **markdown/syntax/diff substrate** has no drop-in and is the largest reimplementation risk — gated on a spike (§12).
+- **Watch** — Chat session view from **host-service over the relay**, in **two presentations over one store**: an **ambient default** (glanceable narrative + status) and a **lean-in full-fidelity** mode (expandable thinking + tool-result renderers). Inline-result renderers (bounded set): markdown/text, file edit/diff, shell output, file read, search results, web fetch, **generic fallback** for other tool types. Oversized results show a summary + an explicit "open full" host fetch (never a scroll side-effect). **Rich content (streaming markdown, syntax-highlighted code, diffs) renders in a WKWebView reusing the desktop's web stack** — `streamdown`, `shiki`, and `@pierre/diffs` (diffs.com) — behind the renderer protocol (ADR-0009), fed by native (no auth/network in the webview); native owns the shell, lists, composer, and chrome. This dissolves the native-substrate build (R6).
 - **Prompt** — composer with **voice dictation and virtual keyboard as co-equal inputs** (dictation gated on a WER bar, §9; quick-action chips for approve/reject/retry), agent + model picker (model picker is cloud; **agent-preset picker is Host-gated** — empty when the Host sleeps), session switcher. Text-only in V1 (attachment upload deferred).
 - **Workspace lifecycle** — create/delete (Host-gated, client-driven relay), rename/restore (cloud-only).
 - **Auth & org** — system-browser sign-in (ADR-0005), org list + switch (`setActive()`), sign-out (drops the Keychain token).
 - **Settings (read-mostly)** — *editable:* org/team switch, model prefs, device-local appearance + dictation/notification prefs, sign-out. *Read-only views:* hosts (with live host-online indicator), projects, billing, account. *Cut/N-A:* terminal, git, permissions, api-keys, presets/agents/behavior (host-side), integrations, links, ringtones, experimental; keyboard → shortcut reference.
-- **Notifications** — agent lifecycle routed to the owning Workspace window if open, else the command-center ornament. **Out-of-headset alerting** (agent done while the headset is off): V1 stance is to **delegate to existing desktop/mobile Superset notifications** (APNs server-push is not built — §15); stated as a known V1 limitation.
+- **Notifications (in-app only)** — agent lifecycle routed to the owning Workspace window if open, else the command-center ornament. **Out-of-headset alerting is explicitly out of V1 scope** — that is the desktop app's story (Superset already notifies you there). No APNs work in this client.
 - **Onboarding (FR-ONB)** — lightweight, skippable, settings-replayable **5-beat** first-run: gaze+pinch, switcher/palette (Cmd+K), **host-online state (what "Host offline" means)**, open your first Workspace, window-vs-pane close (Cmd+W). No-Host orgs get a **"connect a Host" terminal state** (QR/deep-link), since "open first Workspace" is impossible without a Host.
 
 ---
@@ -137,7 +137,7 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 | Feature | V1 | Notes |
 |---|---|---|
 | Project/Workspace browser + switcher | **Must** | Cloud tRPC; only Host-independent surface. |
-| Watch Chat (live + history) | **Must (Host-gated)** | host-service over relay; ambient + full-fidelity. Largest native build (markdown/syntax/diff). |
+| Watch Chat (live + history) | **Must (Host-gated)** | host-service over relay; ambient + full-fidelity; **rich content via WKWebView** (`streamdown`/`shiki`/`@pierre/diffs`, ADR-0009). |
 | Send prompt (voice/keyboard) | **Must (Host-gated)** | Co-equal modalities; explicit send; agent runs on Host. |
 | Workspace create / delete | **Must (Host-gated)** | Client-driven relay, keyed by `machineId`. |
 | Workspace rename / restore | **Must** | Cloud-only; safe Host-offline. |
@@ -147,7 +147,7 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 | Settings (read-mostly) | **Must** | Minimal editable set. |
 | Onboarding | **Must** | 5-beat incl. host-online + no-Host state. |
 | Observability (crash + telemetry) | **Must** | ADR-0007. |
-| Out-of-headset push (APNs) | **Defer** | Delegate to desktop/mobile in V1; server push not built. |
+| Out-of-headset alerting (APNs) | **Out of scope** | Desktop app's story; not this client. |
 | Terminal | **Defer → V1.1** | Native PTY-over-relay-WS + backgrounding reconnect. |
 | Diff / file / comment review | **Defer → V1.1** | Host-gated native UI. |
 | Host-resilient watch (cloud stream) | **Defer → V2** | Build Durable Stream producer + consumer + history. |
@@ -211,7 +211,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 - **No new `packages/superset-core` for V1** (ADR-0004 removed the native-sync need). Revisit in V2 with native Electric.
 - **Schema:** add `'visionos'` to **both** `deviceTypeValues` and `v2ClientTypeValues` (each `["desktop","mobile","web"]`), **appended last** (else Drizzle emits a destructive enum recreate). **Targeting path is unsettled:** `device.registerDevice`→`device_presence` is v1 code marked *"retired with the rest of v1"*; `host.ensureClient`→`v2Clients` has zero callers. Confirm the live device-targeting mechanism with the platform team before relying on either. Additive migration via `drizzle-kit generate` (maintainer-run; never hand-edit `packages/db/drizzle/`).
 - **Wire contract:** hand-typed Swift models for the small V1 surface (cloud tRPC + host-service calls), with **SuperJSON `{json, meta}` handling** (§11). A TS→Swift codegen step is a later nicety; account for server-contract drift (§15) since there is no auto-updater.
-- **Markdown/syntax/diff substrate (named spike):** the full-fidelity transcript needs a Swift rendering substrate (swift-markdown vs JS-via-JavaScriptCore; Highlightr/Splash vs Shiki). Decide via a spike before committing the transcript estimate.
+- **Rich-content rendering = web stack in a WKWebView (ADR-0009):** the transcript's markdown/syntax/diff renders via the desktop's libraries — `streamdown` (streaming markdown), `shiki` (syntax), `@pierre/diffs` (diffs) — inside a webview behind the renderer protocol, fed by native (no auth/network in the webview). No native Swift substrate to build; tune the webview for the headset (≥60pt, gaze scroll, glass theming) and bridge interactions to native.
 - **Registry:** chat at parity in V1; diff/file/comment/terminal/browser as registered placeholders.
 
 ---
@@ -221,7 +221,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 **Security (elevated — the relay JWT is an RCE key).**
 - A valid relay JWT reaches the **full host-service surface** (e.g. `terminal.createSession` runs arbitrary commands) = **RCE on the developer's Host**. The Keychain token + the minted JWT are high-value secrets: short JWT TTL, drop tokens on sign-out/background where feasible, never log them.
 - **Revocation lags ~1h:** relay/host JWTs are stateless (JWKS verify, no revocation lookup) + a 15-min `allowedCache`. Session revocation does **not** immediately cut host access. Treat as a known limitation; prefer low TTL + proactive token drop.
-- **Shared/lost device:** Keychain/UserDefaults are per-Apple-Account, not per-human. Decide **single-user-per-install** (drop any "shared headset" claim) or add an Optic ID re-auth gate on foreground + clear the cached JWT on background; define Guest User behavior.
+- **Optic ID gate, per-user device (ADR-0008):** gate app access + the stored credential behind **Optic ID** (LocalAuthentication) on launch/foreground — "put it on, see your workspaces." Clear the cached relay JWT on background; re-auth on foreground (also mitigates the ~1h revocation lag). Platform constraint: Optic ID is the enrolled owner; shared-headset auto-switch-by-face is not native — each user has their own device + login.
 - Gaze for system targeting only — **never inferred or logged**. Outbound HTTPS/WSS only; no inbound listeners. Client sees only orgs in its membership.
 
 **Performance.**
@@ -249,13 +249,14 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 
 | # | Risk | Mitigation |
 |---|---|---|
-| **R1 (TOP)** | **V1 needs a live Host; host-offline yields only the Workspace list** (ADR-0006). | Host-awake persona (§4); explicit "Host offline (asleep / plan-gated)" state; roaming + host-resilient watch are V2 (Durable Stream producer/consumer, host-wake). |
+| R1 | **V1 needs a live Host; host-offline yields only the Workspace list** (ADR-0006). | **Mitigated by targeting remote always-on Hosts** (§4) — host-awake is the norm; explicit "Host offline (asleep / plan-gated)" state; roaming against a sleeping personal Mac + host-resilient watch are V2 (Durable Stream producer/consumer, host-wake). |
 | R2 | **Auth handoff** (system browser → token → Keychain → Bearer) is net-new; relay JWT minting must work from a fresh client. | Mirror desktop `/api/auth/desktop/connect` + `@better-auth/expo`; M0d gate on hardware (sign-in + a host call + org switch). |
 | R3 | **RCE surface:** a leaked token = full host-service command execution. | Short JWT TTL, drop on sign-out/background, never log; treat Keychain token as top secret (§13). |
 | R4 | **Revocation lags ~1h** (stateless JWT). | Low TTL + proactive token drop; document non-immediacy; lost-device flow (§13). |
 | R5 | **Free-plan orgs 403 on every host call.** | Each dogfood org carries an `active`/`trialing` sub; host-online indicator distinguishes asleep vs plan-gated. |
-| R6 | **Full-fidelity transcript has no Swift markdown/syntax/diff drop-in** — largest reimplementation. | Named spike (§12) before estimating; bounded 6-renderer list; ambient default reduces pressure. |
-| R7 | **Out-of-headset alerting** (agent done while headset off) has no APNs infra. | V1 delegates to existing desktop/mobile notifications; state the limitation; APNs is later. |
+| R6 | ~~Full-fidelity transcript has no Swift substrate~~ **Resolved (ADR-0009):** rich content renders in a WKWebView reusing `streamdown`/`shiki`/`@pierre/diffs`. Residual: tune the webview for headset comfort + bridge interactions to native. |
+| R6b (TOP) | **Watch transport + chat-stream-over-relay across visionOS backgrounding is unproven** — the core loop depends on consuming live chat from host-service over the relay, with no reference client. | Confirm host-service exposes a relay-consumable chat stream; stream contract + resume; hardware spike folded into M0c. |
+| R7 | Out-of-headset alerting (agent done while headset off). | **Out of V1 scope** — owned by the desktop app's notifications; no APNs work in this client. |
 | R8 | **Dictation accuracy** unproven for technical prompts; on-device STT silently falls back to server. | Co-equal modalities; M0d WER gate; detect/disclose server fallback (privacy). |
 | R9 | **Distribution / App Review** for an internal visionOS app. | §18; TestFlight channel; pre-empt Guideline 4.2/2.1. |
 | R10 | **Server-contract drift** with no auto-updater + hand-typed models. | Compat policy + version-header tripwire; SuperJSON handling. |
@@ -310,3 +311,5 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 - **ADR-0005** — Bearer-token auth via system-browser handoff — accepted (supersedes 0002).
 - **ADR-0006** — V1 host-awake; watch & history Host-gated — accepted.
 - **ADR-0007** — On-device observability — accepted.
+- **ADR-0008** — Optic ID-gated access, per-user device — accepted.
+- **ADR-0009** — Rich transcript content via WKWebView (markdown/syntax/diff) — accepted (scoped exception to 0003).
