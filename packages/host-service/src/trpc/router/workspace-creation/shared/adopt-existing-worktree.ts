@@ -165,6 +165,7 @@ export async function adoptExistingWorktree(
 			hostId: host.machineId,
 			id: idempotencyId,
 			taskId,
+			clientMachineId: ctx.clientMachineId,
 		})
 		.catch((err) => {
 			if (err instanceof TRPCError) throw err;
@@ -295,7 +296,7 @@ async function recordBaseBranch(
 	baseBranch: string | undefined,
 ): Promise<void> {
 	if (!baseBranch) return;
-	await gitConfigWrite(git, [
+	await gitConfigWrite(git as Parameters<typeof gitConfigWrite>[0], [
 		"config",
 		`branch.${branch}.base`,
 		baseBranch,

@@ -1,3 +1,5 @@
+import type { WorkspaceTransactionSnapshot } from "renderer/stores/workspace-creates";
+
 export type DashboardSidebarWorkspaceHostType =
 	| "local-device"
 	| "remote-device"
@@ -15,7 +17,7 @@ export interface DashboardSidebarWorkspacePullRequest {
 	url: string;
 	number: number;
 	title: string;
-	state: "open" | "merged" | "closed" | "draft";
+	state: "open" | "merged" | "closed" | "draft" | "queued";
 	reviewDecision: "approved" | "changes_requested" | "pending" | null;
 	requestedReviewers?: string[];
 	checksStatus: "success" | "failure" | "pending" | "none";
@@ -41,7 +43,7 @@ export interface DashboardSidebarWorkspace {
 	createdAt: Date;
 	updatedAt: Date;
 	taskId: string | null;
-	creationStatus?: "preparing" | "generating-branch" | "creating" | "failed";
+	pendingTransaction: WorkspaceTransactionSnapshot | null;
 }
 
 export interface DashboardSidebarSection {

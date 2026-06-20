@@ -1,11 +1,11 @@
 import { toast } from "@superset/ui/sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCopyToClipboard } from "renderer/hooks/useCopyToClipboard";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
+import { showHostServiceUnavailableToast } from "renderer/lib/host-service-unavailable";
 import { electronTrpcClient } from "renderer/lib/trpc-client";
 import { useDashboardSidebarSectionRename } from "renderer/routes/_authenticated/_dashboard/components/DashboardSidebar/components/DashboardSidebarSectionRenameContext";
-import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useOptimisticCollectionActions } from "renderer/routes/_authenticated/hooks/useOptimisticCollectionActions";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
@@ -20,7 +20,6 @@ interface UseDashboardSidebarWorkspaceItemActionsOptions {
 	projectId: string;
 	workspaceName: string;
 	branch: string;
-	isActive: boolean;
 	isMainWorkspace?: boolean;
 }
 
@@ -29,11 +28,12 @@ export function useDashboardSidebarWorkspaceItemActions({
 	projectId,
 	workspaceName,
 	branch,
-	isActive,
 	isMainWorkspace = false,
 }: UseDashboardSidebarWorkspaceItemActionsOptions) {
 	const navigate = useNavigate();
-	const { activeHostUrl } = useLocalHostService();
+	const matchRoute = useMatchRoute();
+	const hostService = useLocalHostService();
+	const { activeHostUrl } = hostService;
 	const { copyToClipboard } = useCopyToClipboard();
 	const { v2Workspaces: workspaceActions } = useOptimisticCollectionActions();
 	const { requestSectionRename } = useDashboardSidebarSectionRename();
@@ -49,11 +49,19 @@ export function useDashboardSidebarWorkspaceItemActions({
 	const [renameValue, setRenameValue] = useState(workspaceName);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+	const isActive = !!matchRoute({
+		to: "/v2-workspace/$workspaceId",
+		params: { workspaceId },
+		fuzzy: true,
+	});
+
 	const handleClick = () => {
 		if (isRenaming) return;
 		clearWorkspaceAttention(workspaceId);
-		if (isActive) return;
-		void navigateToV2Workspace(workspaceId, navigate);
+		navigate({
+			to: "/v2-workspace/$workspaceId",
+			params: { workspaceId },
+		});
 	};
 
 	const startRename = () => {
@@ -94,7 +102,9 @@ export function useDashboardSidebarWorkspaceItemActions({
 
 	const resolveWorktreePath = async (): Promise<string | null> => {
 		if (!activeHostUrl) {
-			toast.error("Host service is not available");
+			showHostServiceUnavailableToast(hostService, {
+				action: "resolve the workspace path",
+			});
 			return null;
 		}
 		const workspace = await getHostServiceClientByUrl(
@@ -165,6 +175,7 @@ export function useDashboardSidebarWorkspaceItemActions({
 		handleOpenInFinder,
 		handleRemoveFromSidebar,
 		handleToggleUnread,
+		isActive,
 		isDeleteDialogOpen,
 		isRenaming,
 		isUnread,

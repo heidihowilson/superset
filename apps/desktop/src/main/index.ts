@@ -26,7 +26,7 @@ import {
 import { setupAgentHooks } from "./lib/agent-setup";
 import { initAppState } from "./lib/app-state";
 import { requestAppleEventsAccess } from "./lib/apple-events-permission";
-import { setupAutoUpdater } from "./lib/auto-updater";
+import { isUpdateReadyToInstall, setupAutoUpdater } from "./lib/auto-updater";
 import { installBundledCliShim } from "./lib/bundled-cli";
 import { resolveDevWorkspaceName } from "./lib/dev-workspace-name";
 import { setWorkspaceDockIcon } from "./lib/dock-icon";
@@ -49,28 +49,11 @@ import {
 	getTerminalHostClient,
 } from "./lib/terminal-host/client";
 import { disposeTray, initTray } from "./lib/tray";
+import { startNetworkLogger, stopNetworkLogger } from "./network-logger";
 import { MainWindow } from "./windows/main";
 
 console.log("[main] Local database ready:", !!localDb);
 const IS_DEV = process.env.NODE_ENV === "development";
-const rendererStressCdpPort =
-	process.env.SUPERSET_RENDERER_STRESS_CDP_PORT?.trim();
-
-if (IS_DEV && rendererStressCdpPort) {
-	if (/^\d+$/.test(rendererStressCdpPort)) {
-		app.commandLine.appendSwitch(
-			"remote-debugging-port",
-			rendererStressCdpPort,
-		);
-		console.log(
-			`[main] Renderer stress CDP enabled on 127.0.0.1:${rendererStressCdpPort}`,
-		);
-	} else {
-		console.warn(
-			`[main] Ignoring invalid SUPERSET_RENDERER_STRESS_CDP_PORT=${rendererStressCdpPort}`,
-		);
-	}
-}
 
 void applyShellEnvToProcess().catch((error) => {
 	console.error("[main] Failed to apply shell environment:", error);
@@ -193,14 +176,14 @@ export function quitApp(): void {
 	app.quit();
 }
 
-/** Nuclear quit: also kills host-service(s) and pty-daemon/terminal-host. */
+/** Quit + also stop background services. Tray "Quit Completely". */
 export function quitAppCompletely(): void {
 	forceFullCleanup = true;
 	setSkipQuitConfirmation();
 	app.quit();
 }
 
-/** Bypasses before-quit — services are left running for re-adoption on next launch. */
+/** Bypasses before-quit. Host-service children self-exit via the parent watchdog. */
 export function exitImmediately(): void {
 	app.exit(0);
 }
@@ -241,27 +224,28 @@ app.on("before-quit", async (event) => {
 
 	isQuitting = true;
 	try {
+		getHostServiceCoordinator().stopAll();
 		if (isDev || forceFullCleanup) {
-			await runDevQuitCleanup();
-		} else {
-			// Prod: leave services running so the next launch re-adopts via manifest.
-			getHostServiceCoordinator().releaseAll();
+			await teardownTerminalHost();
+		} else if (isUpdateReadyToInstall()) {
+			disposeTerminalHostClient();
 		}
 		shutdownTanstackDbPersistence();
 		disposeTray();
 	} catch (error) {
 		console.error("[main] Cleanup during quit failed:", error);
+	} finally {
+		await stopNetworkLogger();
 	}
 	app.exit(0);
 });
 
 /**
- * Full cleanup — kill host-service + terminal-host children. Used in dev (where
- * they'd reparent to init without an explicit stop) and on the tray's
- * "Quit Superset Completely" path in prod.
+ * Fully stop the v1 terminal-host process. Do not call this for update
+ * installs: terminal-host owns the PTY subprocesses, so shutdown is
+ * destructive and prevents reattach on next launch.
  */
-async function runDevQuitCleanup(): Promise<void> {
-	getHostServiceCoordinator().stopAll();
+async function teardownTerminalHost(): Promise<void> {
 	try {
 		await getTerminalHostClient().shutdownIfRunning({ killSessions: true });
 	} catch (err) {
@@ -287,7 +271,11 @@ if (process.env.NODE_ENV === "development") {
 		if (signalHandled) return;
 		signalHandled = true;
 		console.log(`[main] Received ${signal}, quitting...`);
-		void runDevQuitCleanup().finally(() => app.exit(0));
+		getHostServiceCoordinator().stopAll();
+		void Promise.allSettled([
+			teardownTerminalHost(),
+			stopNetworkLogger(),
+		]).finally(() => app.exit(0));
 	};
 
 	process.on("SIGTERM", () => handleTerminationSignal("SIGTERM"));
@@ -406,6 +394,12 @@ if (!gotTheLock) {
 		await initAppState();
 		initTanstackDbPersistence();
 
+		try {
+			await startNetworkLogger();
+		} catch (error) {
+			console.error("[main] Failed to start network logger:", error);
+		}
+
 		await loadWebviewBrowserExtension();
 
 		// Must happen before renderer restore runs
@@ -422,10 +416,6 @@ if (!gotTheLock) {
 		} catch (error) {
 			console.error("[main] Failed to install bundled CLI shim:", error);
 		}
-
-		// Discover and adopt host-services that survived a previous quit
-		// before the tray initializes, so it shows accurate status immediately.
-		await getHostServiceCoordinator().discoverAll();
 
 		if (IS_DEV) {
 			getHostServiceCoordinator().enableDevReload(async () => {

@@ -24,11 +24,9 @@ import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiOutlineCog6Tooth } from "react-icons/hi2";
-import { V2AvailableBanner } from "renderer/components/V2AvailableBanner";
 import { useHotkeyDisplay } from "renderer/hotkeys";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
-import { useV2WorkspaceNavigationStore } from "renderer/stores/v2-workspace-navigation";
 import { DashboardSidebarHeader } from "./components/DashboardSidebarHeader";
 import { DashboardSidebarHelpMenu } from "./components/DashboardSidebarHelpMenu";
 import { DashboardSidebarHoverCardOverlay } from "./components/DashboardSidebarHoverCardOverlay";
@@ -49,7 +47,6 @@ interface SortableProjectWrapperProps {
 	project: DashboardSidebarProject;
 	isCollapsed: boolean;
 	isDraggingProject: boolean;
-	activeWorkspaceId: string | null;
 	workspaceShortcutLabels: Map<string, string>;
 	onWorkspaceHover: (workspaceId: string) => void | Promise<void>;
 	onToggleCollapse: (projectId: string) => void;
@@ -59,7 +56,6 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 	project,
 	isCollapsed,
 	isDraggingProject,
-	activeWorkspaceId,
 	workspaceShortcutLabels,
 	onWorkspaceHover,
 	onToggleCollapse,
@@ -86,7 +82,6 @@ const SortableProjectWrapper = memo(function SortableProjectWrapper({
 				project={project}
 				isSidebarCollapsed={isCollapsed}
 				isDraggingProject={isDraggingProject}
-				activeWorkspaceId={activeWorkspaceId}
 				workspaceShortcutLabels={workspaceShortcutLabels}
 				onWorkspaceHover={onWorkspaceHover}
 				onToggleCollapse={onToggleCollapse}
@@ -109,11 +104,7 @@ export function DashboardSidebar({
 	const isSettingsOpen = !!matchRoute({ to: "/settings", fuzzy: true });
 	const { activeHostUrl } = useLocalHostService();
 	const v2RouteMatch = matchRoute({ to: "/v2-workspace/$workspaceId" });
-	const routeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
-	const pendingV2WorkspaceId = useV2WorkspaceNavigationStore(
-		(state) => state.pendingWorkspaceId,
-	);
-	const activeV2WorkspaceId = pendingV2WorkspaceId ?? routeV2WorkspaceId;
+	const activeV2WorkspaceId = v2RouteMatch ? v2RouteMatch.workspaceId : null;
 
 	const sensors = useSensors(
 		useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
@@ -212,7 +203,6 @@ export function DashboardSidebar({
 											project={project}
 											isCollapsed={isCollapsed}
 											isDraggingProject={activeProject != null}
-											activeWorkspaceId={activeV2WorkspaceId}
 											workspaceShortcutLabels={workspaceShortcutLabels}
 											onWorkspaceHover={refreshWorkspacePullRequest}
 											onToggleCollapse={toggleProjectCollapsed}
@@ -227,7 +217,6 @@ export function DashboardSidebar({
 												<DashboardSidebarProjectSection
 													project={activeProject}
 													isSidebarCollapsed={isCollapsed}
-													activeWorkspaceId={activeV2WorkspaceId}
 													isDraggingProject
 													workspaceShortcutLabels={workspaceShortcutLabels}
 													onWorkspaceHover={() => {}}
@@ -248,7 +237,6 @@ export function DashboardSidebar({
 								projectName={activeV2Project.name}
 							/>
 						)}
-						{!isCollapsed && <V2AvailableBanner />}
 						<div
 							className={cn(
 								"border-t border-border",

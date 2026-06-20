@@ -1,6 +1,7 @@
 import type { ExternalApp } from "@superset/local-db";
-import type { LucideIcon } from "lucide-react";
+import type { ElementType } from "react";
 import type { HotkeyId } from "renderer/hotkeys/registry";
+import type { HostServiceAvailabilityStatus } from "renderer/lib/host-service-unavailable";
 
 export type SectionId = "workspace" | "actions" | "navigation";
 
@@ -18,6 +19,9 @@ export interface CommandContext {
 		preferredOpenInApp?: ExternalApp;
 	} | null;
 	activeHostUrl: string | null;
+	activeOrganizationId: string | null;
+	activeOrganizationName: string | null;
+	hostServiceStatus: HostServiceAvailabilityStatus;
 	localMachineId: string | null;
 	notificationSoundsMuted: boolean;
 	navigate: (path: string) => void;
@@ -28,7 +32,7 @@ export interface Command {
 	id: string;
 	title: string;
 	section: SectionId;
-	icon?: LucideIcon;
+	icon?: ElementType<{ className?: string }>;
 	iconUrl?: string;
 	keywords?: string[];
 	hotkeyId?: HotkeyId;

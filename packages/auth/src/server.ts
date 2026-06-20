@@ -38,6 +38,17 @@ import { formatPrice, getOrganizationOwners } from "./utils";
 
 const qstash = new Client({ token: env.QSTASH_TOKEN });
 
+const userOptions = {
+	additionalFields: {
+		onboardedAt: {
+			type: "date",
+			required: false,
+			input: false,
+			fieldName: "onboarded_at",
+		},
+	},
+} as const;
+
 const NOTIFY_SLACK_URL = `${env.NEXT_PUBLIC_API_URL}/api/integrations/stripe/jobs/notify-slack`;
 const desktopDevPort = process.env.DESKTOP_VITE_PORT || "5173";
 const desktopDevOrigins =
@@ -47,6 +58,26 @@ const desktopDevOrigins =
 				`http://127.0.0.1:${desktopDevPort}`,
 			]
 		: [];
+
+function serializeCancellationDetails(
+	cancellationDetails?: Stripe.Subscription.CancellationDetails | null,
+) {
+	try {
+		if (!cancellationDetails) return undefined;
+
+		return {
+			comment: cancellationDetails.comment,
+			feedback: cancellationDetails.feedback,
+			reason: cancellationDetails.reason,
+		};
+	} catch (error) {
+		console.error(
+			"[stripe/subscription-cancel] Failed to serialize cancellation details:",
+			error,
+		);
+		return undefined;
+	}
+}
 
 export const auth = betterAuth({
 	baseURL: env.NEXT_PUBLIC_API_URL,
@@ -80,6 +111,7 @@ export const auth = betterAuth({
 			maxAge: 60 * 5,
 		},
 	},
+	user: userOptions,
 	advanced: {
 		crossSubDomainCookies: {
 			enabled: true,
@@ -88,6 +120,10 @@ export const auth = betterAuth({
 		database: {
 			generateId: false,
 		},
+	},
+	emailAndPassword: {
+		enabled: process.env.NODE_ENV === "development",
+		autoSignIn: true,
 	},
 	socialProviders: {
 		github: {
@@ -310,7 +346,7 @@ export const auth = betterAuth({
 			},
 			organizationHooks: {
 				beforeCreateInvitation: async (data) => {
-					const { inviterId, organizationId, role } = data.invitation;
+					const { inviterId, organizationId, role, teamId } = data.invitation;
 
 					const { success } = await invitationRateLimit.limit(inviterId);
 					if (!success) {
@@ -338,22 +374,37 @@ export const auth = betterAuth({
 					) {
 						throw new Error("Cannot invite users with this role");
 					}
+
+					if (!teamId) {
+						const oldestTeam = await db.query.teams.findFirst({
+							where: eq(authSchema.teams.organizationId, organizationId),
+							orderBy: asc(authSchema.teams.createdAt),
+							columns: { id: true },
+						});
+						if (oldestTeam) {
+							return {
+								data: { ...data.invitation, teamId: oldestTeam.id },
+							};
+						}
+					}
 				},
 
 				afterCreateOrganization: async ({ organization, user }) => {
-					const customer = await stripeClient.customers.create({
-						name: organization.name,
-						email: user.email,
-						metadata: {
-							organizationId: organization.id,
-							organizationSlug: organization.slug,
-						},
-					});
+					if (process.env.NODE_ENV !== "development") {
+						const customer = await stripeClient.customers.create({
+							name: organization.name,
+							email: user.email,
+							metadata: {
+								organizationId: organization.id,
+								organizationSlug: organization.slug,
+							},
+						});
 
-					await db
-						.update(authSchema.organizations)
-						.set({ stripeCustomerId: customer.id })
-						.where(eq(authSchema.organizations.id, organization.id));
+						await db
+							.update(authSchema.organizations)
+							.set({ stripeCustomerId: customer.id })
+							.where(eq(authSchema.organizations.id, organization.id));
+					}
 
 					await seedDefaultStatuses(organization.id);
 				},
@@ -725,40 +776,51 @@ export const auth = betterAuth({
 			},
 		}),
 		bearer(),
-		customSession(async ({ user, session: baseSession }) => {
-			const session = baseSession as typeof sessions.$inferSelect;
-			const { activeOrganizationId, allMemberships, membership } =
-				await resolveSessionOrganizationState({
-					userId: session.userId ?? user.id,
-					session,
+		customSession(
+			async ({ user, session: baseSession }) => {
+				const session = baseSession as typeof sessions.$inferSelect;
+				const { activeOrganizationId, allMemberships, membership } =
+					await resolveSessionOrganizationState({
+						userId: session.userId ?? user.id,
+						session,
+					});
+
+				const organizationIds = [
+					...new Set(allMemberships.map((m) => m.organizationId)),
+				];
+
+				let plan: string | null = null;
+				if (activeOrganizationId) {
+					const subscription = await db.query.subscriptions.findFirst({
+						where: and(
+							eq(subscriptions.referenceId, activeOrganizationId),
+							eq(subscriptions.status, "active"),
+						),
+					});
+					plan = subscription?.plan ?? null;
+				}
+
+				// additionalFields declares onboardedAt for client typing, but the
+				// drizzle adapter doesn't surface it on the passed-in user — read it
+				// explicitly so the onboarding gate is deterministic.
+				const userRow = await db.query.users.findFirst({
+					where: eq(authSchema.users.id, user.id),
+					columns: { onboardedAt: true },
 				});
 
-			const organizationIds = [
-				...new Set(allMemberships.map((m) => m.organizationId)),
-			];
-
-			let plan: string | null = null;
-			if (activeOrganizationId) {
-				const subscription = await db.query.subscriptions.findFirst({
-					where: and(
-						eq(subscriptions.referenceId, activeOrganizationId),
-						eq(subscriptions.status, "active"),
-					),
-				});
-				plan = subscription?.plan ?? null;
-			}
-
-			return {
-				user,
-				session: {
-					...session,
-					activeOrganizationId,
-					organizationIds,
-					role: membership?.role,
-					plan,
-				},
-			};
-		}),
+				return {
+					user: { ...user, onboardedAt: userRow?.onboardedAt ?? null },
+					session: {
+						...session,
+						activeOrganizationId,
+						organizationIds,
+						role: membership?.role,
+						plan,
+					},
+				};
+			},
+			{ user: userOptions },
+		),
 		stripe({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
@@ -907,7 +969,11 @@ export const auth = betterAuth({
 					}
 				},
 
-				onSubscriptionCancel: async ({ subscription, stripeSubscription }) => {
+				onSubscriptionCancel: async ({
+					subscription,
+					stripeSubscription,
+					cancellationDetails,
+				}) => {
 					const org = await db.query.organizations.findFirst({
 						where: eq(authSchema.organizations.id, subscription.referenceId),
 					});
@@ -944,6 +1010,10 @@ export const auth = betterAuth({
 							body: {
 								eventType: "subscription_cancelled",
 								stripeSubscriptionId: stripeSubscription.id,
+								cancellationDetails: serializeCancellationDetails(
+									cancellationDetails ??
+										stripeSubscription.cancellation_details,
+								),
 							},
 							retries: 3,
 						});

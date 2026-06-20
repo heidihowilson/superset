@@ -5,14 +5,8 @@ import type { HostServiceContext } from "../../../../types";
 
 export type EnsureMainWorkspaceContext = Pick<
 	HostServiceContext,
-	"api" | "db" | "git" | "organizationId"
+	"api" | "db" | "git" | "organizationId" | "clientMachineId"
 >;
-
-const mainWorkspaceEnsuresInFlight = new Map<string, Promise<{ id: string }>>();
-
-function mainWorkspaceEnsureKey(projectId: string, repoPath: string): string {
-	return `${projectId}\0${repoPath}`;
-}
 
 async function getCurrentBranchName(
 	git: Awaited<ReturnType<EnsureMainWorkspaceContext["git"]>>,
@@ -65,30 +59,6 @@ export async function ensureMainWorkspaceStrict(
 	projectId: string,
 	repoPath: string,
 ): Promise<{ id: string }> {
-	const key = mainWorkspaceEnsureKey(projectId, repoPath);
-	const inFlight = mainWorkspaceEnsuresInFlight.get(key);
-	if (inFlight) return await inFlight;
-
-	const promise = ensureMainWorkspaceStrictUncoalesced(
-		ctx,
-		projectId,
-		repoPath,
-	);
-	mainWorkspaceEnsuresInFlight.set(key, promise);
-	try {
-		return await promise;
-	} finally {
-		if (mainWorkspaceEnsuresInFlight.get(key) === promise) {
-			mainWorkspaceEnsuresInFlight.delete(key);
-		}
-	}
-}
-
-async function ensureMainWorkspaceStrictUncoalesced(
-	ctx: EnsureMainWorkspaceContext,
-	projectId: string,
-	repoPath: string,
-): Promise<{ id: string }> {
 	const git = await ctx.git(repoPath);
 	const branch = await getCurrentBranchName(git);
 	if (!branch) {
@@ -112,6 +82,7 @@ async function ensureMainWorkspaceStrictUncoalesced(
 		branch,
 		hostId: host.machineId,
 		type: "main",
+		clientMachineId: ctx.clientMachineId ?? getHostId(),
 	});
 
 	ctx.db

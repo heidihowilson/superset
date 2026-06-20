@@ -127,11 +127,7 @@ describe("bug-hunt-3: workspace.delete + dirty worktree", () => {
 		repo.dispose();
 	});
 
-	test("workspace.delete (legacy v1 API) lets a dirty workspace be deleted without warning", async () => {
-		// This pins legacy behavior. The new v2 `workspaceCleanup.destroy`
-		// has a phase-0 dirty check; `workspace.delete` does not. If a
-		// future PR adds a dirty check to `workspace.delete`, this test
-		// will flip and signal the change.
+	test("workspace.delete forces removal through the v2 cleanup saga", async () => {
 		const workspaceId = randomUUID();
 		const worktreePath = join(repo.repoPath, ".worktrees", "feature-dirty");
 		await repo.git.raw([
@@ -167,8 +163,10 @@ describe("bug-hunt-3: workspace.delete + dirty worktree", () => {
 			.run();
 
 		const result = await host.trpc.workspace.delete.mutate({ id: workspaceId });
-		// No CONFLICT: dirty work is silently destroyed by the legacy path.
-		expect(result).toEqual({ success: true });
+		expect(result.success).toBe(true);
+		expect(result.worktreeRemoved).toBe(true);
+		expect(result.warnings).toEqual([]);
+		expect(existsSync(worktreePath)).toBe(false);
 	});
 });
 
@@ -238,7 +236,7 @@ describe("bug-hunt-3: more concurrency probes", () => {
 		repo.dispose();
 	});
 
-	test("parallel workspace.create calls for different branches retry .git/config lock contention", async () => {
+	test("BUG: parallel workspace.create calls for different branches can race on the same .git/config", async () => {
 		host = await createTestHost({
 			apiOverrides: {
 				"host.ensure.mutate": () => ({ machineId: "m1" }),
@@ -261,29 +259,18 @@ describe("bug-hunt-3: more concurrency probes", () => {
 		// Two different branches in parallel — they both call
 		// `git worktree add` and `git branch.<name>.base` writes via
 		// ensureMainWorkspace / inside the procedure.
-		const warnings: string[] = [];
-		const originalWarn = console.warn;
-		console.warn = (...args: unknown[]) => {
-			warnings.push(args.map(String).join(" "));
-			originalWarn(...args);
-		};
-		let results: PromiseSettledResult<unknown>[] = [];
-		try {
-			results = await Promise.allSettled([
-				host.trpc.workspaces.create.mutate({
-					projectId,
-					name: "a",
-					branch: "feature/a",
-				}),
-				host.trpc.workspaces.create.mutate({
-					projectId,
-					name: "b",
-					branch: "feature/b",
-				}),
-			]);
-		} finally {
-			console.warn = originalWarn;
-		}
+		const results = await Promise.allSettled([
+			host.trpc.workspaces.create.mutate({
+				projectId,
+				name: "a",
+				branch: "feature/a",
+			}),
+			host.trpc.workspaces.create.mutate({
+				projectId,
+				name: "b",
+				branch: "feature/b",
+			}),
+		]);
 
 		// Document current behavior. If both succeed, great — we have no
 		// bug. If one fails with a config-lock or worktree-lock error,
@@ -298,13 +285,5 @@ describe("bug-hunt-3: more concurrency probes", () => {
 		// We currently expect this to be tolerated. If it starts failing,
 		// flip to a `test.todo` documenting the regression.
 		expect(failures.length).toBe(0);
-		expect(
-			warnings.some(
-				(warning) =>
-					warning.includes("could not lock config file") ||
-					warning.includes("failed to record base branch") ||
-					warning.includes("failed to set push.autoSetupRemote"),
-			),
-		).toBe(false);
 	});
 });

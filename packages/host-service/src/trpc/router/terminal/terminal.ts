@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getSupervisor, waitForDaemonReady } from "../../../daemon";
 import { terminalSessions, workspaces } from "../../../db/schema";
 import {
+	countTerminalSessions,
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
 	listTerminalSessions,
@@ -12,7 +13,6 @@ import {
 } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
-import { remoteControlRouter } from "./remote-control";
 
 const createSessionInputSchema = z.object({
 	workspaceId: z.string(),
@@ -119,6 +119,21 @@ export const terminalRouter = router({
 			}),
 		})),
 
+	countBackgroundSessions: protectedProcedure
+		.input(
+			z.object({
+				workspaceId: z.string(),
+				attachedTerminalIds: z.array(z.string()).default([]),
+			}),
+		)
+		.query(({ input }) => ({
+			count: countTerminalSessions({
+				workspaceId: input.workspaceId,
+				includeExited: false,
+				excludeTerminalIds: input.attachedTerminalIds,
+			}),
+		})),
+
 	writeInput: protectedProcedure
 		.input(
 			z.object({
@@ -176,10 +191,9 @@ export const terminalRouter = router({
 			}
 
 			await disposeSessionAndWait(input.terminalId, ctx.db);
+			ctx.terminalAgentStore.markTerminalExited(input.terminalId);
 			return { terminalId: input.terminalId, status: "disposed" as const };
 		}),
 
 	daemon: daemonRouter,
-
-	remoteControl: remoteControlRouter,
 });

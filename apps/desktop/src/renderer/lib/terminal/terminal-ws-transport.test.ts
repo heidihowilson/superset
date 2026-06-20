@@ -1,10 +1,14 @@
-import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import type { Terminal as XTerm } from "@xterm/xterm";
 import {
-	connect,
-	createTransport,
-	disposeTransport,
-} from "./terminal-ws-transport";
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	jest,
+	setSystemTime,
+	test,
+} from "bun:test";
+import type { Terminal as XTerm } from "@xterm/xterm";
+import { connect, createTransport } from "./terminal-ws-transport";
 
 type Listener = (event: {
 	data?: unknown;
@@ -67,82 +71,55 @@ class MockWebSocket {
 
 const originalWebSocket = globalThis.WebSocket;
 
+// `window` is aliased to `globalThis` by the xterm-env-polyfill preload, and
+// `globalThis.addEventListener` is absent on Linux CI runtimes, so the transport's
+// `window.addEventListener` call throws there. Guarantee the methods exist.
+const win = globalThis.window as unknown as Record<string, unknown> | undefined;
+const originalAddEventListener = win?.addEventListener;
+const originalRemoveEventListener = win?.removeEventListener;
+
 function createMockTerminal(
 	cols = 101,
 	rows = 27,
-): XTerm & {
-	disposedInputListenerCount(): number;
-	emitData(data: string): void;
-} {
-	const dataListeners: Array<{
-		disposed: boolean;
-		listener: (data: string) => void;
-	}> = [];
+): XTerm & { emitData(data: string): void } {
+	let onDataListener: ((data: string) => void) | null = null;
 	return {
 		cols,
 		rows,
 		onData: (listener: (data: string) => void) => {
-			const record = { disposed: false, listener };
-			dataListeners.push(record);
-			return {
-				dispose() {
-					record.disposed = true;
-				},
-			};
-		},
-		disposedInputListenerCount() {
-			return dataListeners.filter((record) => record.disposed).length;
+			onDataListener = listener;
+			return { dispose() {} };
 		},
 		emitData(data: string) {
-			for (const record of dataListeners) {
-				if (!record.disposed) record.listener(data);
-			}
+			onDataListener?.(data);
 		},
 		write() {},
 		writeln() {},
-	} as unknown as XTerm & {
-		disposedInputListenerCount(): number;
-		emitData(data: string): void;
-	};
+	} as unknown as XTerm & { emitData(data: string): void };
 }
 
 beforeEach(() => {
 	MockWebSocket.instances = [];
 	globalThis.WebSocket = MockWebSocket as unknown as typeof WebSocket;
+	if (win && typeof win.addEventListener !== "function") {
+		win.addEventListener = () => {};
+	}
+	if (win && typeof win.removeEventListener !== "function") {
+		win.removeEventListener = () => {};
+	}
 });
 
 afterEach(() => {
 	globalThis.WebSocket = originalWebSocket;
+	if (win) {
+		win.addEventListener = originalAddEventListener;
+		win.removeEventListener = originalRemoveEventListener;
+	}
+	setSystemTime();
+	jest.useRealTimers();
 });
 
 describe("terminal-ws-transport", () => {
-	test("can suppress replay on the initial connect when xterm already has content", () => {
-		const transport = createTransport();
-		const terminal = createMockTerminal();
-
-		connect(transport, terminal, "ws://host/terminal/t1", undefined, {
-			replay: false,
-		});
-
-		const socket = MockWebSocket.instances[0];
-		expect(socket?.url).toBe("ws://host/terminal/t1?replay=0");
-	});
-
-	test("skips replay after PTY bytes have already landed", () => {
-		const transport = createTransport();
-		const terminal = createMockTerminal();
-
-		connect(transport, terminal, "ws://host/terminal/t1");
-		const firstSocket = MockWebSocket.instances[0];
-		if (!firstSocket) throw new Error("expected first websocket instance");
-		firstSocket.message(new Uint8Array([1, 2, 3]).buffer);
-
-		connect(transport, terminal, "ws://host/terminal/t2");
-
-		const secondSocket = MockWebSocket.instances[1];
-		expect(secondSocket?.url).toBe("ws://host/terminal/t2?replay=0");
-	});
-
 	test("server-sent error routes to logs, not xterm, and stops reconnect", () => {
 		const transport = createTransport();
 		const writelnCalls: string[] = [];
@@ -207,66 +184,27 @@ describe("terminal-ws-transport", () => {
 		]);
 	});
 
-	test("reconnecting replaces the previous xterm input subscription", () => {
+	test("recovers a half-open socket after the machine resumes from sleep", () => {
+		jest.useFakeTimers();
+		setSystemTime(new Date("2026-01-01T00:00:00Z"));
+
 		const transport = createTransport();
-		const terminal = createMockTerminal();
+		connect(transport, createMockTerminal(), "ws://host/terminal/t1");
 
-		connect(transport, terminal, "ws://host/terminal/t1");
-		const firstSocket = MockWebSocket.instances[0];
-		if (!firstSocket) throw new Error("expected first websocket instance");
-		firstSocket.open();
-		firstSocket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
-
-		connect(transport, terminal, "ws://host/terminal/t2");
-		const secondSocket = MockWebSocket.instances[1];
-		if (!secondSocket) throw new Error("expected second websocket instance");
-		secondSocket.open();
-		secondSocket.message(
-			JSON.stringify({ type: "attached", terminalId: "t2" }),
-		);
-		terminal.emitData("x");
-
-		expect(firstSocket.readyState).toBe(MockWebSocket.CLOSED);
-		expect(terminal.disposedInputListenerCount()).toBe(1);
-		expect(firstSocket.sent.map((payload) => JSON.parse(payload))).toEqual([
-			{ type: "resize", cols: 101, rows: 27 },
-		]);
-		expect(secondSocket.sent.map((payload) => JSON.parse(payload))).toEqual([
-			{ type: "resize", cols: 101, rows: 27 },
-			{ type: "input", data: "x" },
-		]);
-	});
-
-	test("dispose clears pending reconnect and title timers", async () => {
-		const transport = createTransport();
-		const terminal = createMockTerminal();
-		const titleListener = mock(() => {});
-		const logListener = mock(() => {});
-		transport.titleListeners.add(titleListener);
-		transport.logListeners.add(logListener);
-
-		connect(transport, terminal, "ws://host/terminal/t1");
 		const socket = MockWebSocket.instances[0];
 		if (!socket) throw new Error("expected websocket instance");
 		socket.open();
-		socket.message(JSON.stringify({ type: "title", title: "busy" }));
 		socket.message(JSON.stringify({ type: "attached", terminalId: "t1" }));
-		socket.close(1006, "lost");
+		expect(transport.connectionState).toBe("open");
 
-		expect(transport._titleNotifyTimer).not.toBeNull();
-		expect(transport._reconnectTimer).not.toBeNull();
+		// Laptop sleeps: the socket dies but never observes it. readyState stays
+		// OPEN and no `close` is delivered — that silent death is the bug. Two
+		// minutes pass (clock jumps), then the watchdog tick runs on wake.
+		setSystemTime(new Date("2026-01-01T00:02:00Z"));
+		jest.advanceTimersByTime(120_000);
 
-		disposeTransport(transport);
-
-		expect(transport._titleNotifyTimer).toBeNull();
-		expect(transport._reconnectTimer).toBeNull();
-		expect(transport._writeOutput).toBeNull();
-		expect(transport.titleListeners.size).toBe(0);
-		expect(transport.logListeners.size).toBe(0);
-
-		await new Promise((resolve) => setTimeout(resolve, 100));
-
-		expect(titleListener).not.toHaveBeenCalled();
-		expect(logListener).toHaveBeenCalledTimes(1);
+		// Recovery: the wall-clock-gap watchdog drops the wedged socket and dials
+		// a fresh one. Without it, only the original socket would ever exist.
+		expect(MockWebSocket.instances.length).toBe(2);
 	});
 });

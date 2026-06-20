@@ -3,7 +3,7 @@ export interface NormalizedPR {
 	number: number;
 	url: string;
 	title: string;
-	state: "open" | "closed" | "merged" | "draft";
+	state: "open" | "closed" | "merged" | "draft" | "queued";
 	reviewDecision: "approved" | "changes_requested" | "pending";
 	checksStatus: "success" | "failure" | "pending" | "none";
 	checks: NormalizedCheck[];
@@ -30,5 +30,6 @@ export interface NormalizedComment {
 	/** "LEFT" = deletions side, "RIGHT" = additions. Only set for review threads. */
 	diffSide?: "LEFT" | "RIGHT";
 	isResolved: boolean;
+	isOutdated?: boolean;
 	threadId?: string;
 }

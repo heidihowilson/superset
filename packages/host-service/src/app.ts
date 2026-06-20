@@ -17,14 +17,8 @@ import type { GitCredentialProvider } from "./runtime/git";
 import { createGitFactory } from "./runtime/git";
 import { runMainWorkspaceSweep } from "./runtime/main-workspace-sweep";
 import { PullRequestRuntimeManager } from "./runtime/pull-requests";
-import { registerRemoteControlRoute } from "./terminal/remote-control/route";
-import {
-	initRemoteControlSecret,
-	revokeAllSessions,
-	startRemoteControlExpirySweep,
-	stopRemoteControlExpirySweep,
-} from "./terminal/remote-control/session-manager";
 import { registerWorkspaceTerminalRoute } from "./terminal/terminal";
+import { TerminalAgentStore } from "./terminal-agents";
 import { appRouter } from "./trpc/router";
 import {
 	execGh as defaultExecGh,
@@ -39,7 +33,6 @@ export interface CreateAppOptions {
 		cloudApiUrl: string;
 		migrationsFolder: string;
 		allowedOrigins: string[];
-		hostServiceSecret?: string;
 	};
 	providers: {
 		auth: ApiAuthProvider;
@@ -67,6 +60,7 @@ export interface CreateAppResult {
 	app: Hono;
 	injectWebSocket: ReturnType<typeof createNodeWebSocket>["injectWebSocket"];
 	api: ApiClient;
+	db: HostDb;
 	dispose: () => Promise<void>;
 }
 
@@ -129,12 +123,19 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		"*",
 		cors({
 			origin: config.allowedOrigins,
-			allowHeaders: ["Content-Type", "Authorization", "trpc-accept"],
+			allowHeaders: [
+				"Content-Type",
+				"Authorization",
+				"trpc-accept",
+				"x-superset-client-machine-id",
+			],
 		}),
 	);
 
 	const eventBus = new EventBus({ db, filesystem, gitWatcher });
 	eventBus.start();
+
+	const terminalAgentStore = new TerminalAgentStore();
 
 	// Backfill `kind='main'` v2 workspaces for projects already set up before
 	// this column shipped. Idempotent; runs in the background so it doesn't
@@ -158,11 +159,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 	};
 	app.use("/terminal/*", wsAuth);
 	app.use("/events", wsAuth);
-	// `/remote-control/*` does NOT use `wsAuth` — viewers come in via the
-	// relay tunnel (already PSK-authenticated end-to-end) and authenticate
-	// per-session with an HMAC `remoteControlToken` validated by
-	// `authenticateSession` inside the route handler. The HMAC is the
-	// credential we ship to the browser, not the host PSK.
 
 	registerEventBusRoute({ app, eventBus, upgradeWebSocket });
 	registerWorkspaceTerminalRoute({
@@ -172,12 +168,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		upgradeWebSocket,
 	});
 
-	if (config.hostServiceSecret) {
-		initRemoteControlSecret(config.hostServiceSecret);
-		startRemoteControlExpirySweep();
-		registerRemoteControlRoute({ app, upgradeWebSocket });
-	}
-
 	app.use(
 		"/trpc/*",
 		trpcServer({
@@ -186,14 +176,18 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 				const isAuthenticated = await providers.hostAuth.validate(c.req.raw);
 				return {
 					git,
+					credentials: providers.credentials,
 					github,
 					execGh,
 					api,
 					db,
 					runtime,
 					eventBus,
+					terminalAgentStore,
 					organizationId: config.organizationId,
 					isAuthenticated,
+					clientMachineId:
+						c.req.header("x-superset-client-machine-id") ?? undefined,
 				} as Record<string, unknown>;
 			},
 		}),
@@ -205,17 +199,7 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		// not skip the others, otherwise a flaky `.stop()` could leak the
 		// open SQLite handle for the rest of the process lifetime.
 		try {
-			stopRemoteControlExpirySweep();
-		} catch (err) {
-			console.warn("[host-service] stopRemoteControlExpirySweep failed:", err);
-		}
-		try {
-			revokeAllSessions("host-shutdown");
-		} catch (err) {
-			console.warn("[host-service] revokeAllSessions failed:", err);
-		}
-		try {
-			await pullRequestRuntime.stop();
+			pullRequestRuntime.stop();
 		} catch (err) {
 			console.warn("[host-service] pullRequestRuntime.stop failed:", err);
 		}
@@ -229,11 +213,6 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		} catch (err) {
 			console.warn("[host-service] gitWatcher.close failed:", err);
 		}
-		try {
-			await filesystem.close();
-		} catch (err) {
-			console.warn("[host-service] filesystem.close failed:", err);
-		}
 		if (ownsDb) {
 			try {
 				(db as unknown as { $client?: { close: () => void } }).$client?.close();
@@ -243,5 +222,5 @@ export function createApp(options: CreateAppOptions): CreateAppResult {
 		}
 	};
 
-	return { app, injectWebSocket, api, dispose };
+	return { app, injectWebSocket, api, db, dispose };
 }

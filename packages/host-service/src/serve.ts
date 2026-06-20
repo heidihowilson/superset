@@ -2,12 +2,16 @@ import { serve } from "@hono/node-server";
 import { createApp } from "./app";
 import { getSupervisor, startDaemonBootstrap } from "./daemon";
 import { env } from "./env";
-import { JwtApiAuthProvider } from "./providers/auth";
+import {
+	ConfigFileSessionTokenSource,
+	JwtApiAuthProvider,
+} from "./providers/auth";
 import { LocalGitCredentialProvider } from "./providers/git";
 import { PskHostAuthProvider } from "./providers/host-auth";
 import { LocalModelProvider } from "./providers/model-providers";
 import { installProcessSafetyNet } from "./safety";
 import { initTerminalBaseEnv, resolveTerminalBaseEnv } from "./terminal/env";
+import { startTerminalReaper } from "./terminal/reaper";
 import { connectRelay } from "./tunnel";
 
 async function main(): Promise<void> {
@@ -26,19 +30,29 @@ async function main(): Promise<void> {
 	// daemon takes time to come up or fails entirely.
 	startDaemonBootstrap(env.ORGANIZATION_ID);
 
+	const configTokenSource = env.SUPERSET_AUTH_CONFIG_PATH
+		? new ConfigFileSessionTokenSource({
+				configPath: env.SUPERSET_AUTH_CONFIG_PATH,
+				apiUrl: env.SUPERSET_API_URL,
+			})
+		: null;
 	const authProvider = new JwtApiAuthProvider({
-		getSessionToken: async () => env.AUTH_TOKEN,
+		getSessionToken: configTokenSource
+			? () => configTokenSource.getSessionToken()
+			: async () => env.AUTH_TOKEN,
+		onInvalidateCache: configTokenSource
+			? () => configTokenSource.invalidateCache()
+			: undefined,
 		apiUrl: env.SUPERSET_API_URL,
 	});
 
-	const { app, injectWebSocket, api } = createApp({
+	const { app, injectWebSocket, api, db } = createApp({
 		config: {
 			organizationId: env.ORGANIZATION_ID,
 			dbPath: env.HOST_DB_PATH,
 			cloudApiUrl: env.SUPERSET_API_URL,
 			migrationsFolder: env.HOST_MIGRATIONS_FOLDER,
 			allowedOrigins: env.CORS_ORIGINS ?? [],
-			hostServiceSecret: env.HOST_SERVICE_SECRET,
 		},
 		providers: {
 			auth: authProvider,
@@ -81,6 +95,8 @@ async function main(): Promise<void> {
 		// reach `main().catch(...)` and exit with a non-zero code.
 		installProcessSafetyNet();
 		console.log(`[host-service] listening on http://localhost:${info.port}`);
+
+		startTerminalReaper(db);
 
 		if (env.RELAY_URL) {
 			void connectRelay({

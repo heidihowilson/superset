@@ -53,8 +53,8 @@ export async function makeAppSetup(
 	});
 
 	// macOS: keep the app alive (standard behavior) — tray/dock provide re-entry.
-	// Windows/Linux: quit the app UI. Host-services survive via releaseAll()
-	// and will be re-adopted on next launch.
+	// Windows/Linux: quit the app UI. Host-services are coupled to the app and
+	// stop with it; v1 pty-daemon survives separately.
 	app.on("window-all-closed", () => !PLATFORM.IS_MAC && app.quit());
 
 	return window;
@@ -73,6 +73,13 @@ PLATFORM.IS_WINDOWS &&
 	);
 
 app.commandLine.appendSwitch("force-color-profile", "srgb");
+
+if (env.NODE_ENV === "development" && process.env.RENDERER_REMOTE_DEBUG_PORT) {
+	app.commandLine.appendSwitch(
+		"remote-debugging-port",
+		process.env.RENDERER_REMOTE_DEBUG_PORT,
+	);
+}
 
 // Each xterm pane holds one WebGL context. v2 parking keeps panes alive
 // across workspace switches, so cumulative contexts can reach the low

@@ -8,6 +8,10 @@
 			"types": "./src/constants.ts",
 			"default": "./src/constants.ts"
 		},
+		"./dev-credentials": {
+			"types": "./src/dev-credentials.ts",
+			"default": "./src/dev-credentials.ts"
+		},
 		"./v2-only-user": {
 			"types": "./src/v2-only-user.ts",
 			"default": "./src/v2-only-user.ts"
@@ -112,6 +116,10 @@
 			"types": "./src/github-remote.ts",
 			"default": "./src/github-remote.ts"
 		},
+		"./simple-git-options": {
+			"types": "./src/simple-git-options.ts",
+			"default": "./src/simple-git-options.ts"
+		},
 		"./shell-ready-scanner": {
 			"types": "./src/shell-ready-scanner.ts",
 			"default": "./src/shell-ready-scanner.ts"
@@ -123,10 +131,6 @@
 		"./rrule": {
 			"types": "./src/rrule.ts",
 			"default": "./src/rrule.ts"
-		},
-		"./remote-control-protocol": {
-			"types": "./src/remote-control-protocol.ts",
-			"default": "./src/remote-control-protocol.ts"
 		}
 	},
 	"scripts": {
@@ -144,6 +148,6 @@
 		"@superset/typescript": "workspace:*",
 		"@types/friendly-words": "1.2.2",
 		"bun-types": "1.3.11",
-		"typescript": "5.9.3"
+		"typescript": "6.0.3"
 	}
 }

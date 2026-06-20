@@ -338,10 +338,10 @@ export class Server {
 			}
 		});
 		socket.on("close", () => {
-			this.conns.delete(conn);
+			this.dropConn(conn);
 		});
 		socket.on("error", () => {
-			this.conns.delete(conn);
+			this.dropConn(conn);
 		});
 	}
 
@@ -372,6 +372,7 @@ export class Server {
 				type: "hello-ack",
 				protocol: negotiated,
 				daemonVersion: this.opts.daemonVersion,
+				daemonPid: process.pid,
 			});
 			return;
 		}
@@ -463,7 +464,8 @@ export class Server {
 			this.store.appendOutput(session, chunk);
 			const out: ServerMessage = { type: "output", id: session.id };
 			for (const c of this.conns) {
-				if (c.subscriptions.has(session.id)) c.send(out, chunk);
+				if (!c.subscriptions.has(session.id)) continue;
+				c.send(out, chunk);
 			}
 		});
 		session.pty.onExit((info) => {
@@ -494,6 +496,10 @@ export class Server {
 			// footer for that narrow window.
 			this.store.delete(session.id);
 		});
+	}
+
+	private dropConn(conn: ConnState): void {
+		this.conns.delete(conn);
 	}
 }
 

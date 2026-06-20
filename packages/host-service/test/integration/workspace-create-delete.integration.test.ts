@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { randomUUID } from "node:crypto";
-import { existsSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { TRPCClientError } from "@trpc/client";
 import { eq } from "drizzle-orm";
@@ -48,6 +49,128 @@ describe("workspace.create + workspace.delete integration", () => {
 		// HOME-dependent.
 		expect(persisted?.worktreePath).toMatch(/feature\/new$/);
 		expect(existsSync(persisted?.worktreePath ?? "")).toBe(true);
+	});
+
+	test("create() uses the configured host worktree location", async () => {
+		const customRoot = realpathSync(
+			mkdtempSync(join(tmpdir(), "host-service-worktrees-")),
+		);
+
+		try {
+			const scenario = await createProjectScenario({
+				hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+			});
+			dispose = scenario.dispose;
+
+			await scenario.host.trpc.settings.worktreeLocation.set.mutate({
+				path: customRoot,
+			});
+
+			const result = await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				name: "custom root",
+				branch: "feature/custom-root",
+			});
+
+			const persisted = scenario.host.db
+				.select()
+				.from(workspaces)
+				.where(eq(workspaces.id, result?.workspace?.id ?? ""))
+				.get();
+
+			expect(persisted?.worktreePath).toBe(
+				join(customRoot, scenario.projectId, "feature", "custom-root"),
+			);
+			expect(existsSync(persisted?.worktreePath ?? "")).toBe(true);
+		} finally {
+			rmSync(customRoot, { recursive: true, force: true });
+		}
+	});
+
+	test("create() seeds the host location from the legacy desktop setting", async () => {
+		const previousLegacyValue = process.env.SUPERSET_LEGACY_WORKTREE_BASE_DIR;
+		const legacyRoot = realpathSync(
+			mkdtempSync(join(tmpdir(), "host-service-worktrees-legacy-")),
+		);
+		process.env.SUPERSET_LEGACY_WORKTREE_BASE_DIR = legacyRoot;
+
+		try {
+			const scenario = await createProjectScenario({
+				hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+			});
+			dispose = scenario.dispose;
+
+			const result = await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				name: "legacy root",
+				branch: "feature/legacy-root",
+			});
+
+			const persisted = scenario.host.db
+				.select()
+				.from(workspaces)
+				.where(eq(workspaces.id, result?.workspace?.id ?? ""))
+				.get();
+			const settings =
+				await scenario.host.trpc.settings.worktreeLocation.get.query();
+
+			expect(settings.worktreeBaseDir).toBe(legacyRoot);
+			expect(persisted?.worktreePath).toBe(
+				join(legacyRoot, scenario.projectId, "feature", "legacy-root"),
+			);
+		} finally {
+			if (previousLegacyValue === undefined) {
+				delete process.env.SUPERSET_LEGACY_WORKTREE_BASE_DIR;
+			} else {
+				process.env.SUPERSET_LEGACY_WORKTREE_BASE_DIR = previousLegacyValue;
+			}
+			rmSync(legacyRoot, { recursive: true, force: true });
+		}
+	});
+
+	test("create() lets a project override the host worktree location", async () => {
+		const hostRoot = realpathSync(
+			mkdtempSync(join(tmpdir(), "host-service-worktrees-host-")),
+		);
+		const projectRoot = realpathSync(
+			mkdtempSync(join(tmpdir(), "host-service-worktrees-project-")),
+		);
+
+		try {
+			const scenario = await createProjectScenario({
+				hostOptions: { apiOverrides: cloudFlows.workspaceCreateOk() },
+			});
+			dispose = scenario.dispose;
+
+			await scenario.host.trpc.settings.worktreeLocation.set.mutate({
+				path: hostRoot,
+			});
+			await scenario.host.trpc.project.setWorktreeBaseDir.mutate({
+				projectId: scenario.projectId,
+				path: projectRoot,
+			});
+
+			const result = await scenario.host.trpc.workspaces.create.mutate({
+				projectId: scenario.projectId,
+				name: "project root",
+				branch: "feature/project-root",
+			});
+
+			const persisted = scenario.host.db
+				.select()
+				.from(workspaces)
+				.where(eq(workspaces.id, result?.workspace?.id ?? ""))
+				.get();
+
+			expect(persisted?.worktreePath).toBe(
+				join(projectRoot, scenario.projectId, "feature", "project-root"),
+			);
+			expect(persisted?.worktreePath.startsWith(hostRoot)).toBe(false);
+			expect(existsSync(persisted?.worktreePath ?? "")).toBe(true);
+		} finally {
+			rmSync(hostRoot, { recursive: true, force: true });
+			rmSync(projectRoot, { recursive: true, force: true });
+		}
 	});
 
 	test("create() adopts an existing worktree at a non-canonical path instead of failing on `git worktree add`", async () => {
@@ -271,7 +394,9 @@ describe("workspace.create + workspace.delete integration", () => {
 		const result = await scenario.host.trpc.workspace.delete.mutate({
 			id: scenario.featureWorkspaceId,
 		});
-		expect(result).toEqual({ success: true });
+		expect(result.success).toBe(true);
+		expect(result.worktreeRemoved).toBe(true);
+		expect(result.warnings).toEqual([]);
 
 		expect(existsSync(scenario.worktreePath)).toBe(false);
 		const rows = scenario.host.db
@@ -285,84 +410,6 @@ describe("workspace.create + workspace.delete integration", () => {
 				(c) => c.path === "v2Workspace.delete.mutate",
 			),
 		).toBe(true);
-	});
-
-	test("parallel create() then destroy() churn leaves no duplicate rows or stale worktrees", async () => {
-		const scenario = await createProjectScenario({
-			hostOptions: {
-				apiOverrides: {
-					...cloudFlows.workspaceCreateOk(),
-					...cloudFlows.workspaceDeleteOk(),
-				},
-			},
-		});
-		dispose = scenario.dispose;
-
-		const branches = ["feature/churn-a", "feature/churn-b", "feature/churn-c"];
-		const createResults = await Promise.all(
-			branches.map((branch) =>
-				scenario.host.trpc.workspaces.create.mutate({
-					projectId: scenario.projectId,
-					name: branch,
-					branch,
-				}),
-			),
-		);
-
-		const createdRows = createResults.map((result) => result.workspace);
-		expect(createdRows.map((row) => row.branch).sort()).toEqual(
-			branches.toSorted(),
-		);
-
-		const rowsAfterCreate = scenario.host.db.select().from(workspaces).all();
-		const featureRows = rowsAfterCreate.filter((row) =>
-			branches.includes(row.branch),
-		);
-		const mainRows = rowsAfterCreate.filter(
-			(row) => row.worktreePath === scenario.repo.repoPath,
-		);
-		expect(featureRows).toHaveLength(branches.length);
-		expect(mainRows).toHaveLength(1);
-		for (const row of featureRows) {
-			expect(existsSync(row.worktreePath)).toBe(true);
-		}
-
-		const destroyResults = await Promise.all(
-			createdRows.map((row) =>
-				scenario.host.trpc.workspaceCleanup.destroy.mutate({
-					workspaceId: row.id,
-					deleteBranch: true,
-					force: true,
-				}),
-			),
-		);
-		expect(destroyResults.every((result) => result.success)).toBe(true);
-
-		const rowsAfterDestroy = scenario.host.db.select().from(workspaces).all();
-		expect(
-			rowsAfterDestroy.filter((row) => branches.includes(row.branch)),
-		).toHaveLength(0);
-		expect(
-			rowsAfterDestroy.filter(
-				(row) => row.worktreePath === scenario.repo.repoPath,
-			),
-		).toHaveLength(1);
-		for (const row of featureRows) {
-			expect(existsSync(row.worktreePath)).toBe(false);
-		}
-
-		const worktreeList = await scenario.repo.git.raw([
-			"worktree",
-			"list",
-			"--porcelain",
-		]);
-		for (const row of featureRows) {
-			expect(worktreeList).not.toContain(row.worktreePath);
-		}
-		const localBranches = await scenario.repo.git.branchLocal();
-		for (const branch of branches) {
-			expect(localBranches.all).not.toContain(branch);
-		}
 	});
 
 	test("delete() requires authentication", async () => {

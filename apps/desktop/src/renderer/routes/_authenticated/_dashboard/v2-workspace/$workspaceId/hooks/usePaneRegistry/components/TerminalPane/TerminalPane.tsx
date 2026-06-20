@@ -3,7 +3,6 @@ import { cn } from "@superset/ui/utils";
 import { workspaceTrpc } from "@superset/workspace-client";
 import "@xterm/xterm/css/xterm.css";
 import {
-	memo,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -49,7 +48,7 @@ interface TerminalPaneProps {
 	onRevealPath: (path: string, options?: { isDirectory?: boolean }) => void;
 }
 
-function TerminalPaneComponent({
+export function TerminalPane({
 	ctx,
 	workspaceId,
 	onOpenFile,
@@ -82,6 +81,7 @@ function TerminalPaneComponent({
 	});
 	const baseWebsocketUrl = useWorkspaceWsUrl(`/terminal/${terminalId}`);
 	const themedUrl = new URL(baseWebsocketUrl);
+	themedUrl.searchParams.set("workspaceId", workspaceId);
 	themedUrl.searchParams.set("themeType", themeType);
 	const websocketUrl = themedUrl.toString();
 	const websocketUrlRef = useRef(websocketUrl);
@@ -156,7 +156,10 @@ function TerminalPaneComponent({
 
 	useEffect(() => {
 		if (!ctx.isActive) return;
-		terminalRuntimeRegistry.focus(terminalId, terminalInstanceId);
+
+		terminalRuntimeRegistry
+			.getTerminal(terminalId, terminalInstanceId)
+			?.focus();
 	}, [ctx.isActive, terminalId, terminalInstanceId]);
 
 	const lastInvalidatedOpenSessionRef = useRef<string | null>(null);
@@ -443,18 +446,6 @@ function TerminalPaneComponent({
 		</div>
 	);
 }
-
-export const TerminalPane = memo(
-	TerminalPaneComponent,
-	(prev, next) =>
-		prev.workspaceId === next.workspaceId &&
-		prev.onOpenFile === next.onOpenFile &&
-		prev.onRevealPath === next.onRevealPath &&
-		prev.ctx.store === next.ctx.store &&
-		prev.ctx.isActive === next.ctx.isActive &&
-		prev.ctx.pane.id === next.ctx.pane.id &&
-		prev.ctx.pane.data === next.ctx.pane.data,
-);
 
 // Compute "what would clicking right now do?" for the live link tooltip.
 // Folders use the hardcoded folderIntent rule; files/urls go through the

@@ -147,6 +147,8 @@ export const v2WorkspaceRouter = {
 					projectId: v2Workspaces.projectId,
 					projectName: v2Projects.name,
 					hostId: v2Workspaces.hostId,
+					type: v2Workspaces.type,
+					createdAt: v2Workspaces.createdAt,
 				})
 				.from(v2Workspaces)
 				.innerJoin(
@@ -179,6 +181,8 @@ export const v2WorkspaceRouter = {
 				projectId: row.projectId,
 				projectName: row.projectName ?? "",
 				hostId: row.hostId,
+				type: row.type,
+				createdAt: row.createdAt,
 			}));
 		}),
 
@@ -193,6 +197,7 @@ export const v2WorkspaceRouter = {
 				type: z.enum(v2WorkspaceTypeValues).default("worktree"),
 				taskId: z.string().uuid().optional(),
 				id: z.string().uuid().optional(),
+				clientMachineId: z.string().optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
@@ -258,9 +263,16 @@ export const v2WorkspaceRouter = {
 							host_id: inserted.hostId,
 							branch: inserted.branch,
 							type: inserted.type,
+							host_kind:
+								input.clientMachineId &&
+								input.clientMachineId === inserted.hostId
+									? "local"
+									: "remote",
+							client_machine_id: input.clientMachineId ?? null,
 						},
 					});
-					return inserted;
+					const txid = await getCurrentTxid(tx);
+					return { workspace: inserted, txid };
 				}
 
 				if (input.id) {
@@ -270,7 +282,7 @@ export const v2WorkspaceRouter = {
 							eq(v2Workspaces.organizationId, project.organizationId),
 						),
 					});
-					if (existing) return existing;
+					if (existing) return { workspace: existing, txid: null };
 					const collision = await tx.query.v2Workspaces.findFirst({
 						columns: { id: true },
 						where: eq(v2Workspaces.id, input.id),
@@ -308,16 +320,22 @@ export const v2WorkspaceRouter = {
 								.set(patch)
 								.where(eq(v2Workspaces.id, existing.id))
 								.returning();
-							return updated ?? existing;
+							if (updated) {
+								const txid = await getCurrentTxid(tx);
+								return { workspace: updated, txid };
+							}
+							return { workspace: existing, txid: null };
 						}
-						return existing;
+						return { workspace: existing, txid: null };
 					}
 				}
 
-				return null;
+				return { workspace: null, txid: null };
 			});
 
-			if (result) return result;
+			if (result.workspace) {
+				return { ...result.workspace, txid: result.txid };
+			}
 
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
@@ -357,11 +375,21 @@ export const v2WorkspaceRouter = {
 					});
 				}
 			}
-			await dbWs
-				.update(v2Workspaces)
-				.set({ taskId: input.taskId })
-				.where(eq(v2Workspaces.id, input.workspaceId));
-			return { success: true as const };
+			const txid = await dbWs.transaction(async (tx) => {
+				const [updated] = await tx
+					.update(v2Workspaces)
+					.set({ taskId: input.taskId })
+					.where(eq(v2Workspaces.id, input.workspaceId))
+					.returning({ id: v2Workspaces.id });
+				if (!updated) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Workspace not found",
+					});
+				}
+				return getCurrentTxid(tx);
+			});
+			return { success: true as const, txid };
 		}),
 
 	getFromHost: jwtProcedure
@@ -499,12 +527,17 @@ export const v2WorkspaceRouter = {
 			const patch: { name?: string; branch?: string } = {};
 			if (input.name !== undefined) patch.name = input.name;
 			if (input.branch !== undefined) patch.branch = input.branch;
-			const [updated] = await dbWs
-				.update(v2Workspaces)
-				.set(patch)
-				.where(and(...conditions))
-				.returning();
-			if (updated) return updated;
+			const result = await dbWs.transaction(async (tx) => {
+				const [updated] = await tx
+					.update(v2Workspaces)
+					.set(patch)
+					.where(and(...conditions))
+					.returning();
+				if (!updated) return { updated, txid: null };
+				const txid = await getCurrentTxid(tx);
+				return { updated, txid };
+			});
+			if (result.updated) return { ...result.updated, txid: result.txid };
 
 			// Nothing updated — disambiguate for a useful error. Happy path
 			// already returned above, so this fetch only runs when id/org/name
@@ -563,7 +596,17 @@ export const v2WorkspaceRouter = {
 					message: MAIN_WORKSPACE_DELETE_MESSAGE,
 				});
 			}
-			await dbWs.delete(v2Workspaces).where(eq(v2Workspaces.id, workspace.id));
+			const txid = await dbWs.transaction(async (tx) => {
+				const [deleted] = await tx
+					.delete(v2Workspaces)
+					.where(eq(v2Workspaces.id, workspace.id))
+					.returning({ id: v2Workspaces.id });
+				if (!deleted) return null;
+				return getCurrentTxid(tx);
+			});
+			if (txid === null) {
+				return { success: true, alreadyGone: true as const, txid };
+			}
 
 			posthog.capture({
 				distinctId: ctx.userId,
@@ -578,7 +621,7 @@ export const v2WorkspaceRouter = {
 				},
 			});
 
-			return { success: true, alreadyGone: false as const };
+			return { success: true, alreadyGone: false as const, txid };
 		}),
 
 	// Main workspaces are not normal delete targets. This endpoint is reserved
@@ -617,7 +660,17 @@ export const v2WorkspaceRouter = {
 					message: "Workspace is not a main workspace",
 				});
 			}
-			await dbWs.delete(v2Workspaces).where(eq(v2Workspaces.id, workspace.id));
-			return { success: true, alreadyGone: false as const };
+			const txid = await dbWs.transaction(async (tx) => {
+				const [deleted] = await tx
+					.delete(v2Workspaces)
+					.where(eq(v2Workspaces.id, workspace.id))
+					.returning({ id: v2Workspaces.id });
+				if (!deleted) return null;
+				return getCurrentTxid(tx);
+			});
+			if (txid === null) {
+				return { success: true, alreadyGone: true as const, txid };
+			}
+			return { success: true, alreadyGone: false as const, txid };
 		}),
 } satisfies TRPCRouterRecord;

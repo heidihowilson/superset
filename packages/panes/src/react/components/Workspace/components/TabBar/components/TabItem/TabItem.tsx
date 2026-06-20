@@ -6,10 +6,11 @@ import {
 	ContextMenuSeparator,
 	ContextMenuTrigger,
 } from "@superset/ui/context-menu";
+import { OverflowFadeText } from "@superset/ui/overflow-fade-text";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@superset/ui/tooltip";
 import { cn } from "@superset/ui/utils";
 import { PencilIcon, XIcon } from "lucide-react";
-import { memo, type ReactNode, useCallback, useRef, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { Tab } from "../../../../../../../types";
 import type { PaneRegistry } from "../../../../../../types";
@@ -34,7 +35,7 @@ interface TabItemProps<TData> {
 	accessory?: ReactNode;
 }
 
-function TabItemComponent<TData>({
+export function TabItem<TData>({
 	tab,
 	tabs,
 	registry,
@@ -110,7 +111,8 @@ function TabItemComponent<TData>({
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
-				{/* biome-ignore lint/a11y/noStaticElementInteractions: mousedown selects tab immediately before drag threshold */}
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: clicking a tab selects it */}
+				{/* biome-ignore lint/a11y/useKeyWithClickEvents: tabs are pointer-driven; keyboard nav is out of scope here */}
 				<div
 					ref={setRef}
 					className={cn(
@@ -121,9 +123,10 @@ function TabItemComponent<TData>({
 						isPaneOver && "bg-primary/5",
 						isDragging && "opacity-30",
 					)}
-					onMouseDown={(event) => {
-						if (event.button === 0) onSelect();
-					}}
+					// Select on click, not mousedown: the browser suppresses click after a
+					// drag, so starting a drag (reorder, or merging a tab into a pane) no
+					// longer switches the active tab mid-gesture.
+					onClick={() => onSelect()}
 				>
 					{isEditing ? (
 						<div className="flex h-full w-full shrink-0 items-center px-2">
@@ -143,7 +146,8 @@ function TabItemComponent<TData>({
 								open={isDragging ? false : undefined}
 							>
 								<TooltipTrigger asChild>
-									<button
+									{/* biome-ignore lint/a11y/noStaticElementInteractions: tab selection is handled by the wrapper's mousedown; this title element is intentionally a non-focusable div so clicking a tab never steals focus from the active pane (issue #4967) */}
+									<div
 										className="flex h-full min-w-0 flex-1 items-center gap-1.5 pl-3 pr-1 text-left text-xs transition-colors"
 										onAuxClick={(event) => {
 											if (event.button === 1) {
@@ -152,11 +156,12 @@ function TabItemComponent<TData>({
 											}
 										}}
 										onDoubleClick={startEditing}
-										type="button"
 									>
 										{icon && <span className="shrink-0">{icon}</span>}
-										<span className="min-w-0 flex-1 truncate">{title}</span>
-									</button>
+										<OverflowFadeText className="flex-1">
+											{title}
+										</OverflowFadeText>
+									</div>
 								</TooltipTrigger>
 								<TooltipContent side="bottom" showArrow={false}>
 									{title}
@@ -168,31 +173,25 @@ function TabItemComponent<TData>({
 										{accessory}
 									</span>
 								)}
-								<Tooltip delayDuration={500}>
-									<TooltipTrigger asChild>
-										<Button
-											className={cn(
-												"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
-												isActive ? "hover:bg-foreground/10" : "hover:bg-muted",
-											)}
-											onClick={(event) => {
-												event.stopPropagation();
-												onClose();
-											}}
-											onMouseDown={(event) => {
-												event.stopPropagation();
-											}}
-											size="icon"
-											type="button"
-											variant="ghost"
-										>
-											<XIcon className="size-3.5" />
-										</Button>
-									</TooltipTrigger>
-									<TooltipContent side="top" showArrow={false}>
-										Close
-									</TooltipContent>
-								</Tooltip>
+								<Button
+									aria-label="Close tab"
+									className={cn(
+										"pointer-events-none size-5 cursor-pointer text-current opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100",
+										isActive ? "hover:bg-foreground/10" : "hover:bg-muted",
+									)}
+									onClick={(event) => {
+										event.stopPropagation();
+										onClose();
+									}}
+									onMouseDown={(event) => {
+										event.stopPropagation();
+									}}
+									size="icon"
+									type="button"
+									variant="ghost"
+								>
+									<XIcon className="size-3.5" />
+								</Button>
 							</div>
 						</>
 					)}
@@ -214,21 +213,3 @@ function TabItemComponent<TData>({
 		</ContextMenu>
 	);
 }
-
-function areTabItemPropsEqual<TData>(
-	previous: TabItemProps<TData>,
-	next: TabItemProps<TData>,
-) {
-	return (
-		previous.tab === next.tab &&
-		previous.tabs === next.tabs &&
-		previous.registry === next.registry &&
-		previous.index === next.index &&
-		previous.isActive === next.isActive
-	);
-}
-
-export const TabItem = memo(
-	TabItemComponent,
-	areTabItemPropsEqual,
-) as typeof TabItemComponent;

@@ -3,7 +3,7 @@ import { useCallback, useMemo, useRef } from "react";
 import { useHotkey } from "renderer/hotkeys";
 import { navigateToV2Workspace } from "renderer/routes/_authenticated/_dashboard/utils/workspace-navigation";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
-import { useV2WorkspaceNavigationStore } from "renderer/stores/v2-workspace-navigation";
+import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 import type { DashboardSidebarProject } from "../../types";
 import { getProjectChildrenWorkspaces } from "../../utils/projectChildren";
 
@@ -54,12 +54,17 @@ export function useDashboardSidebarShortcuts(
 	const navigate = useNavigate();
 	const { toggleProjectCollapsed, toggleSectionCollapsed } =
 		useDashboardSidebarState();
+	const { isDeleting } = useDeletingWorkspaces();
 	const flattenedWorkspaces = useMemo(
 		() =>
 			groups
 				.flatMap((project) => getProjectChildrenWorkspaces(project.children))
-				.filter((workspace) => !workspace.creationStatus),
-		[groups],
+				.filter(
+					(workspace) =>
+						workspace.pendingTransaction?.type !== "insert" &&
+						!isDeleting(workspace.id),
+				),
+		[groups, isDeleting],
 	);
 	const workspaceShortcutLabels =
 		useStableWorkspaceShortcutLabels(flattenedWorkspaces);
@@ -109,7 +114,7 @@ export function useDashboardSidebarShortcuts(
 			const workspace = flattenedWorkspaces[index];
 			if (workspace) {
 				revealWorkspace(workspace.id);
-				void navigateToV2Workspace(workspace.id, navigate);
+				navigateToV2Workspace(workspace.id, navigate);
 			}
 		},
 		[flattenedWorkspaces, navigate, revealWorkspace],
@@ -132,33 +137,29 @@ export function useDashboardSidebarShortcuts(
 	});
 	const currentWorkspaceId =
 		currentWorkspaceMatch !== false ? currentWorkspaceMatch.workspaceId : null;
-	const pendingWorkspaceId = useV2WorkspaceNavigationStore(
-		(state) => state.pendingWorkspaceId,
-	);
-	const activeWorkspaceId = pendingWorkspaceId ?? currentWorkspaceId;
 
 	useHotkey("PREV_WORKSPACE", () => {
-		if (!activeWorkspaceId || flattenedWorkspaces.length === 0) return;
+		if (!currentWorkspaceId || flattenedWorkspaces.length === 0) return;
 		const index = flattenedWorkspaces.findIndex(
-			(w) => w.id === activeWorkspaceId,
+			(w) => w.id === currentWorkspaceId,
 		);
 		if (index === -1) return;
 		const prevIndex = index <= 0 ? flattenedWorkspaces.length - 1 : index - 1;
 		const target = flattenedWorkspaces[prevIndex];
 		revealWorkspace(target.id);
-		void navigateToV2Workspace(target.id, navigate);
+		navigateToV2Workspace(target.id, navigate);
 	});
 
 	useHotkey("NEXT_WORKSPACE", () => {
-		if (!activeWorkspaceId || flattenedWorkspaces.length === 0) return;
+		if (!currentWorkspaceId || flattenedWorkspaces.length === 0) return;
 		const index = flattenedWorkspaces.findIndex(
-			(w) => w.id === activeWorkspaceId,
+			(w) => w.id === currentWorkspaceId,
 		);
 		if (index === -1) return;
 		const nextIndex = index >= flattenedWorkspaces.length - 1 ? 0 : index + 1;
 		const target = flattenedWorkspaces[nextIndex];
 		revealWorkspace(target.id);
-		void navigateToV2Workspace(target.id, navigate);
+		navigateToV2Workspace(target.id, navigate);
 	});
 
 	return workspaceShortcutLabels;

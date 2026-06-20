@@ -14,6 +14,7 @@ import {
 	LuFolderInput,
 	LuFolderPlus,
 	LuLayers,
+	LuLayoutTemplate,
 	LuPlus,
 } from "react-icons/lu";
 import { GATED_FEATURES, usePaywall } from "renderer/components/Paywall";
@@ -24,9 +25,15 @@ import { NavigationControls } from "renderer/routes/_authenticated/_dashboard/co
 import { SidebarToggle } from "renderer/routes/_authenticated/_dashboard/components/SidebarToggle";
 import { OrganizationDropdown } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/OrganizationDropdown";
 import { ResourceConsumption } from "renderer/routes/_authenticated/_dashboard/components/TopBar/components/ResourceConsumption";
-import { useTasksFilterStore } from "renderer/routes/_authenticated/_dashboard/tasks/stores/tasks-filter-state";
+import {
+	tasksSearchFromFilters,
+	useTasksFilterStore,
+} from "renderer/routes/_authenticated/_dashboard/tasks/stores/tasks-filter-state";
 import { STROKE_WIDTH_THICK } from "renderer/screens/main/components/WorkspaceSidebar/constants";
-import { useOpenNewProjectModal } from "renderer/stores/add-repository-modal";
+import {
+	useOpenNewProjectModal,
+	useOpenTemplateGalleryModal,
+} from "renderer/stores/add-repository-modal";
 import { useOpenNewWorkspaceModal } from "renderer/stores/new-workspace-modal";
 
 interface DashboardSidebarHeaderProps {
@@ -38,6 +45,7 @@ export function DashboardSidebarHeader({
 }: DashboardSidebarHeaderProps) {
 	const openModal = useOpenNewWorkspaceModal();
 	const openNewProject = useOpenNewProjectModal();
+	const openTemplateGallery = useOpenTemplateGalleryModal();
 	const navigate = useNavigate();
 	const folderImport = useFolderFirstImport({
 		onError: (message) => {
@@ -84,20 +92,21 @@ export function DashboardSidebarHeader({
 	};
 
 	const handleAutomationsClick = () => {
-		gateFeature(GATED_FEATURES.AUTOMATIONS, () => {
-			navigate({ to: "/automations" });
-		});
+		navigate({ to: "/automations" });
 	};
 
 	const handleTasksClick = () => {
 		gateFeature(GATED_FEATURES.TASKS, () => {
-			const search: Record<string, string> = {};
-			if (lastTab !== "all") search.tab = lastTab;
-			if (lastAssignee) search.assignee = lastAssignee;
-			if (lastSearch) search.search = lastSearch;
-			if (lastTypeTab !== "tasks") search.type = lastTypeTab;
-			if (lastProjectFilter) search.project = lastProjectFilter;
-			navigate({ to: "/tasks", search });
+			navigate({
+				to: "/tasks",
+				search: tasksSearchFromFilters({
+					tab: lastTab,
+					assignee: lastAssignee,
+					search: lastSearch,
+					typeTab: lastTypeTab,
+					projectFilter: lastProjectFilter,
+				}),
+			});
 		});
 	};
 
@@ -157,7 +166,7 @@ export function DashboardSidebarHeader({
 							<HiOutlineClipboardDocumentList className="size-4" />
 						</button>
 					</TooltipTrigger>
-					<TooltipContent side="right">Tasks</TooltipContent>
+					<TooltipContent side="right">Tasks & PRs</TooltipContent>
 				</Tooltip>
 
 				<Tooltip delayDuration={300}>
@@ -201,6 +210,10 @@ export function DashboardSidebarHeader({
 						<DropdownMenuItem onSelect={handleImportFolder}>
 							<LuFolderInput className="size-4" />
 							Open from folder
+						</DropdownMenuItem>
+						<DropdownMenuItem onSelect={() => openTemplateGallery()}>
+							<LuLayoutTemplate className="size-4" />
+							Start from a template
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -262,7 +275,7 @@ export function DashboardSidebarHeader({
 				)}
 			>
 				<HiOutlineClipboardDocumentList className="size-4 shrink-0" />
-				<span className="flex-1 text-left">Tasks</span>
+				<span className="flex-1 text-left">Tasks & PRs</span>
 			</button>
 
 			<div className="flex items-center gap-0">
@@ -313,6 +326,10 @@ export function DashboardSidebarHeader({
 						<DropdownMenuItem onSelect={handleImportFolder}>
 							<LuFolderInput className="size-4" />
 							Open from folder
+						</DropdownMenuItem>
+						<DropdownMenuItem onSelect={() => openTemplateGallery()}>
+							<LuLayoutTemplate className="size-4" />
+							Start from a template
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

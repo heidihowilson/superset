@@ -10,13 +10,18 @@ import { uploadChatAttachment } from "./utils/upload-chat-attachment";
 
 const AVAILABLE_MODELS = [
 	{
+		id: "anthropic/claude-opus-4-8",
+		name: "Opus 4.8",
+		provider: "Anthropic",
+	},
+	{
 		id: "anthropic/claude-opus-4-7",
 		name: "Opus 4.7",
 		provider: "Anthropic",
 	},
 	{
-		id: "anthropic/claude-opus-4-6",
-		name: "Opus 4.6",
+		id: "anthropic/claude-fable-5",
+		name: "Fable 5",
 		provider: "Anthropic",
 	},
 	{
@@ -68,18 +73,29 @@ export const chatRouter = {
 				});
 			}
 
-			await db
-				.insert(chatSessions)
-				.values({
-					id: input.sessionId,
-					organizationId,
-					createdBy: ctx.session.user.id,
-					v2WorkspaceId: input.v2WorkspaceId,
-				})
-				.onConflictDoNothing();
+			const result = await dbWs.transaction(async (tx) => {
+				const [inserted] = await tx
+					.insert(chatSessions)
+					.values({
+						id: input.sessionId,
+						organizationId,
+						createdBy: ctx.session.user.id,
+						v2WorkspaceId: input.v2WorkspaceId,
+					})
+					.onConflictDoNothing()
+					.returning({ id: chatSessions.id });
+
+				if (!inserted) {
+					return { txid: null };
+				}
+
+				const txid = await getCurrentTxid(tx);
+				return { txid };
+			});
 
 			return {
 				sessionId: input.sessionId,
+				txid: result.txid,
 			};
 		}),
 
@@ -152,6 +168,7 @@ export const chatRouter = {
 					)
 					.returning({ id: chatSessions.id });
 
+				if (!deleted) return { deleted, txid: null };
 				const txid = await getCurrentTxid(tx);
 
 				return { deleted, txid };

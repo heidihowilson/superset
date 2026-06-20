@@ -101,7 +101,7 @@ export function buildWhereClause(
 		}
 
 		case "auth.users": {
-			const fragment = `$1 = ANY("organization_ids")`;
+			const fragment = `"organization_ids" @> ARRAY[$1::uuid]`;
 			return { fragment, params: [organizationId] };
 		}
 
@@ -116,7 +116,7 @@ export function buildWhereClause(
 			return build(agentCommands, agentCommands.organizationId, organizationId);
 
 		case "auth.apikeys": {
-			const fragment = `"metadata" LIKE '%"organizationId":"' || $1 || '"%'`;
+			const fragment = `"organization_id" = $1`;
 			return { fragment, params: [organizationId] };
 		}
 

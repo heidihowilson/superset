@@ -1,11 +1,11 @@
 import { cn } from "@superset/ui/utils";
 import { CgLaptop } from "react-icons/cg";
-import { HiExclamationTriangle } from "react-icons/hi2";
 import {
 	LuGitMerge,
 	LuGitPullRequest,
 	LuGitPullRequestClosed,
 	LuGitPullRequestDraft,
+	LuListChecks,
 } from "react-icons/lu";
 import { RxDot } from "react-icons/rx";
 import { TbCloud, TbCloudOff } from "react-icons/tb";
@@ -25,7 +25,7 @@ interface DashboardSidebarWorkspaceIconProps {
 	isActive: boolean;
 	variant: "collapsed" | "expanded";
 	workspaceStatus?: ActivePaneStatus | null;
-	creationStatus?: "preparing" | "generating-branch" | "creating" | "failed";
+	isCreatePending: boolean;
 	pullRequestState?: DashboardSidebarWorkspacePullRequest["state"] | null;
 }
 
@@ -39,6 +39,7 @@ const PR_ICON_BY_STATE = {
 	merged: LuGitMerge,
 	closed: LuGitPullRequestClosed,
 	draft: LuGitPullRequestDraft,
+	queued: LuListChecks,
 } as const;
 
 const PR_COLOR_BY_STATE = {
@@ -46,6 +47,7 @@ const PR_COLOR_BY_STATE = {
 	merged: "text-purple-500",
 	closed: "text-destructive",
 	draft: "text-muted-foreground",
+	queued: "text-amber-500",
 } as const;
 
 export function DashboardSidebarWorkspaceIcon({
@@ -55,7 +57,7 @@ export function DashboardSidebarWorkspaceIcon({
 	isActive,
 	variant,
 	workspaceStatus = null,
-	creationStatus,
+	isCreatePending,
 	pullRequestState = null,
 }: DashboardSidebarWorkspaceIconProps) {
 	const overlayPosition = OVERLAY_POSITION[variant];
@@ -103,9 +105,7 @@ export function DashboardSidebarWorkspaceIcon({
 
 	return (
 		<>
-			{creationStatus === "failed" ? (
-				<HiExclamationTriangle className="size-4 text-destructive" />
-			) : creationStatus || workspaceStatus === "working" ? (
+			{isCreatePending || workspaceStatus === "working" ? (
 				<AsciiSpinner className="text-base" />
 			) : (
 				renderPrimaryIcon()
