@@ -96,7 +96,7 @@ The web workspace UI is unusable, so the UI is greenfield and built **native Swi
 | Capability | Path | Works when Host asleep? |
 |---|---|---|
 | Workspace/Project list & status | cloud tRPC (bearer), polled | **Yes** (only this) |
-| Watch chat (live + history) | host-service over relay | **No** — Host-gated |
+| Watch chat (history + near-live) | host-service `chat.getDisplayState`/`listMessages` queries over relay, polled | **No** — Host-gated |
 | Send prompt / start run | agent on Host via relay | No |
 | Create / delete Workspace | host-service over relay | No |
 | Rename / restore | cloud-only mutation | Yes |
@@ -122,7 +122,7 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 
 ### 7.2 V1 surfaces (all content surfaces are Host-gated except the list)
 - **Project/Workspace browser + switcher** — cloud tRPC `v2Workspace.list`, polled, cached for instant paint; the one Host-independent surface. Status distinguishes asleep vs plan-gated.
-- **Watch** — Chat session view from **host-service over the relay**, in **two presentations over one store**: an **ambient default** (glanceable narrative + status) and a **lean-in full-fidelity** mode (expandable thinking + tool-result renderers). Inline-result renderers (bounded set): markdown/text, file edit/diff, shell output, file read, search results, web fetch, **generic fallback** for other tool types. Oversized results show a summary + an explicit "open full" host fetch (never a scroll side-effect). **Rich content (streaming markdown, syntax-highlighted code, diffs) renders in a WKWebView reusing the desktop's web stack** — `streamdown`, `shiki`, and `@pierre/diffs` (diffs.com) — behind the renderer protocol (ADR-0009), fed by native (no auth/network in the webview); native owns the shell, lists, composer, and chrome. This dissolves the native-substrate build (R6).
+- **Watch** — Chat session view from **host-service `chat.getDisplayState`/`listMessages` queries over the relay** (polled; near-live — no live subscription exists yet, §11), in **two presentations over one store**: an **ambient default** (glanceable narrative + status) and a **lean-in full-fidelity** mode (expandable thinking + tool-result renderers). Inline-result renderers (bounded set): markdown/text, file edit/diff, shell output, file read, search results, web fetch, **generic fallback** for other tool types. Oversized results show a summary + an explicit "open full" host fetch (never a scroll side-effect). **Rich content (streaming markdown, syntax-highlighted code, diffs) renders in a WKWebView reusing the desktop's web stack** — `streamdown`, `shiki`, and `@pierre/diffs` (diffs.com) — behind the renderer protocol (ADR-0009), fed by native (no auth/network in the webview); native owns the shell, lists, composer, and chrome. This dissolves the native-substrate build (R6).
 - **Prompt** — composer with **voice dictation and virtual keyboard as co-equal inputs** (dictation gated on a WER bar, §9; quick-action chips for approve/reject/retry), agent + model picker (model picker is cloud; **agent-preset picker is Host-gated** — empty when the Host sleeps), session switcher. Text-only in V1 (attachment upload deferred).
 - **Workspace lifecycle** — create/delete (Host-gated, client-driven relay), rename/restore (cloud-only).
 - **Auth & org** — system-browser sign-in (ADR-0005), org list + switch (`setActive()`), sign-out (drops the Keychain token).
@@ -199,7 +199,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 - **SuperJSON** `{json, meta}` (de)serialization on tRPC and host calls (Date handling) — a named work item for hand-typed Swift models.
 
 ### Data (ADR-0004 / ADR-0006)
-- **No Electric, no cloud Durable Stream in V1.** Workspace/Project list from polled cloud tRPC (~5–10s while visible, paused when hidden), cached for instant paint. Chat (live + history) from **host-service over the relay** — Host-gated. Open Workspaces get live updates from the host-service stream; the list polls.
+- **No Electric, no cloud Durable Stream in V1.** Workspace/Project list from polled cloud tRPC (~5–10s while visible, paused when hidden), cached for instant paint. **Watch reads chat from host-service `chat.getDisplayState` / `chat.listMessages` queries over the relay, polled** — these queries exist; there is **no live chat *subscription*** exposed today (live tokens flow only over the desktop's local IPC). Near-live via polling; true token streaming (a host-service chat `.subscription()` + relay forwarding) is deferred to V2 (§14). All Host-gated.
 - Writes are non-optimistic (pending state).
 - Persistence: **Keychain** (session token — a high-value secret, §13); **UserDefaults** for device-local presentation state. No SQLite/Drizzle replica.
 
@@ -239,7 +239,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 
 - **V1 — Native flat multi-window, host-awake.** Shell + windowing; watch (Host-gated, ambient + full-fidelity) + prompt (voice/keyboard); lifecycle (Host-gated create/delete, cloud rename); bearer-handoff auth; cloud list polling + host-service-over-relay reads; settings; 5-beat onboarding; observability; register `visionos`. Single-window-plus-switcher default.
 - **V1.1 — Host-gated power features.** Native terminal (PTY-over-relay-WS + backgrounding reconnect; spike first) and review panes (diff/file/comment).
-- **V2 — Resilience + spatial.** Build the **Durable Stream producer + native consumer + cloud chat history** → host-resilient watch (the roaming story). **Native Electric** for live queries/optimistic writes/offline. **Volume-per-Workspace** (`windowStyle(.volumetric)`) with a RealityKit renderer set. Evaluate **cloud-mediated host-wake** (the differentiated answer to "Host asleep").
+- **V2 — Resilience + spatial.** **True live chat streaming** (host-service chat `.subscription()` + relay subscription forwarding, replacing V1 polling). Optionally the **Durable Stream producer + native consumer + cloud chat history** for host-resilient watch. **Native Electric** for live queries/optimistic writes/offline. **Volume-per-Workspace** (`windowStyle(.volumetric)`) with a RealityKit renderer set. (**Cloud-mediated host-wake is deprioritized** — remote always-on Hosts make a sleeping Host rare; revisit only if personal-Mac roaming becomes a goal.)
 - **V3 — Immersive command deck (optional).** `ImmersiveSpace`, in-app exit.
 - **Later (population-gated):** powered interaction-model A/B; APNs server-push.
 
@@ -255,7 +255,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 | R4 | **Revocation lags ~1h** (stateless JWT). | Low TTL + proactive token drop; document non-immediacy; lost-device flow (§13). |
 | R5 | **Free-plan orgs 403 on every host call.** | Each dogfood org carries an `active`/`trialing` sub; host-online indicator distinguishes asleep vs plan-gated. |
 | R6 | ~~Full-fidelity transcript has no Swift substrate~~ **Resolved (ADR-0009):** rich content renders in a WKWebView reusing `streamdown`/`shiki`/`@pierre/diffs`. Residual: tune the webview for headset comfort + bridge interactions to native. |
-| R6b (TOP) | **Watch transport + chat-stream-over-relay across visionOS backgrounding is unproven** — the core loop depends on consuming live chat from host-service over the relay, with no reference client. | Confirm host-service exposes a relay-consumable chat stream; stream contract + resume; hardware spike folded into M0c. |
+| R6b | **No live chat *subscription* over the relay** — host-service exposes chat history/state as **queries** (`getDisplayState`/`listMessages`, relay-consumable ✓) but live tokens flow only over the desktop's local IPC. | V1 **polls `getDisplayState` over the relay** for near-live watch (no new infra; fits ADR-0004). True streaming (host-service chat `.subscription()` — infra exists, see `ports.ts` — + relay subscription forwarding) is V2. Validate polling cadence/comfort on hardware (M0c). |
 | R7 | Out-of-headset alerting (agent done while headset off). | **Out of V1 scope** — owned by the desktop app's notifications; no APNs work in this client. |
 | R8 | **Dictation accuracy** unproven for technical prompts; on-device STT silently falls back to server. | Co-equal modalities; M0d WER gate; detect/disclose server fallback (privacy). |
 | R9 | **Distribution / App Review** for an internal visionOS app. | §18; TestFlight channel; pre-empt Guideline 4.2/2.1. |
@@ -272,7 +272,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 3. **Onboarding (FR-ONB)** — lightweight, skippable, replayable **5-beat**: gaze+pinch, switcher/palette (Cmd+K), **host-online state**, open first Workspace, window-vs-pane close. No-Host orgs get a "connect a Host" terminal state; acceptance is conditioned on a reachable Host.
 4. **Settings scope** — minimal editable set; hosts/projects/billing/account read-only; host/macOS-specific cut (see §7.2).
 5. **V1→V2 boundary** — minimum-viable seam; no speculative spatial abstraction until V1 learnings.
-6. **Status liveness** — open Workspaces stream from host-service over relay; the list polls cloud tRPC. No cloud status-push in V1; the Durable Stream path is V2.
+6. **Status liveness** — open Workspaces **poll `chat.getDisplayState` over the relay** for near-live transcript; the list polls cloud tRPC. No live subscription / cloud-push in V1; true streaming + the cloud Durable Stream are V2.
 
 ---
 
@@ -281,20 +281,22 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 **Acceptance (V1 ship gates):**
 - **M0 — Renderer seam (minimum-viable):** same store drives the 2D adapter + a throwaway second adapter, zero domain change. Hard gate.
 - **M0a — Auth handoff on hardware:** system-browser sign-in → token in Keychain → a cloud call AND a host-service-over-relay call succeed; org switch via `setActive()` without re-auth. Hard gate.
-- **M0c — Watch on hardware:** open a Workspace against a **live Host**, stream agent output, and **resume the host-service stream across a backgrounding cycle without blanking**. Hard gate.
+- **M0c — Watch on hardware:** open a Workspace against a **live Host**, render the transcript from host-service `getDisplayState`/`listMessages` over the relay, and **refresh (poll) across a backgrounding cycle without blanking**. Hard gate.
 - **M0d — Prompt + dictation bar:** voice-dictate a real technical prompt, review, send, see the run; dictation meets the WER bar on a fixed prompt set or ships disabled/keyboard-first.
 - **M0e — Lifecycle:** create + delete a Workspace against a live Host (org with an active/trialing sub); rename Host-offline.
 
 **Product (dogfood — qualitative + behavioral):**
-- **M1** time-to-first-meaningful-view; onboarding effectiveness (incl. host-online beat).
+- **M1** time-to-first-meaningful-view — **target (initial, validate): < 3s warm (token in Keychain → first Workspace surface), < 15s cold (incl. sign-in)**; onboarding effectiveness (incl. host-online beat).
 - **M2** comfort/fatigue + task completion + preference (descriptive).
 - **M3** multi-window engagement = **per-window focus/foreground time** (visionOS exposes no raw gaze; never log gaze) excluding structurally-forced pairs; collapse-to-single-window tripwire. Transport: **PostHog**.
-- **M4** median comfortable session length (a real target).
+- **M4** median comfortable session length — **target (initial, validate): ≥ 20 min sustained in the watch loop without removal**.
 - **M-Host** % of sessions with a live Host tunnel (validates the host-awake assumption); requires each test org on an active/trialing plan.
 
 ---
 
 ## 18. Distribution & App Review
+
+**Decision:** committed — TestFlight is the V1 channel and we take on the App Review prep below. **Owner: TBD (assign early — review has lead time).**
 
 - **Channel:** TestFlight is the dogfood distribution channel (no enterprise sideload on Vision Pro). Track the 90-day build expiry.
 - **App Review risk:** a remote-control client risks Guideline **4.2** (minimum functionality) and **2.1** (demo account). Pre-stage a **demo account + a reachable always-on Host + reviewer notes**; budget the first review cycle; the watch-without-host *list* surface helps 4.2.
