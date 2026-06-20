@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "skills": {
+    "arkit-visionos-developer": {
+      "source": "tomkrikorian/visionosagents",
+      "sourceType": "github",
+      "skillPath": "skills/arkit-visionos-developer/SKILL.md",
+      "computedHash": "77a281adf547778feb5c3a7d590d852c1a1154362aedd634178326ec6f034f2f"
+    },
+    "realitykit-visionos-developer": {
+      "source": "tomkrikorian/visionosagents",
+      "sourceType": "github",
+      "skillPath": "skills/realitykit-visionos-developer/SKILL.md",
+      "computedHash": "d429f0a476b52d650f6658cc9b03fe261b9cc75beb95878dba68e01ff7d70cef"
+    },
+    "spatial-swiftui-developer": {
+      "source": "tomkrikorian/visionosagents",
+      "sourceType": "github",
+      "skillPath": "skills/spatial-swiftui-developer/SKILL.md",
+      "computedHash": "89d49f8ab57593849290071ddb96dc731dc02df452e0b21b0ba04d6c5caafaef"
+    },
+    "swift-concurrency": {
+      "source": "avdlee/swift-concurrency-agent-skill",
+      "sourceType": "github",
+      "skillPath": "swift-concurrency/SKILL.md",
+      "computedHash": "5e1f6433159038c49135028eeeea3a7b9a0a6001c8a4cc8227e391caf35cd985"
+    },
+    "swiftui-expert-skill": {
+      "source": "avdlee/swiftui-agent-skill",
+      "sourceType": "github",
+      "skillPath": "swiftui-expert-skill/SKILL.md",
+      "computedHash": "12a318304d7cdc6ec40e981f02865d098caf6eab1b992051e3322ebeecf287b1"
+    },
+    "visionos-design-guidelines": {
+      "source": "ehmo/platform-design-skills",
+      "sourceType": "github",
+      "skillPath": "skills/visionos/SKILL.md",
+      "computedHash": "88eaf0e697c6b3bf8dd16dbd1d0618b098c94ad18052f892054d64c16f728eac"
+    },
+    "visionos-widgets": {
+      "source": "rshankras/claude-code-apple-skills",
+      "sourceType": "github",
+      "skillPath": "skills/visionos/widgets/SKILL.md",
+      "computedHash": "807115489d60a2fbd3f44bd152d5d23c2563d1099918d17b191e022857d9e096"
+    }
+  }
+}
