@@ -11,6 +11,12 @@ struct AuthConfiguration: Sendable {
     /// `/api/auth/desktop/connect` and `/api/auth/token`.
     let apiBaseURL: URL
 
+    /// Base URL of the host-dialed relay (`NEXT_PUBLIC_RELAY_URL`). Host-service
+    /// reads route through `${relayBaseURL}/hosts/<routingKey>/trpc/<procedure>`,
+    /// authed with the minted relay JWT (PRD §6.4, §11). Mirrors the desktop/web
+    /// default; a per-org/staging override is a later concern.
+    let relayBaseURL: URL
+
     /// Custom scheme the web success page deep-links back to (`protocol=superset`).
     let callbackScheme: String
 
@@ -22,6 +28,7 @@ struct AuthConfiguration: Sendable {
 
     static let `default` = AuthConfiguration(
         apiBaseURL: URL(string: "https://api.superset.sh")!,
+        relayBaseURL: URL(string: "https://relay.superset.sh")!,
         callbackScheme: "superset",
         callbackHost: "auth",
         callbackPath: "/callback"

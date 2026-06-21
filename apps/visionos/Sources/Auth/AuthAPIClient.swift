@@ -103,6 +103,24 @@ struct AuthAPIClient: Sendable {
         return try JSONDecoder().decode([OrganizationSummary].self, from: data)
     }
 
+    /// Register a client-minted chat session cloud-side (`chat.createSession`, a
+    /// SuperJSON tRPC mutation). V1 chat is client-owned (ADR-0010): the visionOS
+    /// client supplies the `sessionId` (a persisted UUID) and the row is created
+    /// `onConflictDoNothing`, so this is idempotent and safe to call on every open.
+    /// The session's active org is settled by the `x-superset-organization-id`
+    /// override so the row lands under the Workspace's organization.
+    func createChatSession(sessionID: String, workspaceID: String, organizationID: String) async throws {
+        var request = URLRequest(url: configuration.apiBaseURL.appendingPathComponent("api/trpc/chat.createSession"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let envelope = ["json": ["sessionId": sessionID, "v2WorkspaceId": workspaceID]]
+        request.httpBody = try JSONSerialization.data(withJSONObject: envelope)
+        try authorize(&request, organizationID: organizationID)
+
+        let (_, response) = try await http.data(for: request)
+        try Self.ensureOK(response)
+    }
+
     private static func ensureOK(_ response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse else {
             throw AuthError.badServerResponse(status: -1)

@@ -29,7 +29,7 @@ struct SupersetApp: App {
         .defaultSize(width: 760, height: 820)
 
         WindowGroup(id: WorkspaceScene.windowID, for: Workspace.ID.self) { $workspaceID in
-            WorkspaceWindowView(workspaceID: workspaceID, store: store)
+            WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
         }
         .defaultSize(width: 720, height: 720)
     }
