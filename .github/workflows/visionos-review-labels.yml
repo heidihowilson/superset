@@ -1,10 +1,10 @@
 name: visionOS review labels
 
-# Deterministic state machine: when ANY reviewer submits a verdict on an agent
-# PR, translate it into issue labels (no agent involved, so it can't be skipped).
+# Deterministic state machine: a reviewer verdict on an agent PR -> issue labels.
 #   approved          -> agent-approved (a human merges)
-#   changes_requested -> bounced + agent-ready (worker revises) ; 2nd time -> needs-human
-# Adding agent-ready re-fires visionos-agent-dispatch via the issues:labeled event.
+#   changes_requested -> bounced + agent-ready + RE-DISPATCH worker ; 2nd time -> needs-human
+# Note: GITHUB_TOKEN-driven label events do NOT trigger other workflows, so on a
+# bounce we dispatch the worker directly here rather than relying on issues:labeled.
 
 on:
   pull_request_review:
@@ -12,7 +12,7 @@ on:
 
 permissions:
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   relabel:
@@ -25,22 +25,34 @@ jobs:
       HEAD: ${{ github.event.pull_request.head.ref }}
       PRNUM: ${{ github.event.pull_request.number }}
     steps:
-      - name: Transition issue labels from review verdict
+      - name: Transition labels from review verdict
+        id: tr
         run: |
           N=$(printf '%s' "$HEAD" | sed -n 's#.*issue-\([0-9][0-9]*\).*#\1#p')
-          if [ -z "$N" ]; then echo "not an agent branch ($HEAD); skipping"; exit 0; fi
-          # clear the PR's review label so it isn't picked up again
+          if [ -z "$N" ]; then echo "not an agent branch ($HEAD)"; echo "requeue=false" >> "$GITHUB_OUTPUT"; exit 0; fi
           gh pr edit "$PRNUM" --repo "$REPO" --remove-label agent-review || true
           labels=$(gh issue view "$N" --repo "$REPO" --json labels -q '[.labels[].name]|join(",")' || echo "")
           gh issue edit "$N" --repo "$REPO" --remove-label agent-review || true
           if [ "$STATE" = "approved" ]; then
             gh issue edit "$N" --repo "$REPO" --add-label agent-approved
-            echo "issue #$N approved -> agent-approved"
+            echo "issue #$N approved -> agent-approved"; echo "requeue=false" >> "$GITHUB_OUTPUT"
           else
             case ",$labels," in
               *,bounced,*) gh issue edit "$N" --repo "$REPO" --add-label needs-human
-                           echo "issue #$N changes-requested again -> needs-human" ;;
+                           echo "issue #$N -> needs-human"; echo "requeue=false" >> "$GITHUB_OUTPUT" ;;
               *)           gh issue edit "$N" --repo "$REPO" --add-label bounced --add-label agent-ready
-                           echo "issue #$N changes-requested -> bounced + agent-ready (re-fire)" ;;
+                           echo "issue #$N -> bounced + agent-ready"; echo "requeue=true" >> "$GITHUB_OUTPUT" ;;
             esac
           fi
+      - name: Install Superset CLI
+        if: steps.tr.outputs.requeue == 'true'
+        run: |
+          curl -fsSL https://superset.sh/cli/install.sh | sh
+          for d in "$HOME/superset/bin" "$HOME/.local/bin" "/usr/local/bin"; do [ -d "$d" ] && echo "$d" >> "$GITHUB_PATH"; done
+      - name: Re-dispatch worker
+        if: steps.tr.outputs.requeue == 'true'
+        env:
+          SUPERSET_API_KEY: ${{ secrets.SUPERSET_API_KEY }}
+        run: |
+          superset organization switch 05edb58f-bb09-4f1b-932e-b8d7fc1115d9
+          superset automations run 5b6b8a61-1f19-41b9-a334-5e022ac3d8eb
