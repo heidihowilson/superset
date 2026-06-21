@@ -26,7 +26,22 @@ jobs:
       SUPERSET_ORG: 05edb58f-bb09-4f1b-932e-b8d7fc1115d9
       SUPERSET_WORKER: 5b6b8a61-1f19-41b9-a334-5e022ac3d8eb
     steps:
+      - name: Skip if a pipeline is already in flight
+        id: guard
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          # The worker's atomic ref-lock is the real guarantee; this just avoids
+          # spawning a Mac worker that would immediately STOP on a busy pipeline.
+          busy=false
+          for L in agent-working agent-review; do
+            if gh issue list --repo "$REPO" --state open --label "$L" -q '.[].number' | grep -q .; then busy=true; fi
+          done
+          echo "busy=$busy" >> "$GITHUB_OUTPUT"
+          [ "$busy" = "true" ] && echo "pipeline busy — skipping dispatch" || echo "pipeline free — dispatching"
       - name: Install Superset CLI
+        if: steps.guard.outputs.busy == 'false'
         run: |
           curl -fsSL https://superset.sh/cli/install.sh | sh
           # installer extracts to $HOME/superset and adds $HOME/superset/bin to PATH
@@ -34,6 +49,7 @@ jobs:
             [ -d "$d" ] && echo "$d" >> "$GITHUB_PATH"
           done
       - name: Dispatch worker
+        if: steps.guard.outputs.busy == 'false'
         run: |
           superset organization switch "$SUPERSET_ORG"
           superset automations run "$SUPERSET_WORKER"

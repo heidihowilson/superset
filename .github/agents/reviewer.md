@@ -7,12 +7,14 @@ Post **one verdict** on the worker's PR. **You do NOT manage labels** — CI
 
 ## Environment
 - You run on Seth's MacBook. `gh` is authenticated. Repo: `heidihowilson/superset`. Never touch upstream.
+- **API-only — never touch the worktree.** Judge entirely from the GitHub API (`gh pr diff`, `gh pr checks`, `gh api .../comments`). Do **not** `git checkout`, `git switch`, or run a local `xcodebuild` in the shared workspace — a worker may be building there, and a local build is what caused review/worktree contention (and stalled verdicts). Trust the PR's own CI signal.
+- **One verdict, then exit.** Post exactly one review and stop. Do not poll, retry, or re-run — if you can't reach a verdict, request changes with what's blocking you. Never leave the session hanging.
 
 ## Steps
 1. **Find the PR:** `gh pr list --repo heidihowilson/superset --base vision-pro-app --label agent-review --state open`. None → STOP. Several → lowest-numbered.
-2. **Gather context:** the PR diff (`gh pr diff <pr>`), the linked issue (the `Closes #N` issue — its Context / Scope / Acceptance), the PRD §/ADRs it cites, and any existing inline comments incl. CodeRabbit's (`gh api repos/heidihowilson/superset/pulls/<pr>/comments`).
-3. **Judge adversarially:** Does the diff satisfy the issue's **Scope** (nothing missing/extra)? Is it the **smallest correct** change? Regressions, anti-patterns, or violations of the PRD/ADR decisions? Does `xcodebuild`/CI pass on the PR?
-   - **Acceptance bar = the issue's Scope + a green `xcodebuild` build/test** (and a **Simulator** launch where UI is involved). **Do NOT require on-device Vision Pro hardware-launch evidence** — real-hardware launch is a single batched human-QA step before V1 ship, **never** a per-PR gate. If missing hardware-launch evidence would be your *only* objection, **approve instead.**
+2. **Gather context:** the PR diff (`gh pr diff <pr>`), the linked issue (the `Closes #N` issue — its Context / Scope / Acceptance), the PRD §/ADRs it cites, the PR's CI result (`gh pr checks <pr>`), and existing inline comments incl. CodeRabbit's (`gh api repos/heidihowilson/superset/pulls/<pr>/comments`).
+3. **Judge adversarially:** Does the diff satisfy the issue's **Scope** (nothing missing/extra)? Is it the **smallest correct** change? Regressions, anti-patterns, or violations of the PRD/ADR decisions? Did the PR's CI (`gh pr checks`) pass?
+   - **Acceptance bar = the issue's Scope + the PR's CI green** (which already runs `xcodebuild` build/test + a Simulator launch where UI is involved — read it from `gh pr checks`, don't rebuild locally). **Do NOT require on-device Vision Pro hardware-launch evidence** — real-hardware launch is a single batched human-QA step before V1 ship, **never** a per-PR gate. If missing hardware-launch evidence would be your *only* objection, **approve instead.**
 4. **Post exactly one verdict (this is your only state action):**
    - **Approve:** `gh pr review <pr> --approve --body "<concise why>"`
    - **Request changes:** `gh pr review <pr> --request-changes --body "<specific, actionable findings — numbered>"`
