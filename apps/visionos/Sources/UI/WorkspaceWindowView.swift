@@ -17,6 +17,7 @@ struct WorkspaceWindowView: View {
 
     @State private var chat = ChatSessionStore()
     @State private var composer = ComposerStore()
+    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.scenePhase) private var scenePhase
 
     private var workspace: Workspace? {
@@ -29,13 +30,29 @@ struct WorkspaceWindowView: View {
             if let workspace {
                 workspaceContent(workspace)
                     .navigationTitle(workspace.name)
-            } else {
+            } else if store.loadState == .loaded {
+                // The list has loaded and this id is absent — a deleted Workspace, not a
+                // slow restore. Show the 404 surface, not a spinner (PRD §16.2).
                 ContentUnavailableView(
                     "Workspace unavailable",
                     systemImage: "questionmark.square.dashed",
-                    description: Text("This workspace is no longer in the list.")
+                    description: Text("This workspace is no longer in the list. It may have been deleted.")
                 )
+            } else {
+                // Restored onto a not-yet-loaded list: keep loading until the poll lands,
+                // so a valid restored Workspace resolves to content rather than a false 404.
+                ProgressView("Loading workspace…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+        }
+        .onAppear {
+            store.beginPolling()
+            if let workspaceID { openWindows.registerWorkspace(workspaceID) }
+        }
+        .onDisappear {
+            chat.stopPolling()
+            store.endPolling()
+            if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
         }
         // Bind/start the watch poll for this Workspace; re-keys when the window is
         // retargeted to a different Workspace id.
@@ -51,8 +68,8 @@ struct WorkspaceWindowView: View {
                 await composer.loadPickers()
             }
         }
-        .onDisappear { chat.stopPolling() }
         .onChange(of: scenePhase) { _, phase in
+            store.setForeground(phase == .active)
             if phase == .active {
                 chat.startPolling()
             } else {

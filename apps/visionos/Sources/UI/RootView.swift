@@ -1,18 +1,22 @@
 import SwiftUI
 
-/// Root window content. Renders the active adapter's `workspaceList` pane over the
-/// shared, cloud-backed `WorkspaceStore`. The store is polled while this view is
-/// visible and paused when it is hidden or the scene backgrounds (ADR-0004).
+/// Root window content — the command-center / switcher (PRD §7.1). Renders the active
+/// adapter's `workspaceList` pane over the shared, cloud-backed `WorkspaceStore`, which
+/// is polled while any window is visible and paused when the app backgrounds (ADR-0004).
 ///
-/// Two ornaments host the chrome (PRD §9): a leading-edge Workspace switcher that
-/// opens/focuses Workspace windows, and a bottom adapter switcher whose flip
-/// re-renders the *same* store, demonstrating the M0 renderer seam.
+/// Three ornaments host the chrome (PRD §9): a leading-edge Workspace switcher that
+/// opens/focuses Workspace windows, a bottom adapter switcher whose flip re-renders the
+/// *same* store (the M0 renderer seam), and a window-controls menu carrying the
+/// interaction-model flag (§10) and the explicit "consolidate windows" action.
 struct RootView: View {
     @Bindable var store: WorkspaceStore
     @State private var registry = AdapterRegistry(adapters: [
         NativeWorkspaceAdapter(),
         DebugListAdapter(),
     ])
+    @Environment(InteractionModelRegistry.self) private var models
+    @Environment(OpenWindowsModel.self) private var openWindows
+    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -24,17 +28,23 @@ struct RootView: View {
             WorkspaceSwitcherView(store: store)
         }
         .ornament(attachmentAnchor: .scene(.bottom)) {
-            adapterSwitcher
+            bottomControls
         }
-        .onAppear { store.startPolling() }
-        .onDisappear { store.stopPolling() }
+        .onAppear { store.beginPolling() }
+        .onDisappear { store.endPolling() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                store.startPolling()
-            } else {
-                store.stopPolling()
-            }
+            store.setForeground(phase == .active)
         }
+    }
+
+    private var bottomControls: some View {
+        HStack(spacing: 16) {
+            adapterSwitcher
+            Divider().frame(height: 28)
+            windowMenu
+        }
+        .padding()
+        .glassBackgroundEffect()
     }
 
     private var adapterSwitcher: some View {
@@ -48,7 +58,31 @@ struct RootView: View {
                 .tint(adapter.id == registry.activeAdapterID ? .accentColor : .gray)
             }
         }
-        .padding()
-        .glassBackgroundEffect()
+    }
+
+    private var windowMenu: some View {
+        Menu {
+            Picker("Interaction Model", selection: activeModelBinding) {
+                ForEach(models.models) { model in
+                    Text(model.displayName).tag(model.id)
+                }
+            }
+            .pickerStyle(.inline)
+
+            if openWindows.openWindowCount > 0 {
+                Button("Consolidate Windows", systemImage: "rectangle.on.rectangle.slash") {
+                    WindowRouter.consolidate(except: nil, openWindows: openWindows, dismissWindow: dismissWindow)
+                }
+            }
+        } label: {
+            Label("Windows", systemImage: "macwindow.on.rectangle")
+        }
+    }
+
+    private var activeModelBinding: Binding<String> {
+        Binding(
+            get: { models.activeModelID },
+            set: { models.activate($0) }
+        )
     }
 }
