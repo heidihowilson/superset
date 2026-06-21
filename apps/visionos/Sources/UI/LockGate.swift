@@ -16,16 +16,31 @@ private struct LockGate: ViewModifier {
 
     private var signedIn: Bool { auth.status == .signedIn }
 
+    private var loading: Bool { auth.status == .loading }
+
     func body(content: Content) -> some View {
         content
             .overlay {
-                if signedIn && lock.isLocked {
+                if loading {
+                    // A restored Workspace/Project window paints cached signed-in content
+                    // before the Keychain read resolves. Cover it until the gate knows
+                    // whether to demand Optic ID (signed in) or reveal sign-in (signed out)
+                    // — ADR-0008 "Optic ID on launch". No unlock affordance here so the
+                    // owner can't bypass the gate before auth resolves.
+                    LaunchCoverView()
+                } else if signedIn && lock.isLocked {
                     LockView(lock: lock)
                 }
             }
             .onAppear {
-                // Launch / first paint: seal the relay and demand Optic ID before any
-                // restored window can reveal content (ADR-0008 "Optic ID on launch").
+                // A restored content window can appear before the auth root reads the
+                // Keychain — and the main window that normally calls `restore()` may not
+                // itself have been restored. Kick the restore so the launch cover resolves.
+                if loading {
+                    auth.restore()
+                }
+                // Launch / first paint with a session already restored: seal the relay and
+                // demand Optic ID before any restored window can reveal content (ADR-0008).
                 if signedIn && lock.isLocked {
                     lock.lock()
                     Task { await lock.authenticate() }
@@ -62,6 +77,18 @@ private struct LockGate: ViewModifier {
                     break
                 }
             }
+    }
+}
+
+/// Non-interactive launch cover. Hides a restored window's cached content while auth is
+/// still resolving, matching `LockView`'s full-scene material so the locked and launching
+/// states read the same. Carries no unlock control — the gate decides the next surface.
+private struct LaunchCoverView: View {
+    var body: some View {
+        ProgressView()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(.regularMaterial)
+            .ignoresSafeArea()
     }
 }
 
