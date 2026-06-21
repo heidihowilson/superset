@@ -15,6 +15,7 @@ import SwiftUI
 struct SupersetApp: App {
     @State private var auth: AuthController
     @State private var store: WorkspaceStore
+    @State private var lock: LockController
     @State private var models = InteractionModelRegistry()
     @State private var openWindows = OpenWindowsModel()
 
@@ -26,11 +27,15 @@ struct SupersetApp: App {
             lifecycle: auth.makeWorkspaceLifecycleClient(),
             cache: FileWorkspaceListCache()
         ))
+        // The Optic ID gate sits over every signed-in window and shares the relay
+        // credential with `auth`, so locking seals the RCE-grade JWT app-wide (ADR-0008).
+        _lock = State(initialValue: LockController(relay: auth))
     }
 
     var body: some Scene {
         WindowGroup {
             AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
+                .lockGate(lock: lock, auth: auth)
         }
         .defaultSize(width: 760, height: 820)
 
@@ -38,6 +43,7 @@ struct SupersetApp: App {
             WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
                 .environment(models)
                 .environment(openWindows)
+                .lockGate(lock: lock, auth: auth)
         }
         .defaultSize(width: 720, height: 720)
         .restorationBehavior(.automatic)
@@ -46,6 +52,7 @@ struct SupersetApp: App {
             ProjectWindowView(projectID: projectID, store: store)
                 .environment(models)
                 .environment(openWindows)
+                .lockGate(lock: lock, auth: auth)
         }
         .defaultSize(width: 640, height: 720)
         .restorationBehavior(.automatic)

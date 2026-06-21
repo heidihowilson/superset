@@ -19,7 +19,7 @@ enum AuthStatus: Equatable {
 /// Keychain, or the network itself.
 @MainActor
 @Observable
-final class AuthController {
+final class AuthController: RelayCredentialGate {
     private(set) var status: AuthStatus = .loading
     /// Observable for the UI. `setToken` keeps it and `tokenBox` (read by the bearer
     /// seam off the main actor) in lockstep — assign through that, never directly.
@@ -140,6 +140,17 @@ final class AuthController {
     /// re-mints from the still-stored session token.
     func dropRelayToken() {
         Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
+    }
+
+    /// Engage/release the relay-mint gate for the Optic ID lock (ADR-0008). While locked,
+    /// the shared provider refuses to mint, so a poll behind the lock screen cannot
+    /// re-acquire the RCE-grade JWT until the owner re-authenticates on foreground.
+    /// Awaited by `LockController` within the lock transition, so the seal/release reaches
+    /// the provider before the visible `LockState` advances. `generation` carries the
+    /// lock-state transition order onto the actor so a late hop can't reseal the credential
+    /// after a newer unlock (or vice versa).
+    func setRelayLocked(_ locked: Bool, generation: Int) async {
+        await relayTokenProvider.setLocked(locked, generation: generation)
     }
 
     private func setToken(_ newToken: AuthToken?) {
