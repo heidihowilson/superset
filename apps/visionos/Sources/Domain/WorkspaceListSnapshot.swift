@@ -8,27 +8,34 @@ struct WorkspaceListSnapshot: Sendable, Codable, Equatable {
     var projects: [Project]
     var workspaces: [Workspace]
     var hosts: [HostSummary]
+    /// Whether the org is on a paid/trialing plan (`host.checkAccess.paidPlan`), the
+    /// org-level gate on Host actions. Carried at the snapshot level — not on a Host or
+    /// Workspace row — because the subscription is on the org, so one read settles the
+    /// whole list (§11/R5). `nil` when undeterminable (no hosts, or a transient failure).
+    var paidPlan: Bool?
 
     static let empty = WorkspaceListSnapshot(projects: [], workspaces: [], hosts: [])
 
-    init(projects: [Project], workspaces: [Workspace], hosts: [HostSummary] = []) {
+    init(projects: [Project], workspaces: [Workspace], hosts: [HostSummary] = [], paidPlan: Bool? = nil) {
         self.projects = projects
         self.workspaces = workspaces
         self.hosts = hosts
+        self.paidPlan = paidPlan
     }
 
     private enum CodingKeys: String, CodingKey {
-        case projects, workspaces, hosts
+        case projects, workspaces, hosts, paidPlan
     }
 
-    /// `hosts` is decoded leniently so a snapshot cached before it existed still loads
-    /// (the same forward-compatibility `Workspace.hostID`'s optionality buys) — a missed
-    /// poll then refills it. Synthesized `encode(to:)` writes all three keys.
+    /// `hosts`/`paidPlan` are decoded leniently so a snapshot cached before they existed
+    /// still loads (the same forward-compatibility `Workspace.hostID`'s optionality buys)
+    /// — a missed poll then refills them. Synthesized `encode(to:)` writes all four keys.
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         projects = try container.decode([Project].self, forKey: .projects)
         workspaces = try container.decode([Workspace].self, forKey: .workspaces)
         hosts = try container.decodeIfPresent([HostSummary].self, forKey: .hosts) ?? []
+        paidPlan = try container.decodeIfPresent(Bool.self, forKey: .paidPlan)
     }
 }
 

@@ -26,6 +26,11 @@ final class WorkspaceStore {
     /// The org's Hosts, the targets a create can be dialed at — surfaced from the same
     /// poll as the list. Only online Hosts can be created on (create is Host-gated).
     private(set) var hosts: [HostSummary]
+    /// Whether the org is on a paid/trialing plan (`host.checkAccess.paidPlan`), the
+    /// org-level gate on Host actions. `nil` while undeterminable. Create eligibility
+    /// requires this not be a known-false plan, mirroring how delete gates on the
+    /// `.planGated` Workspace status (PRD §6.3 — refuse a relay call known to 403).
+    private(set) var paidPlan: Bool?
     private(set) var selectedWorkspaceID: Workspace.ID?
     private(set) var loadState: LoadState = .idle
     /// Workspaces with a rename/delete in flight — drives a non-optimistic pending state
@@ -61,6 +66,7 @@ final class WorkspaceStore {
         self.projects = cached.projects
         self.workspaces = cached.workspaces
         self.hosts = cached.hosts
+        self.paidPlan = cached.paidPlan
     }
 
     /// The Hosts a new Workspace can be created on — only online Hosts, since create is
@@ -75,13 +81,18 @@ final class WorkspaceStore {
     /// create/rename/delete affordances when false (e.g. the preview/sample store).
     var supportsLifecycle: Bool { lifecycle != nil }
 
-    /// Whether a create may be dialed at `hostID`: lifecycle is wired and that Host is still
-    /// present in `onlineHosts`. The create sheet can outlive a Host going offline — its
-    /// selected `hostID` goes stale while the poll drops the Host from `onlineHosts` — so both
-    /// the UI affordance and the store guard on this before invoking the relay (create is
-    /// Host-gated and never queued, per PRD §6.3 / issue #6).
+    /// Whether a create may be dialed at `hostID`: lifecycle is wired, the org isn't on a
+    /// known-non-paid plan, and that Host is still present in `onlineHosts`. `host.list`
+    /// reports physical presence only; the plan gate is a separate `host.checkAccess` read
+    /// (carried as `paidPlan`), and the relay enforces both — so an online Host on a
+    /// non-active plan must be refused client-side, not dialed. The create sheet can also
+    /// outlive a Host going offline (its selected `hostID` goes stale while the poll drops
+    /// the Host from `onlineHosts`), so both the UI affordance and the store guard on this
+    /// before invoking the relay (create is Host-gated and never queued, per PRD §6.3 /
+    /// issue #6). An undeterminable plan (`nil`) is allowed through, matching how delete
+    /// gates on the Workspace status — only a known-false plan refuses.
     func canCreate(onHostID hostID: String) -> Bool {
-        lifecycle != nil && onlineHosts.contains { $0.id == hostID }
+        lifecycle != nil && paidPlan != false && onlineHosts.contains { $0.id == hostID }
     }
 
     /// Whether a delete may be attempted on `workspace`: lifecycle is wired, the Workspace
@@ -236,6 +247,7 @@ final class WorkspaceStore {
         projects = []
         workspaces = []
         hosts = []
+        paidPlan = nil
         pendingWorkspaceIDs = []
         isCreatingWorkspace = false
         lifecycleError = nil
@@ -268,6 +280,7 @@ final class WorkspaceStore {
         projects = snapshot.projects
         workspaces = snapshot.workspaces
         hosts = snapshot.hosts
+        paidPlan = snapshot.paidPlan
         if let selectedWorkspaceID, !workspaces.contains(where: { $0.id == selectedWorkspaceID }) {
             self.selectedWorkspaceID = nil
         }
@@ -342,7 +355,8 @@ extension WorkspaceStore {
                     Workspace(id: "ws-relay", name: "relay-tunnel", projectID: "p-superset", projectName: "superset", status: .planGated, hostID: "host-1"),
                     Workspace(id: "ws-vision", name: "vision-pro-app", projectID: "p-superset", projectName: "superset", status: .hostAsleep, hostID: "host-1"),
                 ],
-                hosts: [HostSummary(id: "host-1", name: "studio-mac", online: true)]
+                hosts: [HostSummary(id: "host-1", name: "studio-mac", online: true)],
+                paidPlan: true
             )
         }
 

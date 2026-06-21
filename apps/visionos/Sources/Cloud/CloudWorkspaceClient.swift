@@ -39,10 +39,13 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         )
 
         // Plan-gating is org-level (the subscription is on the org), so one
-        // host.checkAccess call settles it for the whole list (§11/R5).
+        // host.checkAccess call settles it for the whole list (§11/R5). Key it off a
+        // Host from `host.list` first, falling back to a Workspace's owning Host, so a
+        // fresh org with a Host but no Workspaces still resolves its plan — create
+        // eligibility depends on this (issue #6 review), not only on existing rows.
         let paidPlan = await resolvePaidPlan(
             organizationID: organizationID,
-            anyHostID: rows.compactMap(\.hostId).first
+            anyHostID: hostSummaries.first?.id ?? rows.compactMap(\.hostId).first
         )
 
         let workspaces = rows.map { row in
@@ -59,7 +62,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
                 hostID: row.hostId
             )
         }
-        return WorkspaceListSnapshot(projects: projects, workspaces: workspaces, hosts: hostSummaries)
+        return WorkspaceListSnapshot(projects: projects, workspaces: workspaces, hosts: hostSummaries, paidPlan: paidPlan)
     }
 
     /// Reachability the Host-independent list CAN derive from cloud reads. Live run

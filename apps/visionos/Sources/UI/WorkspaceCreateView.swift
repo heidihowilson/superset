@@ -41,7 +41,10 @@ struct WorkspaceCreateView: View {
                         .labelsHidden()
                     }
                     Section("Host") {
-                        if store.onlineHosts.isEmpty {
+                        if store.paidPlan == false {
+                            Text("This organization's plan doesn't allow Host actions. Upgrade to an active plan to create a workspace.")
+                                .foregroundStyle(.secondary)
+                        } else if store.onlineHosts.isEmpty {
                             Text("No online Host. A Host must be online to create a workspace.")
                                 .foregroundStyle(.secondary)
                         } else {
