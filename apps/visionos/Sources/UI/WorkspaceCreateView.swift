@@ -14,7 +14,8 @@ struct WorkspaceCreateView: View {
     @State private var hostID: String?
 
     private var canSubmit: Bool {
-        projectID != nil && hostID != nil
+        projectID != nil
+            && hostID.map(store.canCreate(onHostID:)) == true
             && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !store.isCreatingWorkspace
     }

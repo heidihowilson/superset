@@ -75,6 +75,15 @@ final class WorkspaceStore {
     /// create/rename/delete affordances when false (e.g. the preview/sample store).
     var supportsLifecycle: Bool { lifecycle != nil }
 
+    /// Whether a create may be dialed at `hostID`: lifecycle is wired and that Host is still
+    /// present in `onlineHosts`. The create sheet can outlive a Host going offline — its
+    /// selected `hostID` goes stale while the poll drops the Host from `onlineHosts` — so both
+    /// the UI affordance and the store guard on this before invoking the relay (create is
+    /// Host-gated and never queued, per PRD §6.3 / issue #6).
+    func canCreate(onHostID hostID: String) -> Bool {
+        lifecycle != nil && onlineHosts.contains { $0.id == hostID }
+    }
+
     /// Whether a delete may be attempted on `workspace`: lifecycle is wired, the Workspace
     /// has an owning Host, and that Host is currently online on a plan. Delete is Host-gated
     /// (worktree teardown over the relay), so — like create gating on `onlineHosts` — the UI
@@ -155,6 +164,10 @@ final class WorkspaceStore {
     /// the new row appears only after the post-create poll lands it.
     func createWorkspace(projectID: String, name: String, hostID: String) async {
         guard let lifecycle else { return }
+        guard canCreate(onHostID: hostID) else {
+            lifecycleError = "Host unavailable. The Host must be online and the organization on an active plan to create this workspace."
+            return
+        }
         lifecycleError = nil
         isCreatingWorkspace = true
         defer { isCreatingWorkspace = false }
