@@ -39,6 +39,8 @@ struct LockView: View {
         .frame(maxWidth: 360)
         .glassBackgroundEffect()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.regularMaterial)
+        .ignoresSafeArea()
     }
 
     private func unlockButton(_ title: String) -> some View {
