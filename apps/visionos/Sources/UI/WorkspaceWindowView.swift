@@ -54,9 +54,11 @@ struct WorkspaceWindowView: View {
             store.endPolling()
             if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
         }
-        // Bind/start the watch poll for this Workspace; re-keys when the window is
-        // retargeted to a different Workspace id.
-        .task(id: workspaceID) {
+        // Bind/start the watch poll once the Workspace resolves. Keyed off the resolved
+        // workspace id (not the passed-in id) so a restored/deep-linked window — which has
+        // a non-nil id before the list loads — re-runs this when the Workspace appears
+        // (nil→non-nil), and re-keys when the window is retargeted to a different id.
+        .task(id: workspace?.id) {
             guard let workspace, let provider = auth.makeChatTranscriptProvider(for: workspace) else { return }
             chat.bind(provider: provider, workspaceID: workspace.id)
             chat.startPolling()
