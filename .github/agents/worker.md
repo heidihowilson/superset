@@ -25,7 +25,7 @@ Check for an existing open PR: `gh pr list --repo heidihowilson/superset --head 
 - **FRESH** (no PR): `git fetch origin && git switch vision-pro-app && git reset --hard origin/vision-pro-app && git clean -fd && git switch -c agent/issue-<N>`. Implement the smallest correct slice for **that issue only** (read the issue body + cited PRD/ADRs). No drive-by refactors. Ambiguous/large/risky → label `needs-human`, remove `agent-working`, STOP.
 
 ## 5. Verify (macOS — the external gate)
-`xcodebuild` build + test must be green (the issue defines the buildable state; for the scaffold issue a building project IS the deliverable). Red never ships — fix within the slice or bail to `needs-human` (release the lock).
+`xcodebuild` build + test must be green (+ a Simulator launch where UI is involved). Red never ships — fix within the slice or bail to `needs-human` (release the lock). **Real Vision Pro hardware launch is OUT OF SCOPE for you** — never block on it; `xcodebuild` + Simulator is the bar (hardware is a batched human-QA step before V1 ship).
 
 ## 6. Push / PR
 `git push -u origin agent/issue-<N>`.

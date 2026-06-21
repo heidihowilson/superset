@@ -278,12 +278,13 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 
 ## 17. Success Metrics
 
-**Acceptance (V1 ship gates):**
+**Acceptance (V1 ship gates).** Every M0* gate below is **auto-verifiable**: `xcodebuild` build + test + a **Simulator** launch — **no real-hardware launch is required per gate or per PR**. Real Vision Pro hardware verification is a **single batched human pass (M-HW)** before V1 ship, not a per-issue gate.
 - **M0 — Renderer seam (minimum-viable):** same store drives the 2D adapter + a throwaway second adapter, zero domain change. Hard gate.
-- **M0a — Auth handoff on hardware:** system-browser sign-in → token in Keychain → a cloud call AND a host-service-over-relay call succeed; org switch via `setActive()` without re-auth. Hard gate.
-- **M0c — Watch on hardware:** open a Workspace against a **live Host**, render the transcript from host-service `getDisplayState`/`listMessages` over the relay, and **refresh (poll) across a backgrounding cycle without blanking**. Hard gate.
+- **M0a — Auth handoff (Simulator):** system-browser sign-in → token in Keychain → a cloud call AND a host-service-over-relay call succeed; org switch via `setActive()` without re-auth. Hard gate.
+- **M0c — Watch (Simulator):** open a Workspace against a **live Host**, render the transcript from host-service `getDisplayState`/`listMessages` over the relay, and **refresh (poll) across a backgrounding cycle without blanking**. Hard gate.
 - **M0d — Prompt + dictation bar:** voice-dictate a real technical prompt, review, send, see the run; dictation meets the WER bar on a fixed prompt set or ships disabled/keyboard-first.
 - **M0e — Lifecycle:** create + delete a Workspace against a live Host (org with an active/trialing sub); rename Host-offline.
+- **M-HW — Batched hardware QA (human, once before V1 ship):** install the build on a real Vision Pro and confirm the core loops launch and work. **Not** a per-issue/PR gate — the autonomous loop never blocks on it.
 
 **Product (dogfood — qualitative + behavioral):**
 - **M1** time-to-first-meaningful-view — **target (initial, validate): < 3s warm (token in Keychain → first Workspace surface), < 15s cold (incl. sign-in)**; onboarding effectiveness (incl. host-online beat).
