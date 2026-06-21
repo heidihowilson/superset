@@ -17,6 +17,7 @@ struct WorkspaceWindowView: View {
 
     @State private var chat = ChatSessionStore()
     @State private var composer = ComposerStore()
+    @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneActive = false
@@ -70,7 +71,7 @@ struct WorkspaceWindowView: View {
                     // A sent prompt should appear without waiting for the next poll tick.
                     Task { await chat.refresh() }
                 }
-                await composer.loadPickers()
+                await composer.loadPickers(preferredModelID: appSettings.preferredModelID)
             }
         }
         .onChange(of: scenePhase) { _, phase in

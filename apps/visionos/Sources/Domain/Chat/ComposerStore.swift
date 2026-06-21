@@ -62,15 +62,20 @@ final class ComposerStore {
 
     /// Load the pickers. The cloud model list is required-ish (it drives the default
     /// selection); the Host preset list is best-effort and stays empty when the Host is
-    /// asleep — neither failure blocks composing or sending.
-    func loadPickers() async {
+    /// asleep — neither failure blocks composing or sending. The initial selection honors
+    /// the user's `preferredModelID` setting when that model is offered, else the first.
+    func loadPickers(preferredModelID: String? = nil) async {
         guard let sender else { return }
         let loadWorkspaceID = boundWorkspaceID
         if let fetched = try? await sender.availableModels() {
             guard boundWorkspaceID == loadWorkspaceID else { return }
             models = fetched
             if selectedModelID == nil {
-                selectedModelID = fetched.first?.id
+                if let preferredModelID, fetched.contains(where: { $0.id == preferredModelID }) {
+                    selectedModelID = preferredModelID
+                } else {
+                    selectedModelID = fetched.first?.id
+                }
             }
         }
         let presets = (try? await sender.availableAgentPresets()) ?? []

@@ -18,6 +18,7 @@ struct SupersetApp: App {
     @State private var lock: LockController
     @State private var models = InteractionModelRegistry()
     @State private var openWindows = OpenWindowsModel()
+    @State private var appSettings = AppSettingsStore()
 
     init() {
         let auth = AuthController()
@@ -36,6 +37,7 @@ struct SupersetApp: App {
         WindowGroup {
             AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
                 .lockGate(lock: lock, auth: auth)
+                .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 760, height: 820)
 
@@ -43,7 +45,9 @@ struct SupersetApp: App {
             WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
                 .environment(models)
                 .environment(openWindows)
+                .environment(appSettings)
                 .lockGate(lock: lock, auth: auth)
+                .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 720, height: 720)
         .restorationBehavior(.automatic)
@@ -53,8 +57,18 @@ struct SupersetApp: App {
                 .environment(models)
                 .environment(openWindows)
                 .lockGate(lock: lock, auth: auth)
+                .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 640, height: 720)
+        .restorationBehavior(.automatic)
+
+        WindowGroup(id: SettingsScene.windowID) {
+            SettingsView(auth: auth, store: store)
+                .environment(appSettings)
+                .lockGate(lock: lock, auth: auth)
+                .preferredColorScheme(appSettings.appearance.colorScheme)
+        }
+        .defaultSize(width: 560, height: 720)
         .restorationBehavior(.automatic)
     }
 }

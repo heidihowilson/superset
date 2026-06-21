@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		71FB27F602DE54B7B2ECF18E /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */; };
+		22021B324AF4F1C2ACA25396 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34583EBE7D99316044963C56 /* SettingsModel.swift */; };
+		26277365E711EC0DF90C99B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */; };
 		03572042072CD60937FE9971 /* HostSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */; };
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		04C0E1E65158014FCA476D8E /* RelayTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */; };
@@ -72,6 +75,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
+		34583EBE7D99316044963C56 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
+		CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		06A752A00CBBF07D23FB817A /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
 		08B5CF265C0A693A32E586A6 /* WindowRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRouter.swift; sourceTree = "<group>"; };
 		0A89302CCDC57D318AACE341 /* ChatTranscriptProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscriptProviding.swift; sourceTree = "<group>"; };
@@ -272,8 +278,11 @@
 		B55B99E04A5AB3A18722103B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */,
 				38AB15580946313EA26FC000 /* AuthGateView.swift */,
 				FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */,
+				34583EBE7D99316044963C56 /* SettingsModel.swift */,
+				CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */,
 				5A1FAFF61D8724B174205ECA /* InteractionModelRegistry.swift */,
 				A714C9E7340031FA6EF71C5A /* LockGate.swift */,
 				48383CE2E272082F5B861F2C /* LockView.swift */,
@@ -356,6 +365,9 @@
 			files = (
 				03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */,
 				6315F9471E6591AB2B5FA504 /* AgentPreset.swift in Sources */,
+				71FB27F602DE54B7B2ECF18E /* AppSettingsStore.swift in Sources */,
+				22021B324AF4F1C2ACA25396 /* SettingsModel.swift in Sources */,
+				26277365E711EC0DF90C99B4 /* SettingsView.swift in Sources */,
 				518D0A4734F6A0619353EE77 /* AuthAPIClient.swift in Sources */,
 				15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */,
 				A97A651F9FE82B71D4207033 /* AuthController.swift in Sources */,
