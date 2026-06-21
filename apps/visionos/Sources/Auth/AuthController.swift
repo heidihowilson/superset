@@ -103,6 +103,26 @@ final class AuthController {
         )
     }
 
+    /// Prompt sender for a Workspace window — posts `chat.sendMessage` over the relay into
+    /// the same client-owned session the watch polls (ADR-0006/0010), built over the same
+    /// relay JWT cache and `SessionIDStore` as `makeChatTranscriptProvider` so a sent
+    /// prompt lands in the watched transcript. Returns nil when the Workspace has no Host.
+    func makeChatSender(
+        for workspace: Workspace,
+        http: HTTPPerforming = URLSession.shared
+    ) -> HostChatSender? {
+        guard let hostID = workspace.hostID else { return nil }
+        return HostChatSender(
+            api: makeAPIClient(http: http),
+            configuration: configuration,
+            http: http,
+            tokenProvider: relayTokenProvider,
+            sessionIDStore: sessionIDStore,
+            workspaceID: workspace.id,
+            hostID: hostID
+        )
+    }
+
     /// Drop the cached relay JWT — called on background to shrink the RCE-grade token's
     /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). The next poll
     /// re-mints from the still-stored session token.
