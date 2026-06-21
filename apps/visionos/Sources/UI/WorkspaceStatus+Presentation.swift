@@ -7,8 +7,10 @@ extension WorkspaceStatus {
         switch self {
         case .running: "Running"
         case .idle: "Idle"
+        case .hostOnline: "Host online"
         case .hostAsleep: "Host offline (asleep)"
         case .planGated: "Host offline (plan-gated)"
+        case .unknown: "Status pending"
         }
     }
 
@@ -16,8 +18,10 @@ extension WorkspaceStatus {
         switch self {
         case .running: .green
         case .idle: .blue
+        case .hostOnline: .green
         case .hostAsleep: .secondary
         case .planGated: .orange
+        case .unknown: .secondary
         }
     }
 }

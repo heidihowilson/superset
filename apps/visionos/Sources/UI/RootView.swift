@@ -1,24 +1,39 @@
 import SwiftUI
 
-/// Root window content. Owns the single shared `WorkspaceStore` and the
-/// `AdapterRegistry`, and renders the active adapter's `workspaceList` pane. The
-/// bottom ornament hosts a runtime adapter switcher (PRD §9: chrome lives in
-/// ornaments, not inline toolbars) — flipping it re-renders the *same* store,
-/// demonstrating the M0 seam.
+/// Root window content. Renders the active adapter's `workspaceList` pane over the
+/// shared, cloud-backed `WorkspaceStore`. The store is polled while this view is
+/// visible and paused when it is hidden or the scene backgrounds (ADR-0004).
+///
+/// Two ornaments host the chrome (PRD §9): a leading-edge Workspace switcher that
+/// opens/focuses Workspace windows, and a bottom adapter switcher whose flip
+/// re-renders the *same* store, demonstrating the M0 renderer seam.
 struct RootView: View {
-    @State private var store = WorkspaceStore.sample()
+    @Bindable var store: WorkspaceStore
     @State private var registry = AdapterRegistry(adapters: [
         NativeWorkspaceAdapter(),
         DebugListAdapter(),
     ])
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
             registry.activeAdapter.view(for: .workspaceList, store: store)
                 .navigationTitle("Superset")
         }
+        .ornament(attachmentAnchor: .scene(.leading)) {
+            WorkspaceSwitcherView(store: store)
+        }
         .ornament(attachmentAnchor: .scene(.bottom)) {
             adapterSwitcher
+        }
+        .onAppear { store.startPolling() }
+        .onDisappear { store.stopPolling() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                store.startPolling()
+            } else {
+                store.stopPolling()
+            }
         }
     }
 
