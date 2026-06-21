@@ -49,7 +49,8 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
                 name: row.name,
                 projectID: row.projectId,
                 projectName: projectName,
-                status: Self.status(hostID: row.hostId, onlineByHost: hosts, paidPlan: paidPlan)
+                status: Self.status(hostID: row.hostId, onlineByHost: hosts, paidPlan: paidPlan),
+                hostID: row.hostId
             )
         }
         return WorkspaceListSnapshot(projects: projects, workspaces: workspaces)

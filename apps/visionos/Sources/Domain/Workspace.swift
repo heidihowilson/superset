@@ -13,4 +13,10 @@ struct Workspace: Identifiable, Hashable, Sendable, Codable {
     var projectID: String?
     var projectName: String
     var status: WorkspaceStatus
+    /// The Host's `machineId`, half of the relay routing key
+    /// (`organizationId:machineId`) host-service watch/lifecycle calls dial
+    /// (PRD §6.4). Optional: the cloud row's `hostId` is nullable, and a
+    /// Workspace with no Host can still appear in the list (it just can't be
+    /// watched). Optional also keeps an older cached snapshot decodable.
+    var hostID: String?
 }

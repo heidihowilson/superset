@@ -30,6 +30,12 @@ final class AuthController {
     private let webAuth: WebAuthenticating
     private let pendingStateStore: PendingStateStore
     private let tokenBox = TokenBox()
+    /// Shared relay/host JWT cache (mint-once-reuse) backing every Workspace watch over
+    /// the relay, so the per-Workspace poll loops don't each re-mint (PRD §11). Dropped
+    /// on background ahead of the ~1h revocation lag (ADR-0008).
+    private let relayTokenProvider: RelayTokenProvider
+    /// Client-owned chat session map (`workspaceId → sessionId`, ADR-0010).
+    private let sessionIDStore = SessionIDStore()
     /// The `state` issued for the in-flight handoff, validated against the callback.
     /// Mirrored into `pendingStateStore` via `setPendingState` so a callback that
     /// arrives after a cold start (the process was killed mid-OAuth) still validates.
@@ -45,6 +51,9 @@ final class AuthController {
         self.tokenStore = tokenStore
         self.webAuth = webAuth
         self.pendingStateStore = pendingStateStore
+        self.relayTokenProvider = RelayTokenProvider(
+            api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value })
+        )
     }
 
     /// Keep the in-memory nonce and its durable copy in lockstep — assign through
@@ -72,6 +81,33 @@ final class AuthController {
     /// as `makeAPIClient`, so it reads the live token and survives a re-auth.
     func makeWorkspaceListProvider(http: HTTPPerforming = URLSession.shared) -> CloudWorkspaceClient {
         CloudWorkspaceClient(api: makeAPIClient(http: http))
+    }
+
+    /// Watch-transcript provider for a Workspace window — polls `chat.getSnapshot` over
+    /// the relay for that Workspace's client-owned session (ADR-0006/0010). Returns nil
+    /// when the Workspace has no Host (`hostID`), i.e. nothing to watch; the window then
+    /// shows the Host-gated notice instead of a transcript.
+    func makeChatTranscriptProvider(
+        for workspace: Workspace,
+        http: HTTPPerforming = URLSession.shared
+    ) -> HostChatTranscriptProvider? {
+        guard let hostID = workspace.hostID else { return nil }
+        return HostChatTranscriptProvider(
+            api: makeAPIClient(http: http),
+            configuration: configuration,
+            http: http,
+            tokenProvider: relayTokenProvider,
+            sessionIDStore: sessionIDStore,
+            workspaceID: workspace.id,
+            hostID: hostID
+        )
+    }
+
+    /// Drop the cached relay JWT — called on background to shrink the RCE-grade token's
+    /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). The next poll
+    /// re-mints from the still-stored session token.
+    func dropRelayToken() {
+        Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
     }
 
     private func setToken(_ newToken: AuthToken?) {
