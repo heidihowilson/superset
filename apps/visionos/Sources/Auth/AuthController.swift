@@ -25,6 +25,12 @@ final class AuthController: RelayCredentialGate {
     /// seam off the main actor) in lockstep — assign through that, never directly.
     private(set) var token: AuthToken?
 
+    /// Fired on every transition into `.signedOut`. The shared `WorkspaceStore`'s
+    /// privacy reset is wired here (in `SupersetApp`) instead of in a view so the
+    /// previous account's cache is dropped on any sign-out path — including a sign-out
+    /// from the Settings window while the command-center scene is closed.
+    var onSignedOut: (() -> Void)?
+
     private let configuration: AuthConfiguration
     private let tokenStore: TokenStore
     private let webAuth: WebAuthenticating
@@ -158,6 +164,14 @@ final class AuthController: RelayCredentialGate {
         tokenBox.value = newToken
     }
 
+    /// Enter the signed-out state and run its side effects (the cache reset) so every
+    /// path that lands here — an explicit sign-out and a launch where `restore()` finds
+    /// the token missing/expired — clears the previous account uniformly.
+    private func enterSignedOut() {
+        status = .signedOut
+        onSignedOut?()
+    }
+
     /// Restore a persisted, unexpired token on launch. No network: a stored token is
     /// trusted until a 401 forces a fresh handoff (there is no refresh endpoint).
     func restore() {
@@ -170,13 +184,13 @@ final class AuthController: RelayCredentialGate {
             } else {
                 try? tokenStore.clear()
                 setToken(nil)
-                status = .signedOut
+                enterSignedOut()
                 // Recover an interrupted handoff so a pending cold-start callback validates.
                 pendingState = pendingStateStore.load()
             }
         } catch {
             setToken(nil)
-            status = .signedOut
+            enterSignedOut()
             pendingState = pendingStateStore.load()
         }
     }
@@ -230,7 +244,7 @@ final class AuthController: RelayCredentialGate {
         try? tokenStore.clear()
         setToken(nil)
         setPendingState(nil)
-        status = .signedOut
+        enterSignedOut()
     }
 
     private func complete(callbackURL: URL) throws {

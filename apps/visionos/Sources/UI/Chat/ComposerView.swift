@@ -11,6 +11,7 @@ import SwiftUI
 struct ComposerView: View {
     let store: ComposerStore
     @State private var dictation = DictationController()
+    @Environment(AppSettingsStore.self) private var appSettings
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -25,13 +26,25 @@ struct ComposerView: View {
         .padding(.vertical, 16)
         .task {
             dictation.onTranscript = { store.draft = $0 }
-            if case .unknown = dictation.availability {
+            if appSettings.dictationEnabled, case .unknown = dictation.availability {
                 await dictation.requestAuthorization()
             }
         }
         .onDisappear { dictation.stop() }
         .onChange(of: scenePhase) { _, phase in
             if phase != .active { dictation.stop() }
+        }
+        // Honor the Settings dictation toggle live: turning it off stops any live
+        // session and removes the mic; turning it on requests authorization once so
+        // the mic comes up ready without reopening the composer.
+        .onChange(of: appSettings.dictationEnabled) { _, enabled in
+            if enabled {
+                if case .unknown = dictation.availability {
+                    Task { await dictation.requestAuthorization() }
+                }
+            } else {
+                dictation.stop()
+            }
         }
     }
 
@@ -78,19 +91,21 @@ struct ComposerView: View {
 
     @ViewBuilder
     private var micButton: some View {
-        let listening = dictation.state == .listening
-        Button {
-            toggleDictation()
-        } label: {
-            Image(systemName: listening ? "mic.fill" : "mic")
-                .font(.title2)
-                .frame(width: 60, height: 60)
+        if appSettings.dictationEnabled {
+            let listening = dictation.state == .listening
+            Button {
+                toggleDictation()
+            } label: {
+                Image(systemName: listening ? "mic.fill" : "mic")
+                    .font(.title2)
+                    .frame(width: 60, height: 60)
+            }
+            .buttonBorderShape(.circle)
+            .tint(listening ? .red : nil)
+            .disabled(!dictation.isReady && !listening)
+            .accessibilityLabel(listening ? "Stop dictation" : "Start dictation")
+            .help(micHelp)
         }
-        .buttonBorderShape(.circle)
-        .tint(listening ? .red : nil)
-        .disabled(!dictation.isReady && !listening)
-        .accessibilityLabel(listening ? "Stop dictation" : "Start dictation")
-        .help(micHelp)
     }
 
     private var micHelp: String {

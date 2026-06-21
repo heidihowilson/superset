@@ -16,6 +16,7 @@ struct RootView: View {
     ])
     @Environment(InteractionModelRegistry.self) private var models
     @Environment(OpenWindowsModel.self) private var openWindows
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneActive = false
@@ -59,9 +60,18 @@ struct RootView: View {
             adapterSwitcher
             Divider().frame(height: 28)
             windowMenu
+            settingsButton
         }
         .padding()
         .glassBackgroundEffect()
+    }
+
+    private var settingsButton: some View {
+        Button {
+            openWindow(id: SettingsScene.windowID)
+        } label: {
+            Label("Settings", systemImage: "gearshape")
+        }
     }
 
     private var adapterSwitcher: some View {
