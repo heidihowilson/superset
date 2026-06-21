@@ -14,6 +14,8 @@ enum AuthError: Error, Equatable {
     case missingToken
     /// A bearer-authed request needs a token but none is stored (signed out).
     case notAuthenticated
+    /// The signed-in user has no organization to scope a cloud query to.
+    case noActiveOrganization
     /// The server returned a non-2xx status or an undecodable body.
     case badServerResponse(status: Int)
     /// A Keychain operation failed with the given `OSStatus`.

@@ -9,6 +9,7 @@ extension WorkspaceStatus {
         case .idle: "Idle"
         case .hostAsleep: "Host offline (asleep)"
         case .planGated: "Host offline (plan-gated)"
+        case .unknown: "Status pending"
         }
     }
 
@@ -18,6 +19,7 @@ extension WorkspaceStatus {
         case .idle: .blue
         case .hostAsleep: .secondary
         case .planGated: .orange
+        case .unknown: .secondary
         }
     }
 }

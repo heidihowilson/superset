@@ -6,7 +6,8 @@ import SwiftUI
 /// The `loading` flash while the Keychain is read is intentionally minimal — a
 /// progress view, not a redirect.
 struct AuthGateView: View {
-    @State private var auth = AuthController()
+    let auth: AuthController
+    let store: WorkspaceStore
 
     var body: some View {
         content
@@ -20,7 +21,7 @@ struct AuthGateView: View {
         case .loading:
             ProgressView()
         case .signedIn:
-            RootView()
+            RootView(store: store)
                 .ornament(attachmentAnchor: .scene(.topLeading)) {
                     SessionStatusView(client: auth.makeAPIClient())
                 }

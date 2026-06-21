@@ -68,6 +68,12 @@ final class AuthController {
         }
     }
 
+    /// Cloud Workspace-list provider for the browser. Built over the same bearer seam
+    /// as `makeAPIClient`, so it reads the live token and survives a re-auth.
+    func makeWorkspaceListProvider(http: HTTPPerforming = URLSession.shared) -> CloudWorkspaceClient {
+        CloudWorkspaceClient(api: makeAPIClient(http: http))
+    }
+
     private func setToken(_ newToken: AuthToken?) {
         token = newToken
         tokenBox.value = newToken

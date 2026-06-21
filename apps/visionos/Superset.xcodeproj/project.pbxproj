@@ -9,16 +9,21 @@
 /* Begin PBXBuildFile section */
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		093B1209E89A07CAEDA91E45 /* DebugDumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */; };
+		0D6D0B2BFF7330504E7BDD23 /* FileWorkspaceListCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */; };
 		0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */; };
 		15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */; };
 		21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */; };
+		2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */; };
+		314387A8B8FB6C1F6CB1352B /* WorkspaceListSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */; };
 		518D0A4734F6A0619353EE77 /* AuthAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */; };
 		5537B78F011F29017AFC0888 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */; };
+		57C72921400D9FFEE6A4C533 /* WorkspaceSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */; };
 		723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DB07131AB224ABB387A03E /* SignInView.swift */; };
 		774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */; };
 		7DF5684B45A4332F4AE85E49 /* WorkspaceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */; };
 		7FA3E995B478E1C9EFAF5461 /* DebugListAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC567F160659F98C450BF75 /* DebugListAdapter.swift */; };
 		804DA999D250E633859F9B71 /* AuthHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */; };
+		8235B7201A86FBFA09F8DABB /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3C48D92A24056C34E69447 /* Project.swift */; };
 		8600E73F4CAC28122BDFFA8D /* AuthGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38AB15580946313EA26FC000 /* AuthGateView.swift */; };
 		8C3E9B4FC201957E4E2B93D6 /* Workspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951C8B061117E946C12C674B /* Workspace.swift */; };
 		8D2AD532F7C04553E750A2BA /* WorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */; };
@@ -33,6 +38,7 @@
 		BE87A8E9315B404F3D41F9D0 /* WorkspaceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */; };
 		CBFCC03B6B2DA044692A80BE /* AuthToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0955CFCBD44D5379F9687F /* AuthToken.swift */; };
 		F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */; };
+		F7FBFFCDCA057CB2DFE6A1B6 /* CloudWorkspaceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36912B74D7D1879F31FFCB5 /* CloudWorkspaceClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,26 +48,32 @@
 		38AB15580946313EA26FC000 /* AuthGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGateView.swift; sourceTree = "<group>"; };
 		3DDC57904E84BCB8C49B06BC /* AuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthController.swift; sourceTree = "<group>"; };
 		3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
+		4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWindowView.swift; sourceTree = "<group>"; };
+		4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSwitcherView.swift; sourceTree = "<group>"; };
 		4FC567F160659F98C450BF75 /* DebugListAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugListAdapter.swift; sourceTree = "<group>"; };
 		5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceStatus+Presentation.swift"; sourceTree = "<group>"; };
 		5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAPIClient.swift; sourceTree = "<group>"; };
 		66E12DC999DAD3D512CB63A0 /* PaneKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneKind.swift; sourceTree = "<group>"; };
+		6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWorkspaceListCache.swift; sourceTree = "<group>"; };
 		7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPaneView.swift; sourceTree = "<group>"; };
 		7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		92DB07131AB224ABB387A03E /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		951C8B061117E946C12C674B /* Workspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace.swift; sourceTree = "<group>"; };
+		9D3C48D92A24056C34E69447 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		9F36DC5B2A7314017753C666 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		A34473633D6974E4EDDF25D7 /* SupersetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupersetApp.swift; sourceTree = "<group>"; };
 		A7EC74FA3E1D90B3BD0C7CAD /* Superset.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Superset.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceListView.swift; sourceTree = "<group>"; };
 		B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAdapter.swift; sourceTree = "<group>"; };
 		B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStatus.swift; sourceTree = "<group>"; };
+		C36912B74D7D1879F31FFCB5 /* CloudWorkspaceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudWorkspaceClient.swift; sourceTree = "<group>"; };
 		C535EAF837D94137217D69C1 /* AdapterRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterRegistry.swift; sourceTree = "<group>"; };
 		DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeWorkspaceAdapter.swift; sourceTree = "<group>"; };
 		E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingStateStore.swift; sourceTree = "<group>"; };
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStatusView.swift; sourceTree = "<group>"; };
 		F0F959F6CC86D853AE500BE5 /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
+		FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceListSnapshot.swift; sourceTree = "<group>"; };
 		FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugDumpView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -69,7 +81,10 @@
 		2E25C6316507DE62FDD3BBFD /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */,
+				9D3C48D92A24056C34E69447 /* Project.swift */,
 				951C8B061117E946C12C674B /* Workspace.swift */,
+				FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */,
 				B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */,
 				E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */,
 			);
@@ -83,6 +98,14 @@
 				DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */,
 			);
 			path = Adapters;
+			sourceTree = "<group>";
+		};
+		50BF9B3E16D929C1B06B6FAE /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				C36912B74D7D1879F31FFCB5 /* CloudWorkspaceClient.swift */,
+			);
+			path = Cloud;
 			sourceTree = "<group>";
 		};
 		5217E3080141B8706C31A2A1 /* Renderer */ = {
@@ -117,6 +140,7 @@
 			children = (
 				A34473633D6974E4EDDF25D7 /* SupersetApp.swift */,
 				8C6FC9699F7306719CEDE602 /* Auth */,
+				50BF9B3E16D929C1B06B6FAE /* Cloud */,
 				2E25C6316507DE62FDD3BBFD /* Domain */,
 				5217E3080141B8706C31A2A1 /* Renderer */,
 				B55B99E04A5AB3A18722103B /* UI */,
@@ -151,6 +175,8 @@
 				92DB07131AB224ABB387A03E /* SignInView.swift */,
 				AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */,
 				5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */,
+				4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */,
+				4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -222,12 +248,15 @@
 				8600E73F4CAC28122BDFFA8D /* AuthGateView.swift in Sources */,
 				804DA999D250E633859F9B71 /* AuthHandoff.swift in Sources */,
 				CBFCC03B6B2DA044692A80BE /* AuthToken.swift in Sources */,
+				F7FBFFCDCA057CB2DFE6A1B6 /* CloudWorkspaceClient.swift in Sources */,
 				093B1209E89A07CAEDA91E45 /* DebugDumpView.swift in Sources */,
 				7FA3E995B478E1C9EFAF5461 /* DebugListAdapter.swift in Sources */,
+				0D6D0B2BFF7330504E7BDD23 /* FileWorkspaceListCache.swift in Sources */,
 				774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */,
 				9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */,
 				8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */,
 				21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */,
+				8235B7201A86FBFA09F8DABB /* Project.swift in Sources */,
 				B41E3A8CF9DC2C1FB773DBF6 /* RootView.swift in Sources */,
 				0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
@@ -236,10 +265,13 @@
 				90EA0BA2EB3790BD092511AE /* WebAuthenticating.swift in Sources */,
 				8C3E9B4FC201957E4E2B93D6 /* Workspace.swift in Sources */,
 				8D2AD532F7C04553E750A2BA /* WorkspaceAdapter.swift in Sources */,
+				314387A8B8FB6C1F6CB1352B /* WorkspaceListSnapshot.swift in Sources */,
 				7DF5684B45A4332F4AE85E49 /* WorkspaceListView.swift in Sources */,
 				B30472F1601539A167959744 /* WorkspaceStatus+Presentation.swift in Sources */,
 				BE87A8E9315B404F3D41F9D0 /* WorkspaceStatus.swift in Sources */,
 				5537B78F011F29017AFC0888 /* WorkspaceStore.swift in Sources */,
+				57C72921400D9FFEE6A4C533 /* WorkspaceSwitcherView.swift in Sources */,
+				2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
