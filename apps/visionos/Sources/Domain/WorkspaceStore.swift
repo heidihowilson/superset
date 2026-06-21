@@ -75,6 +75,15 @@ final class WorkspaceStore {
     /// create/rename/delete affordances when false (e.g. the preview/sample store).
     var supportsLifecycle: Bool { lifecycle != nil }
 
+    /// Whether a delete may be attempted on `workspace`: lifecycle is wired, the Workspace
+    /// has an owning Host, and that Host is currently online on a plan. Delete is Host-gated
+    /// (worktree teardown over the relay), so — like create gating on `onlineHosts` — the UI
+    /// disables the affordance and the store refuses the relay call for a Workspace it already
+    /// knows isn't host-online (`.hostAsleep`/`.planGated`/`.unknown`), per PRD §6.3.
+    func canDelete(_ workspace: Workspace) -> Bool {
+        lifecycle != nil && workspace.hostID != nil && workspace.status.allowsHostActions
+    }
+
     var selectedWorkspace: Workspace? {
         guard let selectedWorkspaceID else { return nil }
         return workspaces.first { $0.id == selectedWorkspaceID }
@@ -165,6 +174,10 @@ final class WorkspaceStore {
             if workspace.hostID == nil {
                 lifecycleError = "This workspace has no Host to delete it from."
             }
+            return
+        }
+        guard workspace.status.allowsHostActions else {
+            lifecycleError = "Host unavailable. The Host must be online and the organization on an active plan to delete this workspace."
             return
         }
         lifecycleError = nil

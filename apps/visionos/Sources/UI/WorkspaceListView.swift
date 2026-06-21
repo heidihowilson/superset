@@ -105,6 +105,7 @@ struct WorkspaceListView: View {
                                     } label: {
                                         Label("Delete", systemImage: "trash")
                                     }
+                                    .disabled(!store.canDelete(workspace))
                                     Button {
                                         renameTarget = workspace
                                     } label: {
