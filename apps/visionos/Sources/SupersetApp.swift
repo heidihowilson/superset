@@ -18,6 +18,7 @@ struct SupersetApp: App {
         _auth = State(initialValue: auth)
         _store = State(initialValue: WorkspaceStore(
             provider: auth.makeWorkspaceListProvider(),
+            lifecycle: auth.makeWorkspaceLifecycleClient(),
             cache: FileWorkspaceListCache()
         ))
     }

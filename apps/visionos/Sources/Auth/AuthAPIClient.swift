@@ -121,6 +121,24 @@ struct AuthAPIClient: Sendable {
         try Self.ensureOK(response)
     }
 
+    /// Rename a Workspace (`v2Workspace.update`, a SuperJSON tRPC mutation). Cloud-only
+    /// and therefore safe while the Host is offline (PRD §6.3, ADR-0006) — unlike
+    /// create/delete it provisions nothing on the Host. Scoped by the
+    /// `x-superset-organization-id` header (the procedure requires an active org) so the
+    /// rename lands even when the session has no active org set. The result row is not
+    /// decoded; the next list poll reflects the new name. Hand-typed at the boundary (§12).
+    func renameWorkspace(id: String, name: String, organizationID: String) async throws {
+        var request = URLRequest(url: configuration.apiBaseURL.appendingPathComponent("api/trpc/v2Workspace.update"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let envelope = ["json": ["id": id, "name": name]]
+        request.httpBody = try JSONSerialization.data(withJSONObject: envelope)
+        try authorize(&request, organizationID: organizationID)
+
+        let (_, response) = try await http.data(for: request)
+        try Self.ensureOK(response)
+    }
+
     /// The cloud's offered chat models (`chat.getModels`, a no-input SuperJSON tRPC
     /// query). Cloud-sourced, so the composer's model picker populates even when the
     /// Workspace's Host is asleep (PRD §7.2). Hand-typed at the boundary (PRD §12).

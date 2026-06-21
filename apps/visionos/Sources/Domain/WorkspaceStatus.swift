@@ -24,4 +24,20 @@ enum WorkspaceStatus: String, Sendable, CaseIterable, Codable {
     /// Cloud host status not yet known (host.list/checkAccess unavailable this poll).
     /// The list still proves the Workspace exists; this is the honest fallback badge.
     case unknown
+
+    /// Whether Host-gated actions (delete, and live host calls) may be attempted: the
+    /// owning Host is reachable and the org is on a plan. The cloud list distinguishes
+    /// `.hostAsleep`/`.planGated`/`.unknown` precisely so the client can refuse a relay
+    /// call it already knows will 403 (PRD §6.3 — host-gated actions show an explicit
+    /// offline/plan-gated affordance rather than dialing a dead Host). `.running`/`.idle`
+    /// are Host-gated run states that only land while the Host is reachable, so they
+    /// imply eligibility too.
+    var allowsHostActions: Bool {
+        switch self {
+        case .hostOnline, .running, .idle:
+            return true
+        case .hostAsleep, .planGated, .unknown:
+            return false
+        }
+    }
 }

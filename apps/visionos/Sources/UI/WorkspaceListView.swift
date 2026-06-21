@@ -9,6 +9,10 @@ struct WorkspaceListView: View {
     @Bindable var store: WorkspaceStore
     @Environment(\.openWindow) private var openWindow
 
+    @State private var isCreating = false
+    @State private var renameTarget: Workspace?
+    @State private var deleteTarget: Workspace?
+
     var body: some View {
         Group {
             if store.workspaces.isEmpty {
@@ -18,6 +22,59 @@ struct WorkspaceListView: View {
             }
         }
         .navigationTitle("Workspaces")
+        .toolbar {
+            if store.supportsLifecycle {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isCreating = true
+                    } label: {
+                        Label("New Workspace", systemImage: "plus")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $isCreating) {
+            WorkspaceCreateView(store: store)
+        }
+        .sheet(item: $renameTarget) { workspace in
+            WorkspaceRenameView(store: store, workspace: workspace)
+        }
+        .confirmationDialog(
+            "Delete this workspace?",
+            isPresented: deleteConfirmationBinding,
+            titleVisibility: .visible,
+            presenting: deleteTarget
+        ) { workspace in
+            Button("Delete \(workspace.name)", role: .destructive) {
+                Task { await store.delete(workspace) }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { _ in
+            Text("This removes the worktree on the Host. This cannot be undone.")
+        }
+        .alert(
+            "Couldn't complete that",
+            isPresented: lifecycleErrorBinding,
+            presenting: store.lifecycleError
+        ) { _ in
+            Button("OK") { store.clearLifecycleError() }
+        } message: { message in
+            Text(message)
+        }
+    }
+
+    private var deleteConfirmationBinding: Binding<Bool> {
+        Binding(
+            get: { deleteTarget != nil },
+            set: { if !$0 { deleteTarget = nil } }
+        )
+    }
+
+    private var lifecycleErrorBinding: Binding<Bool> {
+        Binding(
+            get: { store.lifecycleError != nil },
+            set: { if !$0 { store.clearLifecycleError() } }
+        )
     }
 
     private var grouped: some View {
@@ -36,10 +93,27 @@ struct WorkspaceListView: View {
                             } label: {
                                 WorkspaceRow(
                                     workspace: workspace,
-                                    isSelected: workspace.id == store.selectedWorkspaceID
+                                    isSelected: workspace.id == store.selectedWorkspaceID,
+                                    isPending: store.pendingWorkspaceIDs.contains(workspace.id)
                                 )
                             }
                             .buttonBorderShape(.roundedRectangle)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                if store.supportsLifecycle {
+                                    Button(role: .destructive) {
+                                        deleteTarget = workspace
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                    .disabled(!store.canDelete(workspace))
+                                    Button {
+                                        renameTarget = workspace
+                                    } label: {
+                                        Label("Rename", systemImage: "pencil")
+                                    }
+                                    .tint(.indigo)
+                                }
+                            }
                         }
                     }
                 }
@@ -74,6 +148,7 @@ struct WorkspaceListView: View {
 private struct WorkspaceRow: View {
     let workspace: Workspace
     let isSelected: Bool
+    let isPending: Bool
 
     var body: some View {
         HStack(spacing: 16) {
@@ -88,12 +163,15 @@ private struct WorkspaceRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer(minLength: 0)
-            if isSelected {
+            if isPending {
+                ProgressView()
+            } else if isSelected {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.tint)
             }
         }
         .frame(minHeight: 60)
+        .opacity(isPending ? 0.6 : 1)
         .contentShape(Rectangle())
     }
 }

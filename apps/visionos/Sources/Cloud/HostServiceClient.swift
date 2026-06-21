@@ -45,6 +45,30 @@ struct HostServiceClient: Sendable {
         _ = try await requestData("chat.sendMessage", method: .post, input: input)
     }
 
+    /// Provision a Workspace on the Host (`workspaces.create`): the Host builds the git
+    /// worktree and registers the cloud row itself (the saga lives host-side, mirroring
+    /// the desktop CollectionsProvider create path). Host-gated by construction (relay):
+    /// a sleeping/unreachable Host throws, never queued (ADR-0006). `branch` is omitted so
+    /// the Host derives it; the result is not decoded — the next list poll shows the row.
+    func createWorkspace(projectID: String, name: String) async throws {
+        var input: [String: Any] = ["projectId": projectID]
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmed.isEmpty { input["name"] = trimmed }
+        _ = try await requestData("workspaces.create", method: .post, input: input)
+    }
+
+    /// Tear down a Workspace on the Host (`workspaceCleanup.destroy`): the Host removes the
+    /// git worktree and deletes the cloud row (host-side saga, idempotent). Host-gated by
+    /// construction (relay). `deleteBranch`/`force` stay false — the default safe teardown
+    /// matching the web app; the row's disappearance is confirmed by the next list poll.
+    func deleteWorkspace(workspaceID: String) async throws {
+        _ = try await requestData(
+            "workspaceCleanup.destroy",
+            method: .post,
+            input: ["workspaceId": workspaceID, "deleteBranch": false, "force": false]
+        )
+    }
+
     /// The Host's configured agent presets (`settings.agentConfigs.list`). Host-gated by
     /// construction (relay): a sleeping/unreachable Host throws, which the caller maps to
     /// an empty picker (PRD §7.2). No input — a workspace-independent settings read.

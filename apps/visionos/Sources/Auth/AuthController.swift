@@ -83,6 +83,18 @@ final class AuthController {
         CloudWorkspaceClient(api: makeAPIClient(http: http))
     }
 
+    /// Workspace lifecycle client for the browser (create/delete over the relay, rename
+    /// over cloud). Built over the same bearer seam and shared relay JWT cache as the
+    /// watch/send paths, so a Host-gated op rides the same minted credential (PRD §6.3/§11).
+    func makeWorkspaceLifecycleClient(http: HTTPPerforming = URLSession.shared) -> HostWorkspaceLifecycleClient {
+        HostWorkspaceLifecycleClient(
+            api: makeAPIClient(http: http),
+            configuration: configuration,
+            http: http,
+            tokenProvider: relayTokenProvider
+        )
+    }
+
     /// Watch-transcript provider for a Workspace window — polls `chat.getSnapshot` over
     /// the relay for that Workspace's client-owned session (ADR-0006/0010). Returns nil
     /// when the Workspace has no Host (`hostID`), i.e. nothing to watch; the window then
