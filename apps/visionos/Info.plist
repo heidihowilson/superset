@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Window-per-workspace/project/settings (PRD §7.1) opens secondary scenes via
+	     openWindow(id:value:). UIKit refuses every openWindow call unless the app
+	     declares multi-scene support, so this flag is load-bearing for the whole
+	     multi-window core loop — not optional. -->
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<true/>
+	</dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Superset uses Optic ID to unlock your workspaces and protect your host access credential.</string>
 	<key>NSMicrophoneUsageDescription</key>
