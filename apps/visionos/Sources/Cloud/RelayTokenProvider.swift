@@ -13,12 +13,16 @@ actor RelayTokenProvider {
     /// Conservative of the ~1h TTL, matching the web client's 50-minute reuse window.
     private let ttl: TimeInterval = 50 * 60
     private var cached: (token: String, fetchedAt: Date)?
+    /// Set while the Optic ID gate is engaged (ADR-0008). Blocks minting so a poll that
+    /// ticks behind the lock screen can't re-acquire the RCE-grade JWT before re-auth.
+    private var locked = false
 
     init(api: AuthAPIClient) {
         self.api = api
     }
 
     func token() async throws -> String {
+        if locked { throw RelayTokenError.locked }
         if let cached, Date().timeIntervalSince(cached.fetchedAt) < ttl {
             return cached.token
         }
@@ -30,4 +34,18 @@ actor RelayTokenProvider {
     func invalidate() {
         cached = nil
     }
+
+    /// Engage/release the Optic ID gate. Locking also drops the cached token so a stale
+    /// JWT can't be served; unlocking lets the next poll re-mint after re-auth.
+    func setLocked(_ value: Bool) {
+        locked = value
+        if value { cached = nil }
+    }
+}
+
+/// Raised when a relay-credential request is attempted while the Optic ID gate is
+/// engaged. Poll loops treat it like any transient host error — keep the last good data
+/// and retry on the next tick, by which point re-auth has released the gate.
+enum RelayTokenError: Error {
+    case locked
 }
