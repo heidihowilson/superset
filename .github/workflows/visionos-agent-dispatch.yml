@@ -29,7 +29,8 @@ jobs:
       - name: Install Superset CLI
         run: |
           curl -fsSL https://superset.sh/cli/install.sh | sh
-          for d in "$HOME/.local/bin" "$HOME/.superset/bin" "/usr/local/bin"; do
+          # installer extracts to $HOME/superset and adds $HOME/superset/bin to PATH
+          for d in "$HOME/superset/bin" "$HOME/.local/bin" "$HOME/.superset/bin" "/usr/local/bin"; do
             [ -d "$d" ] && echo "$d" >> "$GITHUB_PATH"
           done
       - name: Dispatch worker
