@@ -42,15 +42,17 @@ private struct LockGate: ViewModifier {
                 // Launch / first paint with a session already restored: seal the relay and
                 // demand Optic ID before any restored window can reveal content (ADR-0008).
                 if signedIn && lock.isLocked {
-                    lock.lock()
-                    Task { await lock.authenticate() }
+                    Task {
+                        await lock.lock()
+                        await lock.authenticate()
+                    }
                 }
             }
             .onChange(of: scenePhase) { _, phase in
                 guard signedIn else { return }
                 switch phase {
                 case .background:
-                    lock.lock()
+                    Task { await lock.lock() }
                 case .active:
                     if lock.isLocked {
                         Task { await lock.authenticate() }
@@ -64,15 +66,17 @@ private struct LockGate: ViewModifier {
                 case (.loading, .signedIn):
                     // Launch restored a stored session — demand Optic ID before the
                     // workspaces appear (ADR-0008 "Optic ID on launch").
-                    lock.lock()
-                    Task { await lock.authenticate() }
+                    Task {
+                        await lock.lock()
+                        await lock.authenticate()
+                    }
                 case (_, .signedIn):
                     // A fresh OAuth sign-in already proved the owner in the browser —
                     // skip the redundant Optic ID prompt.
-                    lock.unlock()
+                    Task { await lock.unlock() }
                 case (_, .signedOut):
                     // Re-arm the gate so the next sign-in / relaunch requires Optic ID.
-                    lock.lock()
+                    Task { await lock.lock() }
                 default:
                     break
                 }

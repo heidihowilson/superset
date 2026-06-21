@@ -9,10 +9,11 @@ import Observation
 protocol RelayCredentialGate: AnyObject {
     /// Drop the cached relay JWT now (proactive, ahead of the ~1h revocation lag).
     func dropRelayToken()
-    /// Gate minting: while locked, the provider refuses to mint a new JWT. `generation`
-    /// orders this against other seal/release calls so the gate ends up matching the
-    /// latest `LockState` regardless of which hop reaches the provider last.
-    func setRelayLocked(_ locked: Bool, generation: Int)
+    /// Gate minting: while locked, the provider refuses to mint a new JWT. Awaited as part
+    /// of the lock transition so the seal/release lands on the provider before the visible
+    /// `LockState` advances. `generation` still orders concurrent seal/release calls so the
+    /// gate ends up matching the latest `LockState` regardless of which hop arrives last.
+    func setRelayLocked(_ locked: Bool, generation: Int) async
 }
 
 /// Where the wearer stands at the Optic ID gate. Distinct from `AuthStatus`: a user can
@@ -61,10 +62,12 @@ final class LockController {
     var isLocked: Bool { state != .unlocked }
 
     /// Enter the locked state and seal the relay credential: sealing also drops the cached
-    /// JWT and blocks re-minting until a passing Optic ID. Idempotent — safe to call from
-    /// every window's background transition and from the launch gate.
-    func lock() {
-        sealRelay(true)
+    /// JWT and blocks re-minting until a passing Optic ID. Awaits the seal *before* exposing
+    /// the locked state, so the provider can't serve the cached RCE-grade JWT to a poll that
+    /// ticks once the lock screen is up. Idempotent — safe to call from every window's
+    /// background transition and from the launch gate.
+    func lock() async {
+        await sealRelay(true)
         if state == .authenticating { return }
         state = .locked
     }
@@ -78,26 +81,28 @@ final class LockController {
         let outcome = await authenticator.evaluate(reason: reason)
         switch outcome {
         case .success, .unavailable:
-            unlock()
+            await unlock()
         case let .failure(message):
             state = .failed(message)
         }
     }
 
     /// Force unlock without an Optic ID prompt — used right after a fresh OAuth sign-in,
-    /// where the browser handoff already proved the owner.
-    func unlock() {
-        sealRelay(false)
+    /// where the browser handoff already proved the owner. Reveals content first, then
+    /// releases the relay gate so the next poll can re-mint — the release only happens here,
+    /// after a completed unlock (a passing Optic ID or a just-proven OAuth handoff).
+    func unlock() async {
         state = .unlocked
+        await sealRelay(false)
     }
 
-    /// Issue a seal/release to the relay gate under a fresh generation. The state mutation
-    /// in `lock()`/`unlock()` stays synchronous (its current ordering is load-bearing for
-    /// the multi-window launch gate); the generation lets the actor settle on whichever
-    /// intent was minted last even though these hops cross the actor boundary unordered.
-    private func sealRelay(_ sealed: Bool) {
+    /// Issue a seal/release to the relay gate under a fresh generation and await it landing
+    /// on the actor. The generation still lets the actor settle on whichever intent was
+    /// minted last, since concurrent `lock()`/`unlock()` tasks can interleave at their await
+    /// points and reach the provider out of call order.
+    private func sealRelay(_ sealed: Bool) async {
         relayGeneration += 1
-        relay?.setRelayLocked(sealed, generation: relayGeneration)
+        await relay?.setRelayLocked(sealed, generation: relayGeneration)
     }
 
     private var isFailed: Bool {
