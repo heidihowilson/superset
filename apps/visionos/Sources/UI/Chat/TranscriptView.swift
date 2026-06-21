@@ -96,7 +96,10 @@ struct TranscriptView: View {
                 }
                 .padding(24)
             }
-            .onChange(of: store.transcript.messages.last?.id) { _, _ in
+            // Watch the whole last message, not just its id: streaming appends content
+            // to the existing message (id unchanged), so an id-only watch would miss
+            // in-place updates and stop following the transcript as it grows.
+            .onChange(of: store.transcript.messages.last) { _, _ in
                 withAnimation(.easeOut(duration: 0.2)) {
                     proxy.scrollTo(Self.bottomAnchor, anchor: .bottom)
                 }

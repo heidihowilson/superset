@@ -162,6 +162,11 @@ final class AuthController: RelayCredentialGate {
     private func setToken(_ newToken: AuthToken?) {
         token = newToken
         tokenBox.value = newToken
+        // The relay/host JWT is minted from this principal, so any token change —
+        // sign-out, sign-in, or an account switch — must drop the cache; otherwise the
+        // RCE-grade token outlives its credentials for up to the 50-minute reuse window
+        // (PRD §13, ADR-0008). The relay cache lives off the main actor, so hop to it.
+        Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
     }
 
     /// Enter the signed-out state and run its side effects (the cache reset) so every

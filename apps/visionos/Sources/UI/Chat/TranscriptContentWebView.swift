@@ -58,6 +58,13 @@ struct TranscriptContentWebView: UIViewRepresentable {
         func render(_ markdown: String, into webView: WKWebView) {
             self.webView = webView
             guard lastRendered != markdown else { return }
+            // Before the document loads, `window.__render` doesn't exist yet. Stash the
+            // latest markdown (overwriting any earlier pending value) so `didFinish`
+            // flushes the most recent content, not a stale intermediate poll update.
+            if webView.isLoading {
+                pendingMarkdown = markdown
+                return
+            }
             lastRendered = markdown
             guard let payload = Self.jsString(markdown) else { return }
             // No reload — re-render in place so a poll update never blanks the surface.

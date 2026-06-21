@@ -57,7 +57,15 @@ enum JSONValue: Sendable, Equatable, Decodable {
         case let .string(value):
             rendered = value
         case let .number(value):
-            rendered = value == value.rounded() ? String(Int(value)) : String(value)
+            // Render whole numbers without a decimal, but only when they fit in `Int`:
+            // `Int(value)` traps on a value past `Int` range, so fall back to the Double
+            // string for integral-but-out-of-range payloads.
+            if value == value.rounded(),
+               value >= Double(Int.min), value < Double(Int.max) {
+                rendered = String(Int(value))
+            } else {
+                rendered = String(value)
+            }
         case let .bool(value):
             rendered = value ? "true" : "false"
         case .null:

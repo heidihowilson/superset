@@ -7,11 +7,17 @@ import Foundation
 /// it owns — cross-client discovery is V2.
 struct SessionIDStore: Sendable {
     private let keyPrefix = "chat.session.v1."
+    /// Serializes the check-then-mint below so two callers (e.g. the watch provider and
+    /// the sender, built concurrently for one Workspace) can't both see the key missing
+    /// and mint duplicate session ids. Static so it serializes across store instances.
+    private static let mintLock = NSLock()
 
     /// The persisted session id for a Workspace, minting and saving one on first use.
     /// Deterministic across launches: the same Workspace always resolves to the same id.
     func sessionID(for workspaceID: String) -> String {
         let key = keyPrefix + workspaceID
+        Self.mintLock.lock()
+        defer { Self.mintLock.unlock() }
         if let existing = UserDefaults.standard.string(forKey: key) {
             return existing
         }
