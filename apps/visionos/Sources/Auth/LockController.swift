@@ -9,8 +9,10 @@ import Observation
 protocol RelayCredentialGate: AnyObject {
     /// Drop the cached relay JWT now (proactive, ahead of the ~1h revocation lag).
     func dropRelayToken()
-    /// Gate minting: while locked, the provider refuses to mint a new JWT.
-    func setRelayLocked(_ locked: Bool)
+    /// Gate minting: while locked, the provider refuses to mint a new JWT. `generation`
+    /// orders this against other seal/release calls so the gate ends up matching the
+    /// latest `LockState` regardless of which hop reaches the provider last.
+    func setRelayLocked(_ locked: Bool, generation: Int)
 }
 
 /// Where the wearer stands at the Optic ID gate. Distinct from `AuthStatus`: a user can
@@ -42,6 +44,9 @@ final class LockController {
     private let authenticator: LocalAuthenticating
     private let relay: RelayCredentialGate?
     private let reason: String
+    /// Monotonic token bumped on every seal/release so the relay actor can discard a hop
+    /// that lands out of order (lock → authenticate → unlock fire as independent tasks).
+    private var relayGeneration = 0
 
     init(
         authenticator: LocalAuthenticating = OpticIDAuthenticator(),
@@ -55,12 +60,11 @@ final class LockController {
 
     var isLocked: Bool { state != .unlocked }
 
-    /// Enter the locked state and seal the relay credential: drop the cached JWT and
-    /// block re-minting until a passing Optic ID. Idempotent — safe to call from every
-    /// window's background transition and from the launch gate.
+    /// Enter the locked state and seal the relay credential: sealing also drops the cached
+    /// JWT and blocks re-minting until a passing Optic ID. Idempotent — safe to call from
+    /// every window's background transition and from the launch gate.
     func lock() {
-        relay?.setRelayLocked(true)
-        relay?.dropRelayToken()
+        sealRelay(true)
         if state == .authenticating { return }
         state = .locked
     }
@@ -83,8 +87,17 @@ final class LockController {
     /// Force unlock without an Optic ID prompt — used right after a fresh OAuth sign-in,
     /// where the browser handoff already proved the owner.
     func unlock() {
-        relay?.setRelayLocked(false)
+        sealRelay(false)
         state = .unlocked
+    }
+
+    /// Issue a seal/release to the relay gate under a fresh generation. The state mutation
+    /// in `lock()`/`unlock()` stays synchronous (its current ordering is load-bearing for
+    /// the multi-window launch gate); the generation lets the actor settle on whichever
+    /// intent was minted last even though these hops cross the actor boundary unordered.
+    private func sealRelay(_ sealed: Bool) {
+        relayGeneration += 1
+        relay?.setRelayLocked(sealed, generation: relayGeneration)
     }
 
     private var isFailed: Bool {

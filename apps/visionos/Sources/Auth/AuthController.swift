@@ -145,8 +145,10 @@ final class AuthController: RelayCredentialGate {
     /// Engage/release the relay-mint gate for the Optic ID lock (ADR-0008). While locked,
     /// the shared provider refuses to mint, so a poll behind the lock screen cannot
     /// re-acquire the RCE-grade JWT until the owner re-authenticates on foreground.
-    func setRelayLocked(_ locked: Bool) {
-        Task { [relayTokenProvider] in await relayTokenProvider.setLocked(locked) }
+    /// `generation` carries the lock-state transition order onto the actor so a late hop
+    /// can't reseal the credential after a newer unlock (or vice versa).
+    func setRelayLocked(_ locked: Bool, generation: Int) {
+        Task { [relayTokenProvider] in await relayTokenProvider.setLocked(locked, generation: generation) }
     }
 
     private func setToken(_ newToken: AuthToken?) {

@@ -16,6 +16,10 @@ actor RelayTokenProvider {
     /// Set while the Optic ID gate is engaged (ADR-0008). Blocks minting so a poll that
     /// ticks behind the lock screen can't re-acquire the RCE-grade JWT before re-auth.
     private var locked = false
+    /// Highest lock-state generation applied so far. `setLocked` ignores any update older
+    /// than this so the gate's seal/release calls — fire-and-forget hops onto this actor —
+    /// converge on the latest `LockState` intent even when they arrive out of call order.
+    private var lockGeneration = 0
 
     init(api: AuthAPIClient) {
         self.api = api
@@ -36,8 +40,13 @@ actor RelayTokenProvider {
     }
 
     /// Engage/release the Optic ID gate. Locking also drops the cached token so a stale
-    /// JWT can't be served; unlocking lets the next poll re-mint after re-auth.
-    func setLocked(_ value: Bool) {
+    /// JWT can't be served; unlocking lets the next poll re-mint after re-auth. `generation`
+    /// is a monotonic token minted on the lock controller in transition order: a stale
+    /// update (a lower generation arriving late) is dropped so the gate can't be left
+    /// sealed after the UI has unlocked, or open before the lock has engaged.
+    func setLocked(_ value: Bool, generation: Int) {
+        guard generation > lockGeneration else { return }
+        lockGeneration = generation
         locked = value
         if value { cached = nil }
     }
