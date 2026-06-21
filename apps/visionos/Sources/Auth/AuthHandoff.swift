@@ -19,7 +19,11 @@ enum AuthHandoff {
     /// it across the browser round-trip and rejects a callback whose `state` differs.
     static func makeStateToken() -> String {
         var bytes = [UInt8](repeating: 0, count: 32)
-        if SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes) != errSecSuccess {
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        if status != errSecSuccess {
+            // arc4random-backed and still CSPRNG-grade, but a SecRandom failure is an
+            // unusual system state worth flagging in debug rather than swallowing.
+            assertionFailure("SecRandomCopyBytes failed (status \(status)); using fallback")
             for index in bytes.indices { bytes[index] = UInt8.random(in: .min ... .max) }
         }
         return Data(bytes).base64URLEncodedString()

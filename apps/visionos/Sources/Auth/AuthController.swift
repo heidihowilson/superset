@@ -28,18 +28,34 @@ final class AuthController {
     private let configuration: AuthConfiguration
     private let tokenStore: TokenStore
     private let webAuth: WebAuthenticating
+    private let pendingStateStore: PendingStateStore
     private let tokenBox = TokenBox()
     /// The `state` issued for the in-flight handoff, validated against the callback.
+    /// Mirrored into `pendingStateStore` via `setPendingState` so a callback that
+    /// arrives after a cold start (the process was killed mid-OAuth) still validates.
     private var pendingState: String?
 
     init(
         configuration: AuthConfiguration = .default,
         tokenStore: TokenStore = KeychainTokenStore(),
-        webAuth: WebAuthenticating = WebAuthenticationSessionAuthenticator()
+        webAuth: WebAuthenticating = WebAuthenticationSessionAuthenticator(),
+        pendingStateStore: PendingStateStore = UserDefaultsPendingStateStore()
     ) {
         self.configuration = configuration
         self.tokenStore = tokenStore
         self.webAuth = webAuth
+        self.pendingStateStore = pendingStateStore
+    }
+
+    /// Keep the in-memory nonce and its durable copy in lockstep — assign through
+    /// this, never `pendingState` directly, so a cold-start callback can recover it.
+    private func setPendingState(_ value: String?) {
+        pendingState = value
+        if let value {
+            pendingStateStore.save(value)
+        } else {
+            pendingStateStore.clear()
+        }
     }
 
     /// Bearer seam for cloud/relay calls. The client reads the live token through
@@ -64,14 +80,19 @@ final class AuthController {
             if let stored = try tokenStore.load(), !stored.isExpired {
                 setToken(stored)
                 status = .signedIn
+                // Already authed — no handoff is in flight, so drop any stale nonce.
+                setPendingState(nil)
             } else {
                 try? tokenStore.clear()
                 setToken(nil)
                 status = .signedOut
+                // Recover an interrupted handoff so a pending cold-start callback validates.
+                pendingState = pendingStateStore.load()
             }
         } catch {
             setToken(nil)
             status = .signedOut
+            pendingState = pendingStateStore.load()
         }
     }
 
@@ -80,7 +101,7 @@ final class AuthController {
         status = .authenticating
 
         let state = AuthHandoff.makeStateToken()
-        pendingState = state
+        setPendingState(state)
         let url = AuthHandoff.connectURL(
             configuration: configuration,
             provider: provider,
@@ -98,13 +119,17 @@ final class AuthController {
         } catch {
             status = .failed(Self.message(for: error))
         }
-        pendingState = nil
+        setPendingState(nil)
     }
 
     /// Resolve a `superset://auth/callback` deep link that arrived outside the
-    /// browser session (a cold-start pending link, PRD §11). Ignored when it is not
-    /// a callback or no handoff is in flight.
+    /// browser session (a cold-start pending link, PRD §11). Recovers the nonce from
+    /// durable storage when the in-memory copy was lost to a process restart. Ignored
+    /// when it is not a callback or no handoff is in flight.
     func handleDeepLink(_ url: URL) {
+        if pendingState == nil {
+            pendingState = pendingStateStore.load()
+        }
         guard url.scheme == configuration.callbackScheme,
               pendingState != nil
         else { return }
@@ -113,13 +138,13 @@ final class AuthController {
         } catch {
             status = .failed(Self.message(for: error))
         }
-        pendingState = nil
+        setPendingState(nil)
     }
 
     func signOut() {
         try? tokenStore.clear()
         setToken(nil)
-        pendingState = nil
+        setPendingState(nil)
         status = .signedOut
     }
 

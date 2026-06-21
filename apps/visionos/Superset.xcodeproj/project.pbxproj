@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		093B1209E89A07CAEDA91E45 /* DebugDumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */; };
+		0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */; };
 		15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */; };
 		21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */; };
 		518D0A4734F6A0619353EE77 /* AuthAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */; };
@@ -22,6 +23,7 @@
 		8C3E9B4FC201957E4E2B93D6 /* Workspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951C8B061117E946C12C674B /* Workspace.swift */; };
 		8D2AD532F7C04553E750A2BA /* WorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */; };
 		8D53CDE375B2AF87C04BF4FC /* SupersetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34473633D6974E4EDDF25D7 /* SupersetApp.swift */; };
+		8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */; };
 		90EA0BA2EB3790BD092511AE /* WebAuthenticating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */; };
 		9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E12DC999DAD3D512CB63A0 /* PaneKind.swift */; };
 		A97A651F9FE82B71D4207033 /* AuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC57904E84BCB8C49B06BC /* AuthController.swift */; };
@@ -56,7 +58,9 @@
 		B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStatus.swift; sourceTree = "<group>"; };
 		C535EAF837D94137217D69C1 /* AdapterRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdapterRegistry.swift; sourceTree = "<group>"; };
 		DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeWorkspaceAdapter.swift; sourceTree = "<group>"; };
+		E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingStateStore.swift; sourceTree = "<group>"; };
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
+		F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStatusView.swift; sourceTree = "<group>"; };
 		F0F959F6CC86D853AE500BE5 /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
 		FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugDumpView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -101,6 +105,7 @@
 				F0F959F6CC86D853AE500BE5 /* AuthError.swift */,
 				29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */,
 				1F0955CFCBD44D5379F9687F /* AuthToken.swift */,
+				E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */,
 				7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */,
 				20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */,
 			);
@@ -142,6 +147,7 @@
 				FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */,
 				7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */,
 				9F36DC5B2A7314017753C666 /* RootView.swift */,
+				F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */,
 				92DB07131AB224ABB387A03E /* SignInView.swift */,
 				AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */,
 				5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */,
@@ -220,8 +226,10 @@
 				7FA3E995B478E1C9EFAF5461 /* DebugListAdapter.swift in Sources */,
 				774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */,
 				9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */,
+				8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */,
 				21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */,
 				B41E3A8CF9DC2C1FB773DBF6 /* RootView.swift in Sources */,
+				0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
 				8D53CDE375B2AF87C04BF4FC /* SupersetApp.swift in Sources */,
 				F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */,

@@ -69,6 +69,40 @@ struct AuthAPIClient: Sendable {
         try Self.ensureOK(response)
     }
 
+    /// Read the current better-auth session (`/api/auth/get-session`) — the cheapest
+    /// proof the stored bearer token authenticates against the cloud, and the source
+    /// of the session's `activeOrganizationId` (which org `setActiveOrganization`
+    /// switches without re-auth).
+    func fetchSession() async throws -> SessionInfo {
+        var request = URLRequest(url: configuration.apiBaseURL.appendingPathComponent("api/auth/get-session"))
+        try authorize(&request)
+
+        let (data, response) = try await http.data(for: request)
+        try Self.ensureOK(response)
+        struct Payload: Decodable {
+            struct Session: Decodable { let activeOrganizationId: String? }
+            struct User: Decodable { let email: String? }
+            let session: Session?
+            let user: User?
+        }
+        let payload = try JSONDecoder().decode(Payload.self, from: data)
+        return SessionInfo(
+            activeOrganizationID: payload.session?.activeOrganizationId,
+            userEmail: payload.user?.email
+        )
+    }
+
+    /// The organizations the signed-in user belongs to (`/api/auth/organization/list`,
+    /// better-auth organization plugin) — the candidates for an active-org switch.
+    func listOrganizations() async throws -> [OrganizationSummary] {
+        var request = URLRequest(url: configuration.apiBaseURL.appendingPathComponent("api/auth/organization/list"))
+        try authorize(&request)
+
+        let (data, response) = try await http.data(for: request)
+        try Self.ensureOK(response)
+        return try JSONDecoder().decode([OrganizationSummary].self, from: data)
+    }
+
     private static func ensureOK(_ response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse else {
             throw AuthError.badServerResponse(status: -1)
@@ -77,4 +111,18 @@ struct AuthAPIClient: Sendable {
             throw AuthError.badServerResponse(status: http.statusCode)
         }
     }
+}
+
+/// The slice of the better-auth session the M0a connectivity check surfaces: who is
+/// signed in and which org is active. Hand-typed at the boundary (PRD §12) — the
+/// full cloud tRPC contract with SuperJSON models lands with the workspace list.
+struct SessionInfo: Sendable, Equatable {
+    let activeOrganizationID: String?
+    let userEmail: String?
+}
+
+/// A membership candidate for an active-org switch.
+struct OrganizationSummary: Decodable, Sendable, Equatable, Identifiable {
+    let id: String
+    let name: String
 }
