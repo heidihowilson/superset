@@ -170,8 +170,8 @@ extension WorkspaceStore {
             WorkspaceListSnapshot(
                 projects: [Project(id: "p-superset", name: "superset")],
                 workspaces: [
-                    Workspace(id: "ws-auth", name: "auth-handoff", projectID: "p-superset", projectName: "superset", status: .running),
-                    Workspace(id: "ws-relay", name: "relay-tunnel", projectID: "p-superset", projectName: "superset", status: .idle),
+                    Workspace(id: "ws-auth", name: "auth-handoff", projectID: "p-superset", projectName: "superset", status: .hostOnline),
+                    Workspace(id: "ws-relay", name: "relay-tunnel", projectID: "p-superset", projectName: "superset", status: .planGated),
                     Workspace(id: "ws-vision", name: "vision-pro-app", projectID: "p-superset", projectName: "superset", status: .hostAsleep),
                 ]
             )

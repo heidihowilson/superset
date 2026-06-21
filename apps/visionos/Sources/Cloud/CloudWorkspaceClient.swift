@@ -15,26 +15,86 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
     func fetchSnapshot() async throws -> WorkspaceListSnapshot {
         let organizationID = try await resolveOrganizationID()
 
-        async let projectRows: [ProjectRow] = query(
+        // Projects + workspaces are the critical surface: a failure here fails the
+        // poll. Host status (online + plan gate) is fetched best-effort alongside —
+        // it enriches the badge but must never blank the list (PRD §6.3).
+        async let projectRows: [ProjectRow] = fetch(
             "v2Project.list",
             input: ["organizationId": organizationID]
         )
-        async let workspaceRows: [WorkspaceRow] = query(
+        async let workspaceRows: [WorkspaceRow] = fetch(
             "v2Workspace.list",
             input: ["organizationId": organizationID]
         )
+        async let onlineByHost: [String: Bool] = fetchOnlineByHost(organizationID)
 
         let projects = try await projectRows.map { Project(id: $0.id, name: $0.name) }
-        let workspaces = try await workspaceRows.map {
+        let rows = try await workspaceRows
+        let hosts = await onlineByHost
+
+        // Plan-gating is org-level (the subscription is on the org), so one
+        // host.checkAccess call settles it for the whole list (§11/R5).
+        let paidPlan = await resolvePaidPlan(
+            organizationID: organizationID,
+            anyHostID: rows.compactMap(\.hostId).first
+        )
+
+        let workspaces = rows.map { row in
             Workspace(
-                id: $0.id,
-                name: $0.name,
-                projectID: $0.projectId,
-                projectName: $0.projectName ?? "",
-                status: .unknown
+                id: row.id,
+                name: row.name,
+                projectID: row.projectId,
+                projectName: row.projectName ?? "",
+                status: Self.status(hostID: row.hostId, onlineByHost: hosts, paidPlan: paidPlan)
             )
         }
         return WorkspaceListSnapshot(projects: projects, workspaces: workspaces)
+    }
+
+    /// Reachability the Host-independent list CAN derive from cloud reads. Live run
+    /// state (running/done/error) is Host-gated over the relay and lands with Watch
+    /// (ADR-0006, §6.3) — it is intentionally not synthesized here.
+    private static func status(
+        hostID: String?,
+        onlineByHost: [String: Bool],
+        paidPlan: Bool?
+    ) -> WorkspaceStatus {
+        // A known-false plan gate is decisive (host calls 403 regardless of online
+        // state). An indeterminate read must not mislabel access, so fall through.
+        if paidPlan == false { return .planGated }
+        guard let hostID, let online = onlineByHost[hostID] else { return .unknown }
+        return online ? .hostOnline : .hostAsleep
+    }
+
+    /// `host.list` online flags keyed by machineId — best-effort: a failure degrades
+    /// status to `.unknown`, it never fails the list poll.
+    private func fetchOnlineByHost(_ organizationID: String) async -> [String: Bool] {
+        do {
+            let rows: [HostRow] = try await fetch(
+                "host.list",
+                input: ["organizationId": organizationID]
+            )
+            return Dictionary(rows.map { ($0.id, $0.online) }, uniquingKeysWith: { _, last in last })
+        } catch {
+            return [:]
+        }
+    }
+
+    /// Whether the org is on a paid/trialing plan, via `host.checkAccess` keyed by any
+    /// of its hosts (`organizationId:machineId`, the host-routing-key contract). Returns
+    /// nil when undeterminable (no hosts, or a transient failure) so a poll hiccup never
+    /// mislabels a Workspace as plan-gated.
+    private func resolvePaidPlan(organizationID: String, anyHostID: String?) async -> Bool? {
+        guard let anyHostID else { return nil }
+        do {
+            let access: HostAccess = try await fetch(
+                "host.checkAccess",
+                input: ["hostId": "\(organizationID):\(anyHostID)"]
+            )
+            return access.paidPlan
+        } catch {
+            return nil
+        }
     }
 
     /// The org to scope the list to: the session's active org, else the user's first
@@ -46,7 +106,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         throw AuthError.noActiveOrganization
     }
 
-    private func query<Row: Decodable>(_ path: String, input: [String: String]) async throws -> [Row] {
+    private func fetch<Payload: Decodable>(_ path: String, input: [String: String]) async throws -> Payload {
         let envelope = ["json": input]
         let inputData = try JSONSerialization.data(withJSONObject: envelope)
         let inputString = String(decoding: inputData, as: UTF8.self)
@@ -63,7 +123,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
 
         let (data, response) = try await api.http.data(for: request)
         try Self.ensureOK(response)
-        return try JSONDecoder().decode(TRPCResult<[Row]>.self, from: data).result.data.json
+        return try JSONDecoder().decode(TRPCResult<Payload>.self, from: data).result.data.json
     }
 
     private static func ensureOK(_ response: URLResponse) throws {
@@ -91,11 +151,26 @@ private struct ProjectRow: Decodable {
     let name: String
 }
 
-/// `v2Workspace.list` row — `projectId`/`projectName` drive grouping; other columns
-/// (branch, type, createdAt) are intentionally not decoded until a feature needs them.
+/// `v2Workspace.list` row — `projectId`/`projectName` drive grouping; `hostId` keys the
+/// reachability status. Other columns (branch, type, createdAt) are intentionally not
+/// decoded until a feature needs them.
 private struct WorkspaceRow: Decodable {
     let id: String
     let name: String
     let projectId: String?
     let projectName: String?
+    let hostId: String?
+}
+
+/// `host.list` row — only the online flag (keyed by machineId `id`) is consumed here.
+private struct HostRow: Decodable {
+    let id: String
+    let online: Bool
+}
+
+/// `host.checkAccess` result — `paidPlan` is the org plan gate (`allowed` is implied
+/// for any listed Workspace, which inner-joins the user's host membership).
+private struct HostAccess: Decodable {
+    let allowed: Bool
+    let paidPlan: Bool
 }
