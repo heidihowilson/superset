@@ -7,7 +7,7 @@ import SwiftUI
 struct SupersetApp: App {
     var body: some Scene {
         WindowGroup {
-            RootView()
+            AuthGateView()
         }
         .defaultSize(width: 760, height: 820)
     }
