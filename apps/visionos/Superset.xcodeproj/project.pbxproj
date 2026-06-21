@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		71FB27F602DE54B7B2ECF18E /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */; };
-		22021B324AF4F1C2ACA25396 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34583EBE7D99316044963C56 /* SettingsModel.swift */; };
-		26277365E711EC0DF90C99B4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */; };
 		03572042072CD60937FE9971 /* HostSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */; };
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		04C0E1E65158014FCA476D8E /* RelayTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */; };
@@ -30,6 +27,7 @@
 		314387A8B8FB6C1F6CB1352B /* WorkspaceListSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */; };
 		318AE87A0DB1984EC684CBA5 /* ChatSending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6082965EE16AC8180EE852AB /* ChatSending.swift */; };
 		4677A02239BCFDAB2528C883 /* MessageRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74435601BA60CDC6A6783E5 /* MessageRowView.swift */; };
+		46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2978A7F458C82111FBB5B731 /* SettingsModel.swift */; };
 		48D6739261B886DC0ADEB607 /* OpenWindowsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E033B8837C310A1ACC8BF8 /* OpenWindowsModel.swift */; };
 		518D0A4734F6A0619353EE77 /* AuthAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */; };
 		545E8D04830E2C024962F48B /* WindowRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B5CF265C0A693A32E586A6 /* WindowRouter.swift */; };
@@ -38,6 +36,7 @@
 		57C72921400D9FFEE6A4C533 /* WorkspaceSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */; };
 		5E0D2502006B85DB858A481B /* InteractionModelRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1FAFF61D8724B174205ECA /* InteractionModelRegistry.swift */; };
 		6315F9471E6591AB2B5FA504 /* AgentPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */; };
+		6C09EBBD3266BE28C3928D8B /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FD4BDCD99524147416F507 /* AppSettingsStore.swift */; };
 		723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DB07131AB224ABB387A03E /* SignInView.swift */; };
 		774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */; };
 		7DF5684B45A4332F4AE85E49 /* WorkspaceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */; };
@@ -53,6 +52,7 @@
 		90EA0BA2EB3790BD092511AE /* WebAuthenticating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */; };
 		90F31E6C569BE9EF2B99AB38 /* LocalAuthenticating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E54C463B7C9F6B1808C8587 /* LocalAuthenticating.swift */; };
 		9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E12DC999DAD3D512CB63A0 /* PaneKind.swift */; };
+		9EB4375690B5B18B47D4D5D9 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84E52950F51D244AFDD15CE1 /* OnboardingView.swift */; };
 		9FFCAEAAF043A69F58200B96 /* ComposerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D82E9A288FF8D1A3D58DB6E9 /* ComposerStore.swift */; };
 		A5E215B39DF4E3D7971949B2 /* HostServiceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C4F66798274C0C2405DA556 /* HostServiceClient.swift */; };
 		A97A651F9FE82B71D4207033 /* AuthController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DDC57904E84BCB8C49B06BC /* AuthController.swift */; };
@@ -64,9 +64,11 @@
 		BE87A8E9315B404F3D41F9D0 /* WorkspaceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */; };
 		BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */; };
 		BEA166713C42991BC1044B55 /* DictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */; };
+		C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF721B84B64BBFA6A277F655 /* SettingsView.swift */; };
 		C7F1C7C4A2991D2DDE633F6C /* LockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714C9E7340031FA6EF71C5A /* LockGate.swift */; };
 		CA1A0EE668C67131AC87D08F /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB289D39EB7C8517A4F924B2 /* JSONValue.swift */; };
 		CBFCC03B6B2DA044692A80BE /* AuthToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0955CFCBD44D5379F9687F /* AuthToken.swift */; };
+		E9FF1F83E22847605B58B3B6 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */; };
 		F3E655B98BF06D05AB324E38 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A354115CC73B8D78D623386 /* ComposerView.swift */; };
 		F68C9ACC7FCC7FB8A62D4C0B /* ChatTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A752A00CBBF07D23FB817A /* ChatTranscript.swift */; };
 		F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */; };
@@ -75,9 +77,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
-		34583EBE7D99316044963C56 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
-		CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		06A752A00CBBF07D23FB817A /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
 		08B5CF265C0A693A32E586A6 /* WindowRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowRouter.swift; sourceTree = "<group>"; };
 		0A89302CCDC57D318AACE341 /* ChatTranscriptProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscriptProviding.swift; sourceTree = "<group>"; };
@@ -88,7 +87,9 @@
 		194E32D705561C5BE2FAC96F /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
 		1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationController.swift; sourceTree = "<group>"; };
 		1F0955CFCBD44D5379F9687F /* AuthToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthToken.swift; sourceTree = "<group>"; };
+		20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStore.swift; sourceTree = "<group>"; };
 		20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthenticating.swift; sourceTree = "<group>"; };
+		2978A7F458C82111FBB5B731 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHandoff.swift; sourceTree = "<group>"; };
 		2A354115CC73B8D78D623386 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		38AB15580946313EA26FC000 /* AuthGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGateView.swift; sourceTree = "<group>"; };
@@ -105,11 +106,13 @@
 		5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAPIClient.swift; sourceTree = "<group>"; };
 		604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenProvider.swift; sourceTree = "<group>"; };
 		6082965EE16AC8180EE852AB /* ChatSending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSending.swift; sourceTree = "<group>"; };
+		64FD4BDCD99524147416F507 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
 		66E12DC999DAD3D512CB63A0 /* PaneKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneKind.swift; sourceTree = "<group>"; };
 		6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWorkspaceListCache.swift; sourceTree = "<group>"; };
 		7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPaneView.swift; sourceTree = "<group>"; };
 		7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentPreset.swift; sourceTree = "<group>"; };
+		84E52950F51D244AFDD15CE1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		92DB07131AB224ABB387A03E /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		951C8B061117E946C12C674B /* Workspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace.swift; sourceTree = "<group>"; };
 		999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStore.swift; sourceTree = "<group>"; };
@@ -136,6 +139,7 @@
 		E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingStateStore.swift; sourceTree = "<group>"; };
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIDStore.swift; sourceTree = "<group>"; };
+		EF721B84B64BBFA6A277F655 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStatusView.swift; sourceTree = "<group>"; };
 		F0F959F6CC86D853AE500BE5 /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
 		FA0FFEE2E71BD748C8C1DF25 /* LockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockController.swift; sourceTree = "<group>"; };
@@ -175,6 +179,15 @@
 				A6180B8BEA53AC401CC16168 /* Routing */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		3189518095884CDA2ADDE4AC /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */,
+				84E52950F51D244AFDD15CE1 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		38134F1BF13006725476B2C0 /* Adapters */ = {
@@ -278,11 +291,9 @@
 		B55B99E04A5AB3A18722103B /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				A3060C7B46761D52A59BC2FE /* AppSettingsStore.swift */,
+				64FD4BDCD99524147416F507 /* AppSettingsStore.swift */,
 				38AB15580946313EA26FC000 /* AuthGateView.swift */,
 				FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */,
-				34583EBE7D99316044963C56 /* SettingsModel.swift */,
-				CA038BDE3985DF9BF0A66B8B /* SettingsView.swift */,
 				5A1FAFF61D8724B174205ECA /* InteractionModelRegistry.swift */,
 				A714C9E7340031FA6EF71C5A /* LockGate.swift */,
 				48383CE2E272082F5B861F2C /* LockView.swift */,
@@ -291,6 +302,8 @@
 				CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */,
 				9F36DC5B2A7314017753C666 /* RootView.swift */,
 				F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */,
+				2978A7F458C82111FBB5B731 /* SettingsModel.swift */,
+				EF721B84B64BBFA6A277F655 /* SettingsView.swift */,
 				92DB07131AB224ABB387A03E /* SignInView.swift */,
 				08B5CF265C0A693A32E586A6 /* WindowRouter.swift */,
 				9CD8E03372D3D5EE6DF32053 /* WorkspaceCreateView.swift */,
@@ -300,6 +313,7 @@
 				4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */,
 				4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */,
 				A9BA41B4CA67AD9E60FC4DB3 /* Chat */,
+				3189518095884CDA2ADDE4AC /* Onboarding */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -365,9 +379,7 @@
 			files = (
 				03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */,
 				6315F9471E6591AB2B5FA504 /* AgentPreset.swift in Sources */,
-				71FB27F602DE54B7B2ECF18E /* AppSettingsStore.swift in Sources */,
-				22021B324AF4F1C2ACA25396 /* SettingsModel.swift in Sources */,
-				26277365E711EC0DF90C99B4 /* SettingsView.swift in Sources */,
+				6C09EBBD3266BE28C3928D8B /* AppSettingsStore.swift in Sources */,
 				518D0A4734F6A0619353EE77 /* AuthAPIClient.swift in Sources */,
 				15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */,
 				A97A651F9FE82B71D4207033 /* AuthController.swift in Sources */,
@@ -399,6 +411,8 @@
 				553D719B351AD5089ECA5064 /* LockView.swift in Sources */,
 				4677A02239BCFDAB2528C883 /* MessageRowView.swift in Sources */,
 				774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */,
+				E9FF1F83E22847605B58B3B6 /* OnboardingStore.swift in Sources */,
+				9EB4375690B5B18B47D4D5D9 /* OnboardingView.swift in Sources */,
 				48D6739261B886DC0ADEB607 /* OpenWindowsModel.swift in Sources */,
 				9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */,
 				8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */,
@@ -409,6 +423,8 @@
 				B41E3A8CF9DC2C1FB773DBF6 /* RootView.swift in Sources */,
 				253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */,
 				0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */,
+				46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */,
+				C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
 				8D53CDE375B2AF87C04BF4FC /* SupersetApp.swift in Sources */,
 				F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */,

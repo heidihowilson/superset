@@ -20,6 +20,7 @@ struct AuthGateView: View {
 
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
+    @Environment(OnboardingStore.self) private var onboarding
     @State private var pendingRoute: DeepLinkRoute?
 
     var body: some View {
@@ -56,6 +57,16 @@ struct AuthGateView: View {
         }
     }
 
+    /// Drives the onboarding sheet off the shared store. The setter funnels every
+    /// dismissal path into `complete()` so closing the tour — by button or swipe — always
+    /// records the first run as done.
+    private var onboardingPresented: Binding<Bool> {
+        Binding(
+            get: { onboarding.isPresented },
+            set: { presented in if !presented { onboarding.complete() } }
+        )
+    }
+
     private func flushPendingRoute() {
         guard let route = pendingRoute else { return }
         pendingRoute = nil
@@ -89,6 +100,12 @@ struct AuthGateView: View {
                     }
                     .padding()
                     .glassBackgroundEffect()
+                }
+                // First-run onboarding presents over the command-center window only
+                // (FR-ONB). Any dismissal — Done, Skip, or an interactive swipe — routes
+                // through `complete()`, so first-run is recorded however the user leaves.
+                .sheet(isPresented: onboardingPresented) {
+                    OnboardingView(store: store, onboarding: onboarding)
                 }
         case .signedOut, .authenticating, .failed:
             SignInView(controller: auth)

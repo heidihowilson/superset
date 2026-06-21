@@ -19,6 +19,7 @@ struct SupersetApp: App {
     @State private var models = InteractionModelRegistry()
     @State private var openWindows = OpenWindowsModel()
     @State private var appSettings = AppSettingsStore()
+    @State private var onboarding = OnboardingStore()
 
     init() {
         let auth = AuthController()
@@ -41,6 +42,7 @@ struct SupersetApp: App {
     var body: some Scene {
         WindowGroup {
             AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
+                .environment(onboarding)
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }
@@ -70,6 +72,7 @@ struct SupersetApp: App {
         WindowGroup(id: SettingsScene.windowID) {
             SettingsView(auth: auth, store: store)
                 .environment(appSettings)
+                .environment(onboarding)
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }

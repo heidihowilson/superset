@@ -19,6 +19,7 @@ struct SettingsView: View {
     @Bindable var store: WorkspaceStore
 
     @Environment(AppSettingsStore.self) private var appSettings
+    @Environment(OnboardingStore.self) private var onboarding
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
 
@@ -61,6 +62,19 @@ struct SettingsView: View {
                     Text("Input & Notifications")
                 } footer: {
                     Text("These preferences are stored on this device.")
+                }
+
+                Section {
+                    Button("Show Welcome Tour") {
+                        // The tour presents over the command-center window (FR-ONB), so
+                        // close Settings to surface it unobstructed there.
+                        onboarding.replay()
+                        dismissWindow(id: SettingsScene.windowID)
+                    }
+                } header: {
+                    Text("Onboarding")
+                } footer: {
+                    Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
                 }
 
                 accountSection
