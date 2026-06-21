@@ -13,6 +13,15 @@ struct AuthGateView: View {
         content
             .onAppear { auth.restore() }
             .onOpenURL { auth.handleDeepLink($0) }
+            // Any landing in a signed-out state — an explicit Sign Out, or a launch
+            // where `restore()` finds the token expired/missing — must drop the
+            // previous account's cached Workspaces. The store loads its durable cache
+            // at app init, before a session is known, so without this the next sign-in
+            // would paint the prior account's rows until the first poll (privacy +
+            // correctness). Keying on `.signedOut` makes this the single owner.
+            .onChange(of: auth.status) { _, status in
+                if status == .signedOut { store.reset() }
+            }
     }
 
     @ViewBuilder
@@ -28,9 +37,6 @@ struct AuthGateView: View {
                 .ornament(attachmentAnchor: .scene(.topTrailing)) {
                     Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right") {
                         auth.signOut()
-                        // Drop the previous account's cached Workspaces so the next
-                        // sign-in never paints them (privacy + correctness).
-                        store.reset()
                     }
                     .padding()
                     .glassBackgroundEffect()
