@@ -7,7 +7,10 @@ import SwiftUI
 /// the empty case (AGENTS rule 9 analog for the polled list).
 struct WorkspaceListView: View {
     @Bindable var store: WorkspaceStore
+    @Environment(InteractionModelRegistry.self) private var models
+    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     @State private var isCreating = false
     @State private var renameTarget: Workspace?
@@ -88,8 +91,14 @@ struct WorkspaceListView: View {
                     } else {
                         ForEach(group.workspaces) { workspace in
                             Button {
-                                store.select(workspace.id)
-                                openWindow(id: WorkspaceScene.windowID, value: workspace.id)
+                                WindowRouter.openWorkspace(
+                                    workspace.id,
+                                    store: store,
+                                    models: models,
+                                    openWindows: openWindows,
+                                    openWindow: openWindow,
+                                    dismissWindow: dismissWindow
+                                )
                             } label: {
                                 WorkspaceRow(
                                     workspace: workspace,

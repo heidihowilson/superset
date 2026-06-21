@@ -4,14 +4,19 @@ import SwiftUI
 /// `WindowGroup`s, no `ImmersiveSpace`); the system owns window placement and the app
 /// passes only a `defaultSize` hint (PRD §7.1, PI-1).
 ///
-/// Owns the app-wide `AuthController` and the cloud-backed `WorkspaceStore` so both
-/// the root window and the per-Workspace windows render the same store. Workspace
-/// windows are keyed by Workspace id, so opening an already-open Workspace focuses its
-/// window instead of spawning a duplicate.
+/// Owns the app-wide singletons the windows share: the `AuthController`, the
+/// cloud-backed `WorkspaceStore`, the `InteractionModelRegistry` (the §10 windowing
+/// flag), and the `OpenWindowsModel` (the roster backing consolidate). Workspace and
+/// Project windows are `WindowGroup(for:)` scenes keyed by domain id, so opening an
+/// already-open id focuses its window instead of spawning a duplicate (PRD §7.1).
+/// Both restore on relaunch (intent, not just geometry — PRD §16.2): the restored view
+/// reloads against the shared store and shows a 404 surface for a deleted id.
 @main
 struct SupersetApp: App {
     @State private var auth: AuthController
     @State private var store: WorkspaceStore
+    @State private var models = InteractionModelRegistry()
+    @State private var openWindows = OpenWindowsModel()
 
     init() {
         let auth = AuthController()
@@ -25,13 +30,24 @@ struct SupersetApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AuthGateView(auth: auth, store: store)
+            AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
         }
         .defaultSize(width: 760, height: 820)
 
         WindowGroup(id: WorkspaceScene.windowID, for: Workspace.ID.self) { $workspaceID in
             WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
+                .environment(models)
+                .environment(openWindows)
         }
         .defaultSize(width: 720, height: 720)
+        .restorationBehavior(.automatic)
+
+        WindowGroup(id: ProjectScene.windowID, for: Project.ID.self) { $projectID in
+            ProjectWindowView(projectID: projectID, store: store)
+                .environment(models)
+                .environment(openWindows)
+        }
+        .defaultSize(width: 640, height: 720)
+        .restorationBehavior(.automatic)
     }
 }

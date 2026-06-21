@@ -5,14 +5,29 @@ import SwiftUI
 /// connectivity check (which exercises the bearer seams) and a Sign Out affordance.
 /// The `loading` flash while the Keychain is read is intentionally minimal — a
 /// progress view, not a redirect.
+///
+/// Also the deep-link entry point (PRD §16.2): `superset://auth/callback` completes the
+/// OAuth handoff; `workspace`/`project`/`session` links open the target window. A link
+/// that arrives signed-out is held as `pendingRoute` and replayed once sign-in lands
+/// (cold-start intent, PRD §11). Injects the interaction-model registry and the
+/// open-windows roster into the environment so the switcher/list/window controls share
+/// one instance of each.
 struct AuthGateView: View {
     let auth: AuthController
     let store: WorkspaceStore
+    let models: InteractionModelRegistry
+    let openWindows: OpenWindowsModel
+
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
+    @State private var pendingRoute: DeepLinkRoute?
 
     var body: some View {
         content
+            .environment(models)
+            .environment(openWindows)
             .onAppear { auth.restore() }
-            .onOpenURL { auth.handleDeepLink($0) }
+            .onOpenURL { handle($0) }
             // Any landing in a signed-out state — an explicit Sign Out, or a launch
             // where `restore()` finds the token expired/missing — must drop the
             // previous account's cached Workspaces. The store loads its durable cache
@@ -20,8 +35,49 @@ struct AuthGateView: View {
             // would paint the prior account's rows until the first poll (privacy +
             // correctness). Keying on `.signedOut` makes this the single owner.
             .onChange(of: auth.status) { _, status in
-                if status == .signedOut { store.reset() }
+                switch status {
+                case .signedOut:
+                    store.reset()
+                case .signedIn:
+                    flushPendingRoute()
+                default:
+                    break
+                }
             }
+    }
+
+    /// Route a `superset://` deep link. Auth callbacks always go to `AuthController`
+    /// (they may arrive mid-handoff); content links open immediately when signed in,
+    /// else wait as `pendingRoute` for the post-sign-in replay.
+    private func handle(_ url: URL) {
+        guard let route = DeepLinkRouter.route(url) else { return }
+        switch route {
+        case .authCallback:
+            auth.handleDeepLink(url)
+        default:
+            if auth.status == .signedIn {
+                open(route)
+            } else {
+                pendingRoute = route
+            }
+        }
+    }
+
+    private func flushPendingRoute() {
+        guard let route = pendingRoute else { return }
+        pendingRoute = nil
+        open(route)
+    }
+
+    private func open(_ route: DeepLinkRoute) {
+        WindowRouter.open(
+            route,
+            store: store,
+            models: models,
+            openWindows: openWindows,
+            openWindow: openWindow,
+            dismissWindow: dismissWindow
+        )
     }
 
     @ViewBuilder

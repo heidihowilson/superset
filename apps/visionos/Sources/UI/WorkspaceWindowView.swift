@@ -17,7 +17,9 @@ struct WorkspaceWindowView: View {
 
     @State private var chat = ChatSessionStore()
     @State private var composer = ComposerStore()
+    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.scenePhase) private var scenePhase
+    @State private var sceneActive = false
 
     private var workspace: Workspace? {
         guard let workspaceID else { return nil }
@@ -29,17 +31,37 @@ struct WorkspaceWindowView: View {
             if let workspace {
                 workspaceContent(workspace)
                     .navigationTitle(workspace.name)
-            } else {
+            } else if store.loadState == .loaded {
+                // The list has loaded and this id is absent — a deleted Workspace, not a
+                // slow restore. Show the 404 surface, not a spinner (PRD §16.2).
                 ContentUnavailableView(
                     "Workspace unavailable",
                     systemImage: "questionmark.square.dashed",
-                    description: Text("This workspace is no longer in the list.")
+                    description: Text("This workspace is no longer in the list. It may have been deleted.")
                 )
+            } else {
+                // Restored onto a not-yet-loaded list: keep loading until the poll lands,
+                // so a valid restored Workspace resolves to content rather than a false 404.
+                ProgressView("Loading workspace…")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        // Bind/start the watch poll for this Workspace; re-keys when the window is
-        // retargeted to a different Workspace id.
-        .task(id: workspaceID) {
+        .onAppear {
+            store.beginPolling()
+            syncForeground(scenePhase)
+            if let workspaceID { openWindows.registerWorkspace(workspaceID) }
+        }
+        .onDisappear {
+            syncForeground(.background)
+            chat.stopPolling()
+            store.endPolling()
+            if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
+        }
+        // Bind/start the watch poll once the Workspace resolves. Keyed off the resolved
+        // workspace id (not the passed-in id) so a restored/deep-linked window — which has
+        // a non-nil id before the list loads — re-runs this when the Workspace appears
+        // (nil→non-nil), and re-keys when the window is retargeted to a different id.
+        .task(id: workspace?.id) {
             guard let workspace, let provider = auth.makeChatTranscriptProvider(for: workspace) else { return }
             chat.bind(provider: provider, workspaceID: workspace.id)
             chat.startPolling()
@@ -51,8 +73,8 @@ struct WorkspaceWindowView: View {
                 await composer.loadPickers()
             }
         }
-        .onDisappear { chat.stopPolling() }
         .onChange(of: scenePhase) { _, phase in
+            syncForeground(phase)
             if phase == .active {
                 chat.startPolling()
             } else {
@@ -60,6 +82,17 @@ struct WorkspaceWindowView: View {
                 auth.dropRelayToken()
             }
         }
+    }
+
+    /// Report this scene's active-ness to the shared store, contributing exactly one to
+    /// its active-scene count and keeping register/unregister balanced across phase
+    /// changes and window close (so one inactive window can't pause the shared list poll
+    /// for others). The per-window watch poll is gated separately above.
+    private func syncForeground(_ phase: ScenePhase) {
+        let active = phase == .active
+        guard active != sceneActive else { return }
+        sceneActive = active
+        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     @ViewBuilder

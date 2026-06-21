@@ -12,7 +12,10 @@ enum WorkspaceScene {
 /// the window is keyed by Workspace id, re-tapping focuses the existing window.
 struct WorkspaceSwitcherView: View {
     @Bindable var store: WorkspaceStore
+    @Environment(InteractionModelRegistry.self) private var models
+    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
         ScrollView {
@@ -25,8 +28,14 @@ struct WorkspaceSwitcherView: View {
                             .padding(.top, 4)
                         ForEach(group.workspaces) { workspace in
                             Button {
-                                store.select(workspace.id)
-                                openWindow(id: WorkspaceScene.windowID, value: workspace.id)
+                                WindowRouter.openWorkspace(
+                                    workspace.id,
+                                    store: store,
+                                    models: models,
+                                    openWindows: openWindows,
+                                    openWindow: openWindow,
+                                    dismissWindow: dismissWindow
+                                )
                             } label: {
                                 HStack(spacing: 10) {
                                     Circle()

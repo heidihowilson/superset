@@ -46,6 +46,18 @@ final class WorkspaceStore {
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
     private var pollingTask: Task<Void, Never>?
+    /// Number of visible windows holding the poll open. Multi-window scenes share this one
+    /// store (PRD §13), so polling is reference-counted: it runs while ≥1 window is visible
+    /// and stops only when the last closes — a Workspace window restored on its own keeps the
+    /// list fresh, so it resolves to content or a 404 rather than a hung spinner (PRD §16.2).
+    private var pollingWindowCount = 0
+    /// Number of scenes currently reporting `.active`. visionOS backgrounds the whole app,
+    /// but each scene phases independently, so foreground is "≥1 active scene" — a single
+    /// boolean would be last-writer-wins, letting one inactive window pause the shared poll
+    /// for windows that are still visible. Ref-counted so one scene going inactive can't
+    /// stop polling while another stays active.
+    private var activeSceneCount = 0
+    private var isForeground: Bool { activeSceneCount > 0 }
     /// Monotonic token guarding against out-of-order applies: a `refresh` only commits
     /// its snapshot if the generation it captured is still current. Bumped on every
     /// refresh start and on `reset`, so a slow in-flight fetch can't clobber newer state
@@ -256,10 +268,43 @@ final class WorkspaceStore {
         cache?.clear()
     }
 
-    /// Begin polling while the browser is visible. Idempotent — a second call while a
-    /// loop is running is a no-op.
-    func startPolling() {
-        guard provider != nil, pollingTask == nil else { return }
+    /// A newly-visible window joins the shared poll. Reference-counted so multiple windows
+    /// keep one loop alive; balanced by `endPolling` on disappear.
+    func beginPolling() {
+        pollingWindowCount += 1
+        ensurePolling()
+    }
+
+    /// A window disappearing leaves the shared poll; the loop stops once the last window is
+    /// gone. Clamped at zero so an unbalanced extra call can't drive the count negative.
+    func endPolling() {
+        assert(pollingWindowCount > 0, "endPolling called without a matching beginPolling")
+        pollingWindowCount = max(0, pollingWindowCount - 1)
+        if pollingWindowCount == 0 { stopPolling() }
+    }
+
+    /// A scene became foregrounded (`.active`). Ref-counted across scenes so the shared
+    /// poll resumes on the first active scene and is unaffected by later ones; balanced by
+    /// `sceneResignedActive` (ADR-0004).
+    func sceneBecameActive() {
+        activeSceneCount += 1
+        if activeSceneCount == 1 { ensurePolling() }
+    }
+
+    /// A scene left the foreground (inactive/background) or closed while active. The loop
+    /// pauses only once the *last* active scene resigns — an inactive window can't stop
+    /// polling for windows that are still visible. The window count is left untouched so a
+    /// later foreground can resume while windows are still open.
+    func sceneResignedActive() {
+        assert(activeSceneCount > 0, "sceneResignedActive called without a matching sceneBecameActive")
+        activeSceneCount = max(0, activeSceneCount - 1)
+        if activeSceneCount == 0 { stopPolling() }
+    }
+
+    /// Start the shared loop when a window is visible and the app is foregrounded. Idempotent —
+    /// a second call while a loop is running is a no-op.
+    private func ensurePolling() {
+        guard provider != nil, pollingTask == nil, pollingWindowCount > 0, isForeground else { return }
         let interval = pollInterval
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -270,8 +315,9 @@ final class WorkspaceStore {
         }
     }
 
-    /// Pause polling when the browser is hidden or the scene is backgrounded.
-    func stopPolling() {
+    /// Cancel the shared loop (last window closed or app backgrounded). The window count is
+    /// left untouched so a later foreground can resume while windows are still open.
+    private func stopPolling() {
         pollingTask?.cancel()
         pollingTask = nil
     }
