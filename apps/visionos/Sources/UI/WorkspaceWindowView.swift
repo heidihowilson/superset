@@ -19,8 +19,11 @@ struct WorkspaceWindowView: View {
     @State private var composer = ComposerStore()
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OpenWindowsModel.self) private var openWindows
+    @Environment(SessionMetrics.self) private var metrics
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneActive = false
+    private let clock = ContinuousClock()
+    @State private var focusStart: ContinuousClock.Instant?
 
     private var workspace: Workspace? {
         guard let workspaceID else { return nil }
@@ -49,6 +52,7 @@ struct WorkspaceWindowView: View {
         }
         .onAppear {
             store.beginPolling()
+            chat.hostCallRecorder = metrics
             syncForeground(scenePhase)
             if let workspaceID { openWindows.registerWorkspace(workspaceID) }
         }
@@ -93,7 +97,22 @@ struct WorkspaceWindowView: View {
         let active = phase == .active
         guard active != sceneActive else { return }
         sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
+        if active {
+            store.sceneBecameActive()
+            focusStart = clock.now
+        } else {
+            store.sceneResignedActive()
+            // M3: this window's foreground dwell (foreground time, never gaze — §13).
+            if let start = focusStart {
+                metrics.recordWindowFocus(kind: "workspace", seconds: Self.seconds(clock.now - start))
+                focusStart = nil
+            }
+        }
+    }
+
+    private static func seconds(_ duration: Duration) -> Double {
+        let components = duration.components
+        return Double(components.seconds) + Double(components.attoseconds) / 1e18
     }
 
     @ViewBuilder

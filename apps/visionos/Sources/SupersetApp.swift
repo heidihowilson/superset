@@ -20,10 +20,22 @@ struct SupersetApp: App {
     @State private var openWindows = OpenWindowsModel()
     @State private var appSettings = AppSettingsStore()
     @State private var onboarding = OnboardingStore()
+    @State private var metrics: SessionMetrics
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// Retained for the app's lifetime so its MetricKit subscription stays registered
+    /// (ADR-0007). It has no UI; a plain stored reference keeps it alive.
+    private let crashReporter: CrashReporter
 
     init() {
         let auth = AuthController()
         _auth = State(initialValue: auth)
+
+        // On-device observability from day one (ADR-0007): one telemetry sink feeds both
+        // the MetricKit crash reporter and the lifecycle product metrics (M1/M3/M4/M-Host).
+        let telemetry = Telemetry.live()
+        crashReporter = CrashReporter(telemetry: telemetry)
+        _metrics = State(initialValue: SessionMetrics(telemetry: telemetry))
         let store = WorkspaceStore(
             provider: auth.makeWorkspaceListProvider(),
             lifecycle: auth.makeWorkspaceLifecycleClient(),
@@ -43,16 +55,27 @@ struct SupersetApp: App {
         WindowGroup {
             AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
                 .environment(onboarding)
+                .environment(metrics)
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 760, height: 820)
+        // M4/M-Host: a session opens on first activation and closes on background,
+        // independent of which window is frontmost (PRD §17).
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .active: metrics.sessionDidStart()
+            case .background: metrics.sessionDidEnd()
+            default: break
+            }
+        }
 
         WindowGroup(id: WorkspaceScene.windowID, for: Workspace.ID.self) { $workspaceID in
             WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
                 .environment(models)
                 .environment(openWindows)
                 .environment(appSettings)
+                .environment(metrics)
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }

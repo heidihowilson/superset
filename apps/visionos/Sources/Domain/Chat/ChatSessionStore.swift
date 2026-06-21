@@ -25,6 +25,11 @@ final class ChatSessionStore {
     private(set) var transcript: ChatTranscript = .empty
     private(set) var loadState: LoadState = .idle
 
+    /// Records each poll's outcome for the ADR-0007 stream/host-call telemetry and the
+    /// M-Host flag. Optional and weak so the Domain layer stays transport-agnostic and
+    /// never retains the UI-owned sink.
+    weak var hostCallRecorder: (any HostCallRecording)?
+
     private var provider: ChatTranscriptProviding?
     private let pollInterval: Duration
     private var pollingTask: Task<Void, Never>?
@@ -58,17 +63,33 @@ final class ChatSessionStore {
         refreshGeneration &+= 1
         let generation = refreshGeneration
         if transcript.isEmpty { loadState = .loading }
+        let start = ContinuousClock().now
         do {
             let fetched = try await provider.fetchTranscript()
             guard generation == refreshGeneration else { return }
             transcript = fetched
             loadState = .loaded
+            hostCallRecorder?.record(.poll(latency: ContinuousClock().now - start), workspaceID: boundWorkspaceID ?? "")
         } catch is CancellationError {
-            // Polling was cancelled (hidden/backgrounded) — keep the last good transcript.
+            // Polling was cancelled (hidden/backgrounded) — keep the last good transcript
+            // and don't log it as a host-call outcome; it's an intentional pause.
         } catch {
             guard generation == refreshGeneration else { return }
             loadState = transcript.isEmpty ? .failed(Self.message(for: error)) : .loaded
+            recordFailure(error)
         }
+    }
+
+    /// Map a poll failure onto a host-call outcome: a 403 is the plan-gated host-offline
+    /// state (PRD §6.3), everything else is a drop.
+    private func recordFailure(_ error: Error) {
+        let outcome: HostCallOutcome = switch error {
+        case let AuthError.badServerResponse(status) where status == 403:
+            .hostOffline(planGated: true)
+        default:
+            .drop(reason: String(describing: error))
+        }
+        hostCallRecorder?.record(outcome, workspaceID: boundWorkspaceID ?? "")
     }
 
     /// Begin polling while the window is visible. Idempotent.

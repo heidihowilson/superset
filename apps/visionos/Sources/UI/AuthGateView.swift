@@ -21,6 +21,7 @@ struct AuthGateView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(OnboardingStore.self) private var onboarding
+    @Environment(SessionMetrics.self) private var metrics
     @State private var pendingRoute: DeepLinkRoute?
 
     var body: some View {
@@ -108,7 +109,10 @@ struct AuthGateView: View {
                     OnboardingView(store: store, onboarding: onboarding)
                 }
         case .signedOut, .authenticating, .failed:
+            // A visible sign-in surface means this launch had no Keychain token, so M1
+            // is a cold start (time-to-first-view includes the sign-in flow, PRD §17).
             SignInView(controller: auth)
+                .onAppear { metrics.noteSignInRequired() }
         }
     }
 }

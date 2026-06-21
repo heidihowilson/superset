@@ -16,6 +16,7 @@ struct RootView: View {
     ])
     @Environment(InteractionModelRegistry.self) private var models
     @Environment(OpenWindowsModel.self) private var openWindows
+    @Environment(SessionMetrics.self) private var metrics
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
@@ -35,6 +36,9 @@ struct RootView: View {
         .onAppear {
             store.beginPolling()
             syncForeground(scenePhase)
+            // M1: the Workspace browser is the first meaningful Workspace surface
+            // (PRD §17). Once-only — guarded inside `SessionMetrics`.
+            metrics.markFirstMeaningfulView()
         }
         .onDisappear {
             syncForeground(.background)
