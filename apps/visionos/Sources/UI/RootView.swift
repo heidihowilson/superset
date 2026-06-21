@@ -13,7 +13,6 @@ struct RootView: View {
         NativeWorkspaceAdapter(),
         DebugListAdapter(),
     ])
-    @Environment(\.openWindow) private var openWindow
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -34,11 +33,6 @@ struct RootView: View {
                 store.startPolling()
             } else {
                 store.stopPolling()
-            }
-        }
-        .onChange(of: store.selectedWorkspaceID) { _, selected in
-            if let selected {
-                openWindow(id: WorkspaceScene.windowID, value: selected)
             }
         }
     }

@@ -7,6 +7,7 @@ import SwiftUI
 /// the empty case (AGENTS rule 9 analog for the polled list).
 struct WorkspaceListView: View {
     @Bindable var store: WorkspaceStore
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Group {
@@ -31,6 +32,7 @@ struct WorkspaceListView: View {
                         ForEach(group.workspaces) { workspace in
                             Button {
                                 store.select(workspace.id)
+                                openWindow(id: WorkspaceScene.windowID, value: workspace.id)
                             } label: {
                                 WorkspaceRow(
                                     workspace: workspace,

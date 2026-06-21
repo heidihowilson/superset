@@ -22,4 +22,7 @@ protocol WorkspaceListProviding: Sendable {
 protocol WorkspaceListCaching: Sendable {
     func load() -> WorkspaceListSnapshot?
     func save(_ snapshot: WorkspaceListSnapshot)
+    /// Drop the persisted snapshot so a different account/org can't paint it on the
+    /// next launch. Best-effort, like `save`.
+    func clear()
 }

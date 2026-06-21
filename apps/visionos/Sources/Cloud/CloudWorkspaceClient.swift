@@ -40,11 +40,15 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         )
 
         let workspaces = rows.map { row in
-            Workspace(
+            // Empty `projectName` is the domain's "no embedded project name" sentinel,
+            // bucketed under "Other" by the store's grouping. Trim at the boundary so a
+            // whitespace-only name can't masquerade as a real (blank) Project group.
+            let projectName = row.projectName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return Workspace(
                 id: row.id,
                 name: row.name,
                 projectID: row.projectId,
-                projectName: row.projectName ?? "",
+                projectName: projectName,
                 status: Self.status(hostID: row.hostId, onlineByHost: hosts, paidPlan: paidPlan)
             )
         }

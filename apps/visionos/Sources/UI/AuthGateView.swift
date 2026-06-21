@@ -28,6 +28,9 @@ struct AuthGateView: View {
                 .ornament(attachmentAnchor: .scene(.topTrailing)) {
                     Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right") {
                         auth.signOut()
+                        // Drop the previous account's cached Workspaces so the next
+                        // sign-in never paints them (privacy + correctness).
+                        store.reset()
                     }
                     .padding()
                     .glassBackgroundEffect()

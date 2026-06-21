@@ -26,4 +26,8 @@ struct FileWorkspaceListCache: WorkspaceListCaching {
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
         try? data.write(to: fileURL, options: .atomic)
     }
+
+    func clear() {
+        try? FileManager.default.removeItem(at: fileURL)
+    }
 }

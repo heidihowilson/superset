@@ -30,6 +30,11 @@ final class WorkspaceStore {
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
     private var pollingTask: Task<Void, Never>?
+    /// Monotonic token guarding against out-of-order applies: a `refresh` only commits
+    /// its snapshot if the generation it captured is still current. Bumped on every
+    /// refresh start and on `reset`, so a slow in-flight fetch can't clobber newer state
+    /// (overlapping polls/retries) or repopulate a list that was just cleared on sign-out.
+    private var refreshGeneration: UInt64 = 0
 
     init(
         provider: WorkspaceListProviding? = nil,
@@ -63,12 +68,10 @@ final class WorkspaceStore {
 
         var buckets: [String: [Workspace]] = [:]
         for workspace in workspaces {
-            let key = workspace.projectID ?? Self.ungroupedKey
+            let key = Self.groupKey(for: workspace)
             if names[key] == nil {
                 order.append(key)
-                names[key] = key == Self.ungroupedKey || workspace.projectName.isEmpty
-                    ? "Other"
-                    : workspace.projectName
+                names[key] = workspace.projectName.isEmpty ? "Other" : workspace.projectName
             }
             buckets[key, default: []].append(workspace)
         }
@@ -94,17 +97,35 @@ final class WorkspaceStore {
     /// poll runs and even if it fails; `loadState` reflects errors for the empty case.
     func refresh() async {
         guard let provider else { return }
+        refreshGeneration &+= 1
+        let generation = refreshGeneration
         if workspaces.isEmpty { loadState = .loading }
         do {
             let snapshot = try await provider.fetchSnapshot()
+            guard generation == refreshGeneration else { return }
             apply(snapshot)
             cache?.save(snapshot)
             loadState = .loaded
         } catch is CancellationError {
             // Polling was cancelled (hidden/backgrounded) — keep the last good data.
         } catch {
+            guard generation == refreshGeneration else { return }
             loadState = workspaces.isEmpty ? .failed(Self.message(for: error)) : .loaded
         }
+    }
+
+    /// Drop all signed-in state and the durable cache. Called on sign-out so the next
+    /// account/org never paints the previous one's Workspaces (privacy + correctness):
+    /// polling stops, the generation bumps so any in-flight fetch is discarded, the
+    /// in-memory list and selection clear, and the cache file is removed.
+    func reset() {
+        stopPolling()
+        refreshGeneration &+= 1
+        projects = []
+        workspaces = []
+        selectedWorkspaceID = nil
+        loadState = .idle
+        cache?.clear()
     }
 
     /// Begin polling while the browser is visible. Idempotent — a second call while a
@@ -135,7 +156,18 @@ final class WorkspaceStore {
         }
     }
 
+    /// Bucket key for a Workspace: its `projectID` when present, else its embedded
+    /// `projectName` (so Project-less Workspaces sharing a name group together), else a
+    /// single ungrouped bucket. The prefixes can't collide with server-issued ids.
+    private static func groupKey(for workspace: Workspace) -> String {
+        if let projectID = workspace.projectID { return projectID }
+        return workspace.projectName.isEmpty
+            ? ungroupedKey
+            : "\(embeddedKeyPrefix)\(workspace.projectName)"
+    }
+
     private static let ungroupedKey = "__ungrouped"
+    private static let embeddedKeyPrefix = "__embedded:"
 
     private static func message(for error: Error) -> String {
         switch error {
@@ -178,5 +210,7 @@ extension WorkspaceStore {
         }
 
         func save(_ snapshot: WorkspaceListSnapshot) {}
+
+        func clear() {}
     }
 }
