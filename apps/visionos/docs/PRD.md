@@ -316,3 +316,4 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 - **ADR-0007** — On-device observability — accepted.
 - **ADR-0008** — Optic ID-gated access, per-user device — accepted.
 - **ADR-0009** — Rich transcript content via WKWebView (markdown/syntax/diff) — accepted (scoped exception to 0003).
+- **ADR-0010** — Client-owned chat sessions for V1 (mint+persist per workspace; cross-client discovery deferred to V2) — accepted.
