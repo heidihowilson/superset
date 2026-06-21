@@ -23,9 +23,15 @@ enum DeepLinkRouter {
     static let scheme = "superset"
 
     static func route(_ url: URL) -> DeepLinkRoute? {
-        guard url.scheme == scheme else { return nil }
-        switch url.host(percentEncoded: false) {
+        // Scheme and host are case-insensitive per RFC 3986, so a valid mixed-case link
+        // (`Superset://Workspace/…`) must still route. The first path component — the
+        // domain id or the `callback` literal — stays case-sensitive (ids are opaque).
+        guard url.scheme?.caseInsensitiveCompare(scheme) == .orderedSame else { return nil }
+        switch url.host(percentEncoded: false)?.lowercased() {
         case "auth":
+            // The grammar is `superset://auth/callback` exactly; any other auth path is
+            // outside the grammar and dropped like a malformed content link.
+            guard firstPathComponent(of: url) == "callback" else { return nil }
             return .authCallback(url)
         case "workspace":
             return firstPathComponent(of: url).map(DeepLinkRoute.workspace)

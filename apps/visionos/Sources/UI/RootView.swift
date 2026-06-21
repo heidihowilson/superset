@@ -18,6 +18,7 @@ struct RootView: View {
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
+    @State private var sceneActive = false
 
     var body: some View {
         NavigationStack {
@@ -30,11 +31,27 @@ struct RootView: View {
         .ornament(attachmentAnchor: .scene(.bottom)) {
             bottomControls
         }
-        .onAppear { store.beginPolling() }
-        .onDisappear { store.endPolling() }
-        .onChange(of: scenePhase) { _, phase in
-            store.setForeground(phase == .active)
+        .onAppear {
+            store.beginPolling()
+            syncForeground(scenePhase)
         }
+        .onDisappear {
+            syncForeground(.background)
+            store.endPolling()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            syncForeground(phase)
+        }
+    }
+
+    /// Report this scene's active-ness to the shared store, contributing exactly one to
+    /// its active-scene count and keeping register/unregister balanced across phase
+    /// changes and window close (so one inactive window can't pause polling for others).
+    private func syncForeground(_ phase: ScenePhase) {
+        let active = phase == .active
+        guard active != sceneActive else { return }
+        sceneActive = active
+        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     private var bottomControls: some View {

@@ -19,6 +19,7 @@ struct WorkspaceWindowView: View {
     @State private var composer = ComposerStore()
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.scenePhase) private var scenePhase
+    @State private var sceneActive = false
 
     private var workspace: Workspace? {
         guard let workspaceID else { return nil }
@@ -47,9 +48,11 @@ struct WorkspaceWindowView: View {
         }
         .onAppear {
             store.beginPolling()
+            syncForeground(scenePhase)
             if let workspaceID { openWindows.registerWorkspace(workspaceID) }
         }
         .onDisappear {
+            syncForeground(.background)
             chat.stopPolling()
             store.endPolling()
             if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
@@ -71,7 +74,7 @@ struct WorkspaceWindowView: View {
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            store.setForeground(phase == .active)
+            syncForeground(phase)
             if phase == .active {
                 chat.startPolling()
             } else {
@@ -79,6 +82,17 @@ struct WorkspaceWindowView: View {
                 auth.dropRelayToken()
             }
         }
+    }
+
+    /// Report this scene's active-ness to the shared store, contributing exactly one to
+    /// its active-scene count and keeping register/unregister balanced across phase
+    /// changes and window close (so one inactive window can't pause the shared list poll
+    /// for others). The per-window watch poll is gated separately above.
+    private func syncForeground(_ phase: ScenePhase) {
+        let active = phase == .active
+        guard active != sceneActive else { return }
+        sceneActive = active
+        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     @ViewBuilder
