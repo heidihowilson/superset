@@ -33,7 +33,11 @@ Check for an existing open PR: `gh pr list --repo heidihowilson/superset --head 
 - REVISE → the push updates the existing PR; add a PR comment summarizing what you changed and which findings you skipped + why.
 
 ## 7. Hand off (do not merge)
-`gh issue edit <N> --add-label agent-review --remove-label agent-working` (keep `bounced` if present). Then dispatch the reviewer:
+Mark the issue **and label the PR** (the reviewer finds the PR by its label):
+- `gh issue edit <N> --add-label agent-review --remove-label agent-working` (keep `bounced` if present)
+- `gh pr edit <pr> --add-label agent-review`  ← **required** — the reviewer discovers PRs via `gh pr list --label agent-review`.
+
+Then dispatch the reviewer:
 `superset organization switch 05edb58f-bb09-4f1b-932e-b8d7fc1115d9 && superset automations run 2d162700-ca60-4034-b78b-7a820bc39cf6`.
 
 ## 8. Exit invariant
