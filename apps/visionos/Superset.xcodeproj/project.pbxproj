@@ -138,7 +138,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					9A81E7F139DC661E9C0CC326 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = 0DA962D7BA2C7066C9593AFC /* Build configuration list for PBXProject "Superset" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -188,8 +194,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Superset;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -255,7 +263,7 @@
 				SDKROOT = xros;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
@@ -264,8 +272,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Superset;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -338,7 +348,7 @@
 				SDKROOT = xros;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;

@@ -35,8 +35,24 @@ xcodebuild -project Superset.xcodeproj -target Superset \
 > runtime via Xcode ▸ Settings ▸ Components to use `-destination` / run in the
 > simulator.
 
-Open `Superset.xcodeproj` in Xcode to run on the simulator or a device. Real-device
-builds need a signing team (the committed config builds the simulator unsigned).
+Open `Superset.xcodeproj` in Xcode to run on the simulator or a device.
+
+### Device signing
+
+The target uses **automatic signing** (`CODE_SIGN_STYLE = Automatic`). Signing is
+disabled only for the simulator SDK (`CODE_SIGNING_ALLOWED[sdk=xrsimulator*] = NO`),
+so the simulator gate builds unsigned while **device builds sign normally**. To
+build for / install on hardware, set a development team — either in Xcode (Signing &
+Capabilities) or on the command line:
+
+```sh
+xcodebuild -project Superset.xcodeproj -target Superset -sdk xros \
+  -configuration Debug -arch arm64 \
+  DEVELOPMENT_TEAM=<YOUR_TEAM_ID> -allowProvisioningUpdates build
+```
+
+A device build with no team fails with "Signing … requires a development team",
+which confirms the signing path is wired (not disabled) and only awaits a team.
 
 ## M0 — renderer seam
 

@@ -15,6 +15,8 @@ final class AdapterRegistry {
 
     init(adapters: [any WorkspaceAdapter]) {
         precondition(!adapters.isEmpty, "AdapterRegistry requires at least one adapter")
+        let ids = adapters.map(\.id)
+        precondition(Set(ids).count == ids.count, "AdapterRegistry requires unique adapter IDs")
         self.adapters = adapters
         self.activeAdapterID = adapters[0].id
     }

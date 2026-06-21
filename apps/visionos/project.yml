@@ -4,9 +4,11 @@ options:
   createIntermediateGroups: true
   deploymentTarget:
     visionOS: "2.0"
+attributes:
+  LastUpgradeCheck: "2640"
 settings:
   base:
-    SWIFT_VERSION: "5.0"
+    SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
@@ -20,10 +22,14 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos
         GENERATE_INFOPLIST_FILE: "YES"
         TARGETED_DEVICE_FAMILY: "7"
-        # Simulator builds (the M0 gate) run unsigned; real-device signing is
-        # configured by whoever installs to hardware.
-        CODE_SIGNING_ALLOWED: "NO"
-        CODE_SIGNING_REQUIRED: "NO"
+        # Device builds use automatic signing: set DEVELOPMENT_TEAM in Xcode (or via
+        # an untracked xcconfig / xcodebuild override) and a device build signs.
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        # Simulator builds (the M0 CI gate) run unsigned with no team. Scoped to the
+        # simulator SDK so device builds keep signing enabled.
+        "CODE_SIGNING_ALLOWED[sdk=xrsimulator*]": "NO"
+        "CODE_SIGNING_REQUIRED[sdk=xrsimulator*]": "NO"
         INFOPLIST_KEY_CFBundleDisplayName: Superset
     scheme:
       gatherCoverageData: false
