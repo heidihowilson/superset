@@ -21,6 +21,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos
         GENERATE_INFOPLIST_FILE: "YES"
+        # Partial plist merged into the generated Info.plist — registers the
+        # superset:// URL scheme for cold-start deep links (the in-session OAuth
+        # callback is captured by ASWebAuthenticationSession via its scheme arg).
+        INFOPLIST_FILE: Info.plist
         TARGETED_DEVICE_FAMILY: "7"
         # Device builds use automatic signing: set DEVELOPMENT_TEAM in Xcode (or via
         # an untracked xcconfig / xcodebuild override) and a device build signs.
