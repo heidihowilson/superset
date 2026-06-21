@@ -1,0 +1,29 @@
+name: Superset
+options:
+  bundleIdPrefix: sh.superset.visionos
+  createIntermediateGroups: true
+  deploymentTarget:
+    visionOS: "2.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Superset:
+    type: application
+    platform: visionOS
+    sources:
+      - path: Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos
+        GENERATE_INFOPLIST_FILE: "YES"
+        TARGETED_DEVICE_FAMILY: "7"
+        # Simulator builds (the M0 gate) run unsigned; real-device signing is
+        # configured by whoever installs to hardware.
+        CODE_SIGNING_ALLOWED: "NO"
+        CODE_SIGNING_REQUIRED: "NO"
+        INFOPLIST_KEY_CFBundleDisplayName: Superset
+    scheme:
+      gatherCoverageData: false
