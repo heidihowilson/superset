@@ -8,6 +8,9 @@ shared **reuse** workspace. `gh` is authenticated. Spec: `apps/visionos/docs/PRD
 > Hard rules: smallest correct change · one issue per run · never push to upstream
 > `superset-sh/superset` · `xcodebuild` must be green · a human merges, you never merge.
 
+## 0. IDENTITY (first line)
+Author as `sethgho`: `gh auth switch --user sethgho` (the Mac has both `sethgho` and `0xnowater`). Confirm `gh auth status` shows `sethgho` active. The reviewer reviews as `0xnowater`, a **different** account — that's what lets it formally review your PR (GitHub blocks reviewing your own).
+
 ## 1. ACQUIRE THE CLAIM LOCK (atomic — first, no exceptions)
 The pipeline is single-flight and the claim must be **atomic**. The old "list the label then
 add it" was a check-then-act race: two workers dispatched close together both read "no lock,"
