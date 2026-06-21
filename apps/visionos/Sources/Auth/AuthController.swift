@@ -58,7 +58,8 @@ final class AuthController: RelayCredentialGate {
         self.webAuth = webAuth
         self.pendingStateStore = pendingStateStore
         self.relayTokenProvider = RelayTokenProvider(
-            api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value })
+            api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value }),
+            currentPrincipal: { [tokenBox] in tokenBox.value?.value }
         )
     }
 

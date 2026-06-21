@@ -91,6 +91,11 @@ actor HostChatTranscriptProvider: ChatTranscriptProviding {
             // Cancellation isn't a registration failure — propagate it so the poll
             // honors the cancellation contract instead of pressing on to fetch.
             throw CancellationError()
+        } catch let error as URLError where error.code == .cancelled {
+            // URLSession surfaces a cancelled request as `URLError.cancelled`, not
+            // `CancellationError`. Normalize it so the cancellation contract holds and the
+            // poll doesn't fall through to `fetchSnapshot` after the task was cancelled.
+            throw CancellationError()
         } catch {
             // Leave `sessionEnsured` false to retry on the next poll.
         }

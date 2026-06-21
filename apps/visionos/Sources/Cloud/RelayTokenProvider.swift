@@ -10,9 +10,14 @@ import Foundation
 /// backgrounding (proactive drop ahead of the ~1h revocation lag).
 actor RelayTokenProvider {
     private let api: AuthAPIClient
+    /// Reads the live bearer principal (the session-token value) the relay JWT is minted
+    /// from. `AuthController.setToken` updates it synchronously — before any actor hop — so
+    /// the cache can be pinned to the principal it was minted under and a hit refused the
+    /// instant the principal changes, independent of when the queued `invalidate()` lands.
+    private let currentPrincipal: @Sendable () -> String?
     /// Conservative of the ~1h TTL, matching the web client's 50-minute reuse window.
     private let ttl: TimeInterval = 50 * 60
-    private var cached: (token: String, fetchedAt: Date)?
+    private var cached: (token: String, fetchedAt: Date, principal: String?)?
     /// Set while the Optic ID gate is engaged (ADR-0008). Blocks minting so a poll that
     /// ticks behind the lock screen can't re-acquire the RCE-grade JWT before re-auth.
     private var locked = false
@@ -21,17 +26,20 @@ actor RelayTokenProvider {
     /// converge on the latest `LockState` intent even when they arrive out of call order.
     private var lockGeneration = 0
 
-    init(api: AuthAPIClient) {
+    init(api: AuthAPIClient, currentPrincipal: @escaping @Sendable () -> String?) {
         self.api = api
+        self.currentPrincipal = currentPrincipal
     }
 
     func token() async throws -> String {
         if locked { throw RelayTokenError.locked }
-        if let cached, Date().timeIntervalSince(cached.fetchedAt) < ttl {
+        let principal = currentPrincipal()
+        if let cached, cached.principal == principal,
+           Date().timeIntervalSince(cached.fetchedAt) < ttl {
             return cached.token
         }
         let minted = try await api.mintRelayJWT()
-        cached = (minted, Date())
+        cached = (minted, Date(), principal)
         return minted
     }
 
