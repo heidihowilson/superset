@@ -1,0 +1,43 @@
+name: visionOS review labels
+
+# Deterministic state machine: when ANY reviewer submits a verdict on an agent
+# PR, translate it into issue labels (no agent involved, so it can't be skipped).
+#   approved          -> agent-approved (a human merges)
+#   changes_requested -> bounced + agent-ready (worker revises) ; 2nd time -> needs-human
+# Adding agent-ready re-fires visionos-agent-dispatch via the issues:labeled event.
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  issues: write
+  pull-requests: read
+
+jobs:
+  relabel:
+    if: github.event.review.state == 'approved' || github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      STATE: ${{ github.event.review.state }}
+      HEAD: ${{ github.event.pull_request.head.ref }}
+    steps:
+      - name: Transition issue labels from review verdict
+        run: |
+          N=$(printf '%s' "$HEAD" | sed -n 's#.*issue-\([0-9][0-9]*\).*#\1#p')
+          if [ -z "$N" ]; then echo "not an agent branch ($HEAD); skipping"; exit 0; fi
+          labels=$(gh issue view "$N" --repo "$REPO" --json labels -q '[.labels[].name]|join(",")' || echo "")
+          gh issue edit "$N" --repo "$REPO" --remove-label agent-review || true
+          if [ "$STATE" = "approved" ]; then
+            gh issue edit "$N" --repo "$REPO" --add-label agent-approved
+            echo "issue #$N approved -> agent-approved"
+          else
+            case ",$labels," in
+              *,bounced,*) gh issue edit "$N" --repo "$REPO" --add-label needs-human
+                           echo "issue #$N changes-requested again -> needs-human" ;;
+              *)           gh issue edit "$N" --repo "$REPO" --add-label bounced --add-label agent-ready
+                           echo "issue #$N changes-requested -> bounced + agent-ready (re-fire)" ;;
+            esac
+          fi
