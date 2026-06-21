@@ -23,10 +23,21 @@ final class WorkspaceStore {
 
     private(set) var projects: [Project]
     private(set) var workspaces: [Workspace]
+    /// The org's Hosts, the targets a create can be dialed at — surfaced from the same
+    /// poll as the list. Only online Hosts can be created on (create is Host-gated).
+    private(set) var hosts: [HostSummary]
     private(set) var selectedWorkspaceID: Workspace.ID?
     private(set) var loadState: LoadState = .idle
+    /// Workspaces with a rename/delete in flight — drives a non-optimistic pending state
+    /// on the row (the change is shown only after the next poll confirms it, PRD §7.2).
+    private(set) var pendingWorkspaceIDs: Set<Workspace.ID> = []
+    /// A create in flight (no row id yet), driving the create sheet's pending state.
+    private(set) var isCreatingWorkspace = false
+    /// The last lifecycle failure, surfaced to the user and cleared on dismiss/next op.
+    private(set) var lifecycleError: String?
 
     private let provider: WorkspaceListProviding?
+    private let lifecycle: WorkspaceLifecycleProviding?
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
     private var pollingTask: Task<Void, Never>?
@@ -38,16 +49,31 @@ final class WorkspaceStore {
 
     init(
         provider: WorkspaceListProviding? = nil,
+        lifecycle: WorkspaceLifecycleProviding? = nil,
         cache: WorkspaceListCaching? = nil,
         pollInterval: Duration = .seconds(7)
     ) {
         self.provider = provider
+        self.lifecycle = lifecycle
         self.cache = cache
         self.pollInterval = pollInterval
         let cached = cache?.load() ?? .empty
         self.projects = cached.projects
         self.workspaces = cached.workspaces
+        self.hosts = cached.hosts
     }
+
+    /// The Hosts a new Workspace can be created on — only online Hosts, since create is
+    /// Host-gated (the relay forwards only to a reachable Host; ADR-0006).
+    var onlineHosts: [HostSummary] {
+        hosts.filter(\.online).sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
+    }
+
+    /// Whether lifecycle intents are wired (a real client is injected). The UI hides the
+    /// create/rename/delete affordances when false (e.g. the preview/sample store).
+    var supportsLifecycle: Bool { lifecycle != nil }
 
     var selectedWorkspace: Workspace? {
         guard let selectedWorkspaceID else { return nil }
@@ -93,6 +119,66 @@ final class WorkspaceStore {
         selectedWorkspaceID = id
     }
 
+    /// Dismiss the surfaced lifecycle error (the user acknowledged the alert).
+    func clearLifecycleError() {
+        lifecycleError = nil
+    }
+
+    /// Rename a Workspace (cloud-only, safe Host-offline). Non-optimistic: the row keeps
+    /// its old name and shows a pending state until the post-rename poll lands the change.
+    /// A no-op when the name is blank or unchanged.
+    func rename(_ workspace: Workspace, to newName: String) async {
+        guard let lifecycle else { return }
+        let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed != workspace.name else { return }
+        lifecycleError = nil
+        pendingWorkspaceIDs.insert(workspace.id)
+        defer { pendingWorkspaceIDs.remove(workspace.id) }
+        do {
+            try await lifecycle.rename(workspaceID: workspace.id, to: trimmed)
+            await refresh()
+        } catch {
+            lifecycleError = Self.lifecycleMessage(for: error)
+        }
+    }
+
+    /// Create a Workspace on `hostID`'s Host (Host-gated saga over the relay). Non-optimistic:
+    /// the new row appears only after the post-create poll lands it.
+    func createWorkspace(projectID: String, name: String, hostID: String) async {
+        guard let lifecycle else { return }
+        lifecycleError = nil
+        isCreatingWorkspace = true
+        defer { isCreatingWorkspace = false }
+        do {
+            try await lifecycle.create(projectID: projectID, name: name, hostID: hostID)
+            await refresh()
+        } catch {
+            lifecycleError = Self.lifecycleMessage(for: error)
+        }
+    }
+
+    /// Delete a Workspace on its Host (Host-gated saga over the relay). A no-op when the
+    /// Workspace has no Host (nothing to tear down). Non-optimistic: the row shows a pending
+    /// state until the post-delete poll drops it; the selection clears if it was selected.
+    func delete(_ workspace: Workspace) async {
+        guard let lifecycle, let hostID = workspace.hostID else {
+            if workspace.hostID == nil {
+                lifecycleError = "This workspace has no Host to delete it from."
+            }
+            return
+        }
+        lifecycleError = nil
+        pendingWorkspaceIDs.insert(workspace.id)
+        defer { pendingWorkspaceIDs.remove(workspace.id) }
+        do {
+            try await lifecycle.delete(workspaceID: workspace.id, hostID: hostID)
+            if selectedWorkspaceID == workspace.id { selectedWorkspaceID = nil }
+            await refresh()
+        } catch {
+            lifecycleError = Self.lifecycleMessage(for: error)
+        }
+    }
+
     /// Pull one fresh snapshot. Cache-first: a populated list stays on screen while the
     /// poll runs and even if it fails; `loadState` reflects errors for the empty case.
     func refresh() async {
@@ -123,6 +209,10 @@ final class WorkspaceStore {
         refreshGeneration &+= 1
         projects = []
         workspaces = []
+        hosts = []
+        pendingWorkspaceIDs = []
+        isCreatingWorkspace = false
+        lifecycleError = nil
         selectedWorkspaceID = nil
         loadState = .idle
         cache?.clear()
@@ -151,6 +241,7 @@ final class WorkspaceStore {
     private func apply(_ snapshot: WorkspaceListSnapshot) {
         projects = snapshot.projects
         workspaces = snapshot.workspaces
+        hosts = snapshot.hosts
         if let selectedWorkspaceID, !workspaces.contains(where: { $0.id == selectedWorkspaceID }) {
             self.selectedWorkspaceID = nil
         }
@@ -181,6 +272,24 @@ final class WorkspaceStore {
             return "Couldn't load workspaces. Retrying…"
         }
     }
+
+    /// User-facing copy for a failed lifecycle op. A relay 403 means the Host is offline or
+    /// the org's plan doesn't allow host access (`checkHostAccess`), the dominant failure for
+    /// the Host-gated create/delete — surfaced plainly rather than as a raw status.
+    private static func lifecycleMessage(for error: Error) -> String {
+        switch error {
+        case AuthError.notAuthenticated:
+            return "Not signed in."
+        case AuthError.noActiveOrganization:
+            return "No organization available."
+        case AuthError.badServerResponse(status: 403):
+            return "Host unavailable. The Host must be online and the organization on an active plan."
+        case let AuthError.badServerResponse(status):
+            return "The operation failed (HTTP \(status)). Please try again."
+        default:
+            return "The operation failed. Please try again."
+        }
+    }
 }
 
 /// A Project and the Workspaces under it, as rendered in the grouped browser.
@@ -192,9 +301,10 @@ struct WorkspaceGroup: Identifiable, Hashable, Sendable {
 
 extension WorkspaceStore {
     /// In-memory sample for SwiftUI previews and the renderer-seam demo — no network.
-    /// A `WorkspaceListCaching` that returns a fixed snapshot seeds the store on init.
+    /// A `WorkspaceListCaching` that returns a fixed snapshot seeds the store on init; a
+    /// no-op lifecycle wires the create/rename/delete affordances so they render in previews.
     static func sample() -> WorkspaceStore {
-        WorkspaceStore(cache: SampleCache())
+        WorkspaceStore(lifecycle: SampleLifecycle(), cache: SampleCache())
     }
 
     private struct SampleCache: WorkspaceListCaching {
@@ -202,15 +312,22 @@ extension WorkspaceStore {
             WorkspaceListSnapshot(
                 projects: [Project(id: "p-superset", name: "superset")],
                 workspaces: [
-                    Workspace(id: "ws-auth", name: "auth-handoff", projectID: "p-superset", projectName: "superset", status: .hostOnline),
-                    Workspace(id: "ws-relay", name: "relay-tunnel", projectID: "p-superset", projectName: "superset", status: .planGated),
-                    Workspace(id: "ws-vision", name: "vision-pro-app", projectID: "p-superset", projectName: "superset", status: .hostAsleep),
-                ]
+                    Workspace(id: "ws-auth", name: "auth-handoff", projectID: "p-superset", projectName: "superset", status: .hostOnline, hostID: "host-1"),
+                    Workspace(id: "ws-relay", name: "relay-tunnel", projectID: "p-superset", projectName: "superset", status: .planGated, hostID: "host-1"),
+                    Workspace(id: "ws-vision", name: "vision-pro-app", projectID: "p-superset", projectName: "superset", status: .hostAsleep, hostID: "host-1"),
+                ],
+                hosts: [HostSummary(id: "host-1", name: "studio-mac", online: true)]
             )
         }
 
         func save(_ snapshot: WorkspaceListSnapshot) {}
 
         func clear() {}
+    }
+
+    private struct SampleLifecycle: WorkspaceLifecycleProviding {
+        func rename(workspaceID: String, to name: String) async throws {}
+        func create(projectID: String, name: String, hostID: String) async throws {}
+        func delete(workspaceID: String, hostID: String) async throws {}
     }
 }

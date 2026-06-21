@@ -26,11 +26,17 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
             "v2Workspace.list",
             input: ["organizationId": organizationID]
         )
-        async let onlineByHost: [String: Bool] = fetchOnlineByHost(organizationID)
+        async let hostRows: [HostRow] = fetchHosts(organizationID)
 
         let projects = try await projectRows.map { Project(id: $0.id, name: $0.name) }
         let rows = try await workspaceRows
-        let hosts = await onlineByHost
+        let hostSummaries = await hostRows.map {
+            HostSummary(id: $0.id, name: $0.name, online: $0.online)
+        }
+        let hosts = Dictionary(
+            hostSummaries.map { ($0.id, $0.online) },
+            uniquingKeysWith: { _, last in last }
+        )
 
         // Plan-gating is org-level (the subscription is on the org), so one
         // host.checkAccess call settles it for the whole list (§11/R5).
@@ -53,7 +59,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
                 hostID: row.hostId
             )
         }
-        return WorkspaceListSnapshot(projects: projects, workspaces: workspaces)
+        return WorkspaceListSnapshot(projects: projects, workspaces: workspaces, hosts: hostSummaries)
     }
 
     /// Reachability the Host-independent list CAN derive from cloud reads. Live run
@@ -71,17 +77,14 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         return online ? .hostOnline : .hostAsleep
     }
 
-    /// `host.list` online flags keyed by machineId — best-effort: a failure degrades
-    /// status to `.unknown`, it never fails the list poll.
-    private func fetchOnlineByHost(_ organizationID: String) async -> [String: Bool] {
+    /// The org's `host.list` rows — best-effort: a failure yields no hosts, degrading
+    /// status to `.unknown` and emptying the create target list, but it never fails the
+    /// list poll (PRD §6.3). Names feed the create Host picker; `online` keys reachability.
+    private func fetchHosts(_ organizationID: String) async -> [HostRow] {
         do {
-            let rows: [HostRow] = try await fetch(
-                "host.list",
-                input: ["organizationId": organizationID]
-            )
-            return Dictionary(rows.map { ($0.id, $0.online) }, uniquingKeysWith: { _, last in last })
+            return try await fetch("host.list", input: ["organizationId": organizationID])
         } catch {
-            return [:]
+            return []
         }
     }
 
@@ -167,9 +170,11 @@ private struct WorkspaceRow: Decodable {
     let hostId: String?
 }
 
-/// `host.list` row — only the online flag (keyed by machineId `id`) is consumed here.
+/// `host.list` row — `id` is the machineId (the relay routing key half), `name` labels
+/// the create Host picker, `online` keys reachability status.
 private struct HostRow: Decodable {
     let id: String
+    let name: String
     let online: Bool
 }
 
