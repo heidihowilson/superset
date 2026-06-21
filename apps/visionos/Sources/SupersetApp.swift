@@ -23,11 +23,16 @@ struct SupersetApp: App {
     init() {
         let auth = AuthController()
         _auth = State(initialValue: auth)
-        _store = State(initialValue: WorkspaceStore(
+        let store = WorkspaceStore(
             provider: auth.makeWorkspaceListProvider(),
             lifecycle: auth.makeWorkspaceLifecycleClient(),
             cache: FileWorkspaceListCache()
-        ))
+        )
+        _store = State(initialValue: store)
+        // The controller owns the sign-out cache reset so it runs on every sign-out
+        // path — including a sign-out from Settings while the command-center window
+        // (the old observer's host) is closed.
+        auth.onSignedOut = { [store] in store.reset() }
         // The Optic ID gate sits over every signed-in window and shares the relay
         // credential with `auth`, so locking seals the RCE-grade JWT app-wide (ADR-0008).
         _lock = State(initialValue: LockController(relay: auth))

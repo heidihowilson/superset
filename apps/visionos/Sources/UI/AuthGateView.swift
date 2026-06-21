@@ -28,20 +28,13 @@ struct AuthGateView: View {
             .environment(openWindows)
             .onAppear { auth.restore() }
             .onOpenURL { handle($0) }
-            // Any landing in a signed-out state — an explicit Sign Out, or a launch
-            // where `restore()` finds the token expired/missing — must drop the
-            // previous account's cached Workspaces. The store loads its durable cache
-            // at app init, before a session is known, so without this the next sign-in
-            // would paint the prior account's rows until the first poll (privacy +
-            // correctness). Keying on `.signedOut` makes this the single owner.
+            // Replay a deep link that arrived signed-out once sign-in lands. The
+            // signed-out cache reset lives on `AuthController.onSignedOut` (wired in
+            // `SupersetApp`), not here, so it fires on every sign-out path even when
+            // this scene is closed and only Settings is on screen.
             .onChange(of: auth.status) { _, status in
-                switch status {
-                case .signedOut:
-                    store.reset()
-                case .signedIn:
+                if status == .signedIn {
                     flushPendingRoute()
-                default:
-                    break
                 }
             }
     }
