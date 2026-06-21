@@ -92,40 +92,45 @@ final class DictationController {
         guard let recognizer, state == .idle else { return }
         stop()
 
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.record, mode: .measurement, options: .duckOthers)
-        try session.setActive(true, options: .notifyOthersOnDeactivation)
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.record, mode: .measurement, options: .duckOthers)
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
 
-        let request = SFSpeechAudioBufferRecognitionRequest()
-        request.shouldReportPartialResults = true
-        if recognizer.supportsOnDeviceRecognition {
-            request.requiresOnDeviceRecognition = true
-        }
-        self.request = request
+            let request = SFSpeechAudioBufferRecognitionRequest()
+            request.shouldReportPartialResults = true
+            if recognizer.supportsOnDeviceRecognition {
+                request.requiresOnDeviceRecognition = true
+            }
+            self.request = request
 
-        let inputNode = audioEngine.inputNode
-        let format = inputNode.outputFormat(forBus: 0)
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in
-            request.append(buffer)
-        }
+            let inputNode = audioEngine.inputNode
+            let format = inputNode.outputFormat(forBus: 0)
+            inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in
+                request.append(buffer)
+            }
 
-        task = recognizer.recognitionTask(with: request) { [weak self] result, error in
-            let transcript = result?.bestTranscription.formattedString
-            let finished = error != nil || (result?.isFinal ?? false)
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                if let transcript {
-                    self.onTranscript?(transcript)
-                }
-                if finished {
-                    self.stop()
+            task = recognizer.recognitionTask(with: request) { [weak self] result, error in
+                let transcript = result?.bestTranscription.formattedString
+                let finished = error != nil || (result?.isFinal ?? false)
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+                    if let transcript {
+                        self.onTranscript?(transcript)
+                    }
+                    if finished {
+                        self.stop()
+                    }
                 }
             }
-        }
 
-        audioEngine.prepare()
-        try audioEngine.start()
-        state = .listening
+            audioEngine.prepare()
+            try audioEngine.start()
+            state = .listening
+        } catch {
+            stop()
+            throw error
+        }
     }
 
     /// Tear down the live session. Safe to call repeatedly and when already idle.

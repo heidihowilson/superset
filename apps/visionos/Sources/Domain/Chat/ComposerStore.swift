@@ -65,13 +65,17 @@ final class ComposerStore {
     /// asleep — neither failure blocks composing or sending.
     func loadPickers() async {
         guard let sender else { return }
+        let loadWorkspaceID = boundWorkspaceID
         if let fetched = try? await sender.availableModels() {
+            guard boundWorkspaceID == loadWorkspaceID else { return }
             models = fetched
             if selectedModelID == nil {
                 selectedModelID = fetched.first?.id
             }
         }
-        agentPresets = (try? await sender.availableAgentPresets()) ?? []
+        let presets = (try? await sender.availableAgentPresets()) ?? []
+        guard boundWorkspaceID == loadWorkspaceID else { return }
+        agentPresets = presets
     }
 
     /// Send the current draft. Clears it on success and pings the watch to re-poll; on
@@ -90,13 +94,17 @@ final class ComposerStore {
 
     private func deliver(_ text: String, clearingDraft: Bool) async {
         guard let sender, sendState != .sending else { return }
+        let sendWorkspaceID = boundWorkspaceID
+        let sentCallback = onSent
         sendState = .sending
         do {
             try await sender.sendMessage(text, model: selectedModelID)
+            guard boundWorkspaceID == sendWorkspaceID else { return }
             if clearingDraft { draft = "" }
             sendState = .idle
-            onSent?()
+            sentCallback?()
         } catch {
+            guard boundWorkspaceID == sendWorkspaceID else { return }
             sendState = .failed(Self.message(for: error))
         }
     }
