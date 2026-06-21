@@ -23,41 +23,93 @@ struct HostServiceClient: Sendable {
     func fetchSnapshot(sessionID: String, workspaceID: String) async throws -> ChatTranscript {
         try await query(
             "chat.getSnapshot",
+            method: .get,
             input: ["sessionId": sessionID, "workspaceId": workspaceID]
         )
     }
 
-    private func query<Payload: Decodable>(_ procedure: String, input: [String: String]) async throws -> Payload {
+    /// Send a user prompt into the Workspace's client-owned chat session (ADR-0010), the
+    /// session Watch already polls. A tRPC mutation, so POST: the input rides in the body
+    /// rather than `?input=` (`apps/web/src/trpc/host-client.ts`). `model` rides as
+    /// `metadata.model`; an empty/nil model lets the Host pick its default. The result is
+    /// not decoded — the message landing is confirmed by the next `getSnapshot` poll.
+    func sendMessage(sessionID: String, workspaceID: String, content: String, model: String?) async throws {
+        var input: [String: Any] = [
+            "sessionId": sessionID,
+            "workspaceId": workspaceID,
+            "payload": ["content": content],
+        ]
+        if let model, !model.isEmpty {
+            input["metadata"] = ["model": model]
+        }
+        _ = try await requestData("chat.sendMessage", method: .post, input: input)
+    }
+
+    /// The Host's configured agent presets (`settings.agentConfigs.list`). Host-gated by
+    /// construction (relay): a sleeping/unreachable Host throws, which the caller maps to
+    /// an empty picker (PRD §7.2). No input — a workspace-independent settings read.
+    func listAgentConfigs() async throws -> [AgentPreset] {
+        try await query("settings.agentConfigs.list", method: .get, input: nil)
+    }
+
+    private enum HTTPMethod: String {
+        case get = "GET"
+        case post = "POST"
+    }
+
+    private func query<Payload: Decodable>(
+        _ procedure: String,
+        method: HTTPMethod,
+        input: Any?
+    ) async throws -> Payload {
+        let data = try await requestData(procedure, method: method, input: input)
+        return try JSONDecoder().decode(RelayResult<Payload>.self, from: data).result.data.json
+    }
+
+    /// Perform one relay round-trip, re-minting the JWT once on a 401 (the token aged out
+    /// or was dropped on background). Returns the raw body so void mutations skip decoding.
+    private func requestData(_ procedure: String, method: HTTPMethod, input: Any?) async throws -> Data {
         do {
-            return try await send(procedure, input: input)
+            return try await send(procedure, method: method, input: input)
         } catch AuthError.badServerResponse(status: 401) {
-            // The relay JWT aged out (or was dropped on background): re-mint once.
             await tokenProvider.invalidate()
-            return try await send(procedure, input: input)
+            return try await send(procedure, method: method, input: input)
         }
     }
 
-    private func send<Payload: Decodable>(_ procedure: String, input: [String: String]) async throws -> Payload {
-        let envelope = ["json": input]
-        let inputData = try JSONSerialization.data(withJSONObject: envelope)
-        let inputString = String(decoding: inputData, as: UTF8.self)
-
+    private func send(_ procedure: String, method: HTTPMethod, input: Any?) async throws -> Data {
         let base = configuration.relayBaseURL
             .appendingPathComponent("hosts")
             .appendingPathComponent(routingKey)
             .appendingPathComponent("trpc")
             .appendingPathComponent(procedure)
-        var components = URLComponents(url: base, resolvingAgainstBaseURL: false)
-        components?.queryItems = [URLQueryItem(name: "input", value: inputString)]
-        guard let url = components?.url else { throw AuthError.badServerResponse(status: -1) }
 
-        var request = URLRequest(url: url)
+        // SuperJSON envelope (`{"json": …}`): GET carries it in `?input=`, POST in the body.
+        let envelope: Data? = try input.map { try JSONSerialization.data(withJSONObject: ["json": $0]) }
+
+        var request: URLRequest
+        switch method {
+        case .get:
+            var components = URLComponents(url: base, resolvingAgainstBaseURL: false)
+            if let envelope {
+                let inputString = String(decoding: envelope, as: UTF8.self)
+                components?.queryItems = [URLQueryItem(name: "input", value: inputString)]
+            }
+            guard let url = components?.url else { throw AuthError.badServerResponse(status: -1) }
+            request = URLRequest(url: url)
+        case .post:
+            request = URLRequest(url: base)
+            request.httpMethod = method.rawValue
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = envelope
+        }
+
         let token = try await tokenProvider.token()
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await http.data(for: request)
         try Self.ensureOK(response)
-        return try JSONDecoder().decode(RelayResult<Payload>.self, from: data).result.data.json
+        return data
     }
 
     private static func ensureOK(_ response: URLResponse) throws {

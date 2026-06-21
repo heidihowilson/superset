@@ -16,6 +16,7 @@ struct WorkspaceWindowView: View {
     let auth: AuthController
 
     @State private var chat = ChatSessionStore()
+    @State private var composer = ComposerStore()
     @Environment(\.scenePhase) private var scenePhase
 
     private var workspace: Workspace? {
@@ -42,6 +43,13 @@ struct WorkspaceWindowView: View {
             guard let workspace, let provider = auth.makeChatTranscriptProvider(for: workspace) else { return }
             chat.bind(provider: provider, workspaceID: workspace.id)
             chat.startPolling()
+            if let sender = auth.makeChatSender(for: workspace) {
+                composer.bind(sender: sender, workspaceID: workspace.id) {
+                    // A sent prompt should appear without waiting for the next poll tick.
+                    Task { await chat.refresh() }
+                }
+                await composer.loadPickers()
+            }
         }
         .onDisappear { chat.stopPolling() }
         .onChange(of: scenePhase) { _, phase in
@@ -71,6 +79,7 @@ struct WorkspaceWindowView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 TranscriptView(store: chat)
+                ComposerView(store: composer)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

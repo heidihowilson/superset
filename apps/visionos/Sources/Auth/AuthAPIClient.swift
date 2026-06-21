@@ -121,6 +121,28 @@ struct AuthAPIClient: Sendable {
         try Self.ensureOK(response)
     }
 
+    /// The cloud's offered chat models (`chat.getModels`, a no-input SuperJSON tRPC
+    /// query). Cloud-sourced, so the composer's model picker populates even when the
+    /// Workspace's Host is asleep (PRD §7.2). Hand-typed at the boundary (PRD §12).
+    func fetchChatModels() async throws -> [ChatModel] {
+        var request = URLRequest(url: configuration.apiBaseURL.appendingPathComponent("api/trpc/chat.getModels"))
+        try authorize(&request)
+
+        let (data, response) = try await http.data(for: request)
+        try Self.ensureOK(response)
+        struct Payload: Decodable {
+            struct ResultBox: Decodable {
+                struct DataBox: Decodable {
+                    struct Models: Decodable { let models: [ChatModel] }
+                    let json: Models
+                }
+                let data: DataBox
+            }
+            let result: ResultBox
+        }
+        return try JSONDecoder().decode(Payload.self, from: data).result.data.json.models
+    }
+
     private static func ensureOK(_ response: URLResponse) throws {
         guard let http = response as? HTTPURLResponse else {
             throw AuthError.badServerResponse(status: -1)
