@@ -44,6 +44,80 @@ Leading-ornament TabView  (.tabViewStyle(.sidebarAdaptable), 3 tabs, icons + lab
 
 (Considered and rejected: **Option B**, single project-first drill-down — simpler but forces a project pick before resuming a recent session, wrong for the resume-heavy use case. See ADR-0011.)
 
+## Layout sketches (approximate)
+
+The leading **tab ornament floats just outside the window's left edge** (icons only; gazing at one expands its label). The window itself is a 2-column `NavigationSplitView` on glass; the system window bar sits centered beneath it. `◀` marks the active tab/selection.
+
+**Shell — ornament + split-view window**
+```
+   ornament                       main window (glass)
+  ┌────────┐    ┌────────────────────┬─────────────────────────────┐
+  │ ▣ Work │    │                    │                             │
+  │ ▦ Proj │    │   sidebar          │   detail                    │
+  │ ⚙ Sett │    │   (~300pt)         │   (selected item)           │
+  └────────┘    │                    │                             │
+   (tabs,       └────────────────────┴─────────────────────────────┘
+    ~64pt)                     ──────◍──────   ← system window bar
+```
+
+**Workspaces tab (default / home)** — Recents·Active·All + search → a *flat* session list; no project nesting.
+```
+ ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
+ │ ▣ Work◀│  │ ⌕ Find a session         │  pkg/auth-refresh        ⊕   │
+ │ ▦ Proj │  ├──────────────────────────┤  acme · running · 2m ago     │
+ │ ⚙ Sett │  │ RECENTS                  │                              │
+ └────────┘  │  ● pkg/auth-refresh  2m ◀│  ▸ last: "run the tests"     │
+             │  ● web-hotfix        1h  │  ▸ 3 files changed           │
+             │ ACTIVE                   │   ┌────────────────────────┐ │
+             │  ◐ infra-migrate     ⟳   │   │   Open workspace   ⧉   │ │
+             │ ALL                      │   └────────────────────────┘ │
+             │  ○ docs-pass             │                              │
+             └──────────────────────────┴──────────────────────────────┘
+                flat list (one scroll)       opens its own window →
+```
+
+**Projects tab** — pick/search a project → see *only* that project's workspaces (filter, not nest).
+```
+ ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
+ │ ▣ Work │  │ ⌕ Find a project         │  superset            12 ws   │
+ │ ▦ Proj◀│  ├──────────────────────────┤                              │
+ │ ⚙ Sett │  │  superset          12  ◀ │  ● pkg/auth-refresh   2m     │
+ └────────┘  │  marketing          3    │  ● web-hotfix         1h     │
+             │  infra              5    │  ○ docs-pass                 │
+             │  mobile             2    │  ○ …                         │
+             │  …                       │                              │
+             └──────────────────────────┴──────────────────────────────┘
+                projects (searchable)       selected project's workspaces
+```
+
+**Settings** — category sidebar + detail pane (the macOS-Ventura / visionOS master-detail).
+```
+ ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
+ │ ▣ Work │  │  Account                 │  Organization                │
+ │ ▦ Proj │  │  Organization         ◀  │   Active:  [ acme        ⌄ ] │
+ │ ⚙ Sett◀│  │  Appearance              │   Plan:    PRO               │
+ └────────┘  │  Model                   │  ───────────────────────────  │
+             │  Input & Notifications   │   Hosts                      │
+             │  Hosts                   │   ● Seths-MacBook  online     │
+             │  Projects                │                              │
+             │  About                   │                              │
+             └──────────────────────────┴──────────────────────────────┘
+                categories (default-sel)    selected category's controls
+```
+
+**Window-per-workspace** — "Open workspace" spawns a *separate* scene you place in space; watch + prompt one agent per window (unchanged from V1).
+```
+   browser window               workspace window (own scene)
+  ┌──────────────┐             ┌───────────────────────────────┐
+  │  …split view │             │  pkg/auth-refresh · running    │
+  │   (catalog)  │             │ ┌───────────────────────────┐ │
+  └──────────────┘             │ │ transcript (web-rendered) │ │
+        ↘  arranged in         │ │ …agent messages…          │ │
+           a gentle arc        │ └───────────────────────────┘ │
+                               │  [ dictate 🎤 ]  prompt…   ▶  │
+                               └───────────────────────────────┘
+```
+
 ## Component plan
 
 | Current | Change |
