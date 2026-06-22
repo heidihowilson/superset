@@ -185,7 +185,7 @@ final class WorkspaceStore {
 
     /// Create a Workspace on `hostID`'s Host (Host-gated saga over the relay). Non-optimistic:
     /// the new row appears only after the post-create poll lands it.
-    func createWorkspace(projectID: String, name: String, hostID: String) async {
+    func createWorkspace(projectID: String, name: String, branch: String, hostID: String) async {
         guard let lifecycle else { return }
         guard canCreate(onHostID: hostID) else {
             lifecycleError = "Host unavailable. The Host must be online and the organization on an active plan to create this workspace."
@@ -195,7 +195,7 @@ final class WorkspaceStore {
         isCreatingWorkspace = true
         defer { isCreatingWorkspace = false }
         do {
-            try await lifecycle.create(projectID: projectID, name: name, hostID: hostID)
+            try await lifecycle.create(projectID: projectID, name: name, branch: branch, hostID: hostID)
             await refresh()
         } catch {
             lifecycleError = Self.lifecycleMessage(for: error)
@@ -413,7 +413,7 @@ extension WorkspaceStore {
 
     private struct SampleLifecycle: WorkspaceLifecycleProviding {
         func rename(workspaceID: String, to name: String) async throws {}
-        func create(projectID: String, name: String, hostID: String) async throws {}
+        func create(projectID: String, name: String, branch: String, hostID: String) async throws {}
         func delete(workspaceID: String, hostID: String) async throws {}
     }
 }

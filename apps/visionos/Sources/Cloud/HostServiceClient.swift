@@ -47,13 +47,17 @@ struct HostServiceClient: Sendable {
 
     /// Provision a Workspace on the Host (`workspaces.create`): the Host builds the git
     /// worktree and registers the cloud row itself (the saga lives host-side, mirroring
-    /// the desktop CollectionsProvider create path). Host-gated by construction (relay):
-    /// a sleeping/unreachable Host throws, never queued (ADR-0006). `branch` is omitted so
-    /// the Host derives it; the result is not decoded — the next list poll shows the row.
-    func createWorkspace(projectID: String, name: String) async throws {
+    /// the desktop create path). Host-gated by construction (relay): a sleeping/unreachable
+    /// Host throws, never queued (ADR-0006). The org and Host are carried by the routing key,
+    /// so the body only threads `projectId`, `name`, and the chosen `branch`; an empty/nil
+    /// branch is omitted and the Host derives one. The result is not decoded — the next list
+    /// poll shows the row.
+    func createWorkspace(projectID: String, name: String, branch: String?) async throws {
         var input: [String: Any] = ["projectId": projectID]
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmed.isEmpty { input["name"] = trimmed }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedName.isEmpty { input["name"] = trimmedName }
+        let trimmedBranch = branch?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let trimmedBranch, !trimmedBranch.isEmpty { input["branch"] = trimmedBranch }
         _ = try await requestData("workspaces.create", method: .post, input: input)
     }
 
