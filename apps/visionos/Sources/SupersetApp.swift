@@ -90,6 +90,11 @@ struct SupersetApp: App {
             case .background:
                 metrics.sessionDidEnd()
                 if auth.status == .signedIn {
+                    // Clear the cached relay JWT inline so the RCE-grade token is gone before
+                    // the OS can suspend the app; the awaited `lock()` runs in a `Task` that
+                    // may not be scheduled in time. `lock()` then seals re-minting until the
+                    // next Optic ID pass (ADR-0008).
+                    auth.dropRelayToken()
                     Task { await lock.lock() }
                 }
             default: break
