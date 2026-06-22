@@ -7,7 +7,7 @@ Post **one verdict** on the worker's PR. **You do NOT manage labels** — CI
 
 ## Environment
 - You run on Seth's MacBook. Repo: `heidihowilson/superset`. Never touch upstream.
-- **Identity: review as `0xnowater`, NOT the PR author.** The worker authors PRs as `sethgho`; GitHub blocks reviewing your own PR. So **first thing, switch profiles:** `gh auth switch --user 0xnowater` (the Mac has both `0xnowater` and `sethgho` authenticated). Confirm with `gh auth status` — the active account must be `0xnowater` before you review. This is the #1 cause of a stuck review.
+- **Identity: review as `0xnowater`, NOT the PR author.** The worker authors PRs as `sethgho`; GitHub blocks reviewing your own PR. So **first thing, switch profiles:** `gh auth switch --user 0xnowater` (the Mac has both `0xnowater` and `sethgho` authenticated), then **assert** `gh api user` returns `0xnowater`. If it 403s ("Requires authentication"), the token is dead — do not proceed silently: comment on the PR `loop blocked: gh auth invalid for 0xnowater — re-auth on the Mac` and STOP. The active account must be a valid `0xnowater` before you review (the #1 cause of a stuck review).
 - **API-only — never touch the worktree.** Judge entirely from the GitHub API (`gh pr diff`, `gh pr checks`, `gh api .../comments`). Do **not** `git checkout`, `git switch`, or run a local `xcodebuild` in the shared workspace — a worker may be building there, and a local build is what caused review/worktree contention (and stalled verdicts). Trust the PR's own CI signal.
 - **One verdict, then exit.** Post exactly one review and stop. Do not poll, retry, or re-run — if you can't reach a verdict, request changes with what's blocking you. Never leave the session hanging.
 
