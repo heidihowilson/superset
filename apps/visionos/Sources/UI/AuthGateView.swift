@@ -92,16 +92,9 @@ struct AuthGateView: View {
             ProgressView()
         case .signedIn:
             RootView(store: store)
-                .ornament(attachmentAnchor: .scene(.topLeading)) {
-                    SessionStatusView(client: auth.makeAPIClient())
-                }
-                .ornament(attachmentAnchor: .scene(.topTrailing)) {
-                    Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right") {
-                        auth.signOut()
-                    }
-                    .padding()
-                    .glassBackgroundEffect()
-                }
+                // Session status, org switch, host-credential verify, and Sign Out all
+                // live in Settings now (PRD §7.2/§9), so the command-center window carries
+                // no account/session chrome.
                 // First-run onboarding presents over the command-center window only
                 // (FR-ONB). Any dismissal — Done, Skip, or an interactive swipe — routes
                 // through `complete()`, so first-run is recorded however the user leaves.

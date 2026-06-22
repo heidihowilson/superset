@@ -78,6 +78,7 @@ struct SettingsView: View {
                 }
 
                 accountSection
+                hostCredentialSection
                 planSection
                 hostsSection
                 projectsSection
@@ -162,6 +163,42 @@ struct SettingsView: View {
         Section("Account") {
             LabeledContent("Email", value: model.session?.userEmail ?? "—")
             LabeledContent("Organization", value: model.activeOrganizationName ?? "—")
+        }
+    }
+
+    /// Verify the bearer session can mint the relay JWT host-service-over-relay calls
+    /// present (PRD §13). Moved here from the command-center ornament; the minted token is
+    /// never shown.
+    private var hostCredentialSection: some View {
+        Section {
+            Button("Verify host credential") {
+                Task { await model.mintRelayCredential() }
+            }
+            .disabled(model.relayProbe == .running)
+            relayStatus
+        } header: {
+            Text("Host Credential")
+        } footer: {
+            Text("Mints the relay token your hosts present. The token is never shown.")
+        }
+    }
+
+    @ViewBuilder
+    private var relayStatus: some View {
+        switch model.relayProbe {
+        case .idle:
+            EmptyView()
+        case .running:
+            HStack(spacing: 8) {
+                ProgressView()
+                Text("Verifying…").foregroundStyle(.secondary)
+            }
+        case .minted:
+            Label("Relay credential minted", systemImage: "checkmark.seal")
+                .foregroundStyle(.green)
+        case let .failed(message):
+            Label(message, systemImage: "exclamationmark.triangle")
+                .foregroundStyle(.red)
         }
     }
 

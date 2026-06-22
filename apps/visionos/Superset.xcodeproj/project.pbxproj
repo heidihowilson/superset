@@ -13,7 +13,6 @@
 		093B1209E89A07CAEDA91E45 /* DebugDumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */; };
 		0D4FE4F83D6E73977CE7A2B5 /* TelemetryTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C605ADEC56AC4700CDA637C /* TelemetryTransport.swift */; };
 		0D6D0B2BFF7330504E7BDD23 /* FileWorkspaceListCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */; };
-		0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */; };
 		1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C300406588D9244173B6DA /* SessionMetrics.swift */; };
 		15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */; };
 		15CD9DC3E3A2A38948445F26 /* InlineToolResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1C321FA276AC80B909B18A /* InlineToolResultView.swift */; };
@@ -160,7 +159,6 @@
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIDStore.swift; sourceTree = "<group>"; };
 		EF721B84B64BBFA6A277F655 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStatusView.swift; sourceTree = "<group>"; };
 		F0F959F6CC86D853AE500BE5 /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
 		FA0FFEE2E71BD748C8C1DF25 /* LockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockController.swift; sourceTree = "<group>"; };
 		FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceListSnapshot.swift; sourceTree = "<group>"; };
@@ -322,7 +320,6 @@
 				7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */,
 				CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */,
 				9F36DC5B2A7314017753C666 /* RootView.swift */,
-				F06184B59E66F4F6EA9C3B64 /* SessionStatusView.swift */,
 				2978A7F458C82111FBB5B731 /* SettingsModel.swift */,
 				EF721B84B64BBFA6A277F655 /* SettingsView.swift */,
 				92DB07131AB224ABB387A03E /* SignInView.swift */,
@@ -465,7 +462,6 @@
 				B41E3A8CF9DC2C1FB773DBF6 /* RootView.swift in Sources */,
 				253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */,
 				1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */,
-				0ED3C0F4A645C36E3ADF052E /* SessionStatusView.swift in Sources */,
 				46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */,
 				C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
