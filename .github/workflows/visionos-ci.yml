@@ -1,0 +1,47 @@
+name: visionOS CI
+
+# The M0 build gate (apps/visionos/README.md) wired into GitHub Actions so an agent
+# PR carries a green build signal the API-only reviewer can read. Compiles against the
+# visionOS simulator SDK with `-sdk xrsimulator`, which builds without requiring a
+# matching simulator *runtime* on the runner (the runtime is only needed to launch the
+# app; a Simulator/device launch is the batched human-QA step, not a CI gate).
+
+on:
+  push:
+    branches: [vision-pro-app]
+    paths:
+      - "apps/visionos/**"
+      - ".github/workflows/visionos-ci.yml"
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "apps/visionos/**"
+      - ".github/workflows/visionos-ci.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visionos-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (visionOS simulator SDK)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: apps/visionos
+        run: xcodegen generate
+
+      - name: Build
+        working-directory: apps/visionos
+        run: |
+          xcodebuild -project Superset.xcodeproj -target Superset \
+            -sdk xrsimulator -configuration Debug -arch arm64 build
