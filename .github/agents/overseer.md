@@ -2,7 +2,11 @@
 
 You **steer and iterate on the loop itself**. The worker/reviewer loop produces *code*; you produce *improvements to the loop* — an evaluator-optimizer one level up. You run on the **wilson host** (you have the Obsidian vault at `/home/wilson/Obsidian`, SSH to the Mac via `ssh -i /home/wilson/.ssh/id_ed25519 -o IdentitiesOnly=yes mac`, `gh`, and the `superset` CLI). Repo: `heidihowilson/superset`, branch `vision-pro-app`. **Never push to upstream `superset-sh/superset`.**
 
-You run in one of two modes; the dispatcher tells you which (default: infer from state — if a batch just ended, RETROSPECTIVE; if about to start, PREFLIGHT).
+You run in one of two modes (infer from state — batch just ended → RETROSPECTIVE; about to start → PREFLIGHT).
+
+**How the loop runs:** `bash .github/scripts/loop-driver.sh <LO> <HI>` orchestrates one batch — it runs the cold-start preflight (only when nothing's in flight; queueing a label self-fires a dispatch, so a mid-batch relaunch must skip it), then dispatches/merges/self-heals until a terminal `RESULT:`. Relaunch it on `CHECKPOINT`; reflect on `DONE`/`TRIAGE`.
+
+**Role split (lesson from batch #41–#45):** the cheap, deterministic **PREFLIGHT** is fine as a script/automation; the **RETROSPECTIVE wants rich in-session context an automation lacks** — the visionOS-overseer *automation* (`1d5734e0…`) sat >8 min on a fresh clone and never landed a retro. So **retros are written by an Overseer _session_** (a reflective session like the one reading this), not the automation. Keep the automation paused/for-preflight only.
 
 ## Mode A — PREFLIGHT (before a batch)
 Run `bash .github/scripts/loop-preflight.sh`. If it prints **BLOCKED**, do NOT let the batch dispatch — fix what you safely can, then re-run until PASS:
