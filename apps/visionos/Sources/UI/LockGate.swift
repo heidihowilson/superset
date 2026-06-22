@@ -2,12 +2,15 @@ import SwiftUI
 
 /// Wraps a scene's content in the Optic ID gate (ADR-0008). Applied to every window so
 /// the lock is app-wide: signed-in content is covered by `LockView` whenever the shared
-/// `LockController` is engaged, and the credential is sealed on background.
+/// `LockController` is engaged.
 ///
 /// The gate only acts when signed in — a signed-out window shows its own sign-in surface
-/// untouched. Locking keys on `.background` (the whole app leaving the foreground), not a
-/// single window losing focus (`.inactive`), so defocusing one of several windows never
-/// locks the others.
+/// untouched. It re-runs Optic ID when a window foregrounds while locked, but it never
+/// *engages* the lock from its own `scenePhase`: closing or backgrounding a single window
+/// fires that scene's `.background` even while other windows stay visible, so a per-scene
+/// lock here would re-lock every window when one closes. Locking is instead driven from the
+/// app-level `scenePhase` in `SupersetApp`, whose aggregate phase reaches `.background` only
+/// on a true app background (headset removed / app suspended).
 private struct LockGate: ViewModifier {
     @Bindable var lock: LockController
     let auth: AuthController
@@ -50,15 +53,10 @@ private struct LockGate: ViewModifier {
             }
             .onChange(of: scenePhase) { _, phase in
                 guard signedIn else { return }
-                switch phase {
-                case .background:
-                    Task { await lock.lock() }
-                case .active:
-                    if lock.isLocked {
-                        Task { await lock.authenticate() }
-                    }
-                default:
-                    break
+                // Only re-authenticate on foreground; engaging the lock is the app-level
+                // scene's job (`SupersetApp`) so closing one window can't lock the rest.
+                if phase == .active, lock.isLocked {
+                    Task { await lock.authenticate() }
                 }
             }
             .onChange(of: auth.status) { old, new in
