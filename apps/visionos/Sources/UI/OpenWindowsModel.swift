@@ -3,9 +3,8 @@ import Observation
 
 /// Tracks which Workspace/Project content windows are currently open, keyed by domain
 /// id. SwiftUI exposes no roster of open windows, so each window self-registers on
-/// appear and deregisters on disappear. This backs two things: the "close other windows
-/// / consolidate" action (PRD §9, which needs the set of ids to dismiss) and the
-/// single-window-plus-switcher policy (which consolidates the rest on open).
+/// appear and deregisters on disappear. This backs the explicit "close other windows /
+/// consolidate" action (PRD §9), which needs the set of ids to dismiss.
 @MainActor
 @Observable
 final class OpenWindowsModel {

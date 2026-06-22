@@ -4,8 +4,8 @@ import Observation
 /// Device-local user preferences — the slice of Settings that lives on this Vision Pro
 /// rather than the cloud session (PRD §7.2): app appearance, the co-equal-input
 /// dictation toggle (§9), in-app notification opt-in, and a preferred default chat
-/// model. Backed by `UserDefaults` like `InteractionModelRegistry` and
-/// `UserDefaultsPendingStateStore` (none of these are secrets); the cloud-scoped
+/// model. Backed by `UserDefaults` like `UserDefaultsPendingStateStore`
+/// (none of these are secrets); the cloud-scoped
 /// setting — the active organization — flows through the auth session instead.
 @MainActor
 @Observable

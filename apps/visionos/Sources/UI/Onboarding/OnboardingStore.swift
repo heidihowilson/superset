@@ -4,7 +4,7 @@ import Observation
 /// First-run onboarding state (PRD §7.2 / §16.3, FR-ONB). The 5-beat tour is
 /// lightweight, **skippable**, and **settings-replayable**, so this store separates two
 /// concerns: a durable `hasCompletedFirstRun` flag (persisted in `UserDefaults` like
-/// `AppSettingsStore` and `InteractionModelRegistry` — not a secret) that gates the
+/// `AppSettingsStore` — not a secret) that gates the
 /// automatic first-run presentation, and a transient `isPresented` flag that drives the
 /// sheet. Replaying from Settings flips `isPresented` without disturbing the durable flag,
 /// so a deliberate re-watch never re-arms the automatic first-run trigger.

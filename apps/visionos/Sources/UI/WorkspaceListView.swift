@@ -11,10 +11,7 @@ import SwiftUI
 /// case (AGENTS rule 9 analog for the polled list).
 struct WorkspaceListView: View {
     @Bindable var store: WorkspaceStore
-    @Environment(InteractionModelRegistry.self) private var models
-    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
 
     @State private var isCreating = false
     @State private var renameTarget: Workspace?
@@ -124,10 +121,7 @@ struct WorkspaceListView: View {
             WindowRouter.openWorkspace(
                 workspace.id,
                 store: store,
-                models: models,
-                openWindows: openWindows,
-                openWindow: openWindow,
-                dismissWindow: dismissWindow
+                openWindow: openWindow
             )
         } label: {
             WorkspaceRow(

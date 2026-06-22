@@ -4,19 +4,16 @@ import SwiftUI
 /// adapter's `workspaceList` pane over the shared, cloud-backed `WorkspaceStore`, which
 /// is polled while any window is visible and paused when the app backgrounds (ADR-0004).
 ///
-/// Three ornaments host the chrome (PRD §9): a leading-edge icon rail (`RootRailView`,
-/// ADR-0011) that switches the content pane and opens the create sheet, a bottom adapter
-/// switcher whose flip re-renders the *same* store (the M0 renderer seam), and a
-/// window-controls menu carrying the interaction-model flag (§10) and the explicit
-/// "consolidate windows" action.
+/// Two ornaments host the chrome (PRD §9, ADR-0011): a leading-edge icon rail
+/// (`RootRailView`) that switches the content pane, opens the create sheet, and opens
+/// Settings, and a bottom window-controls menu carrying the explicit "consolidate
+/// windows" action.
 struct RootView: View {
     @Bindable var store: WorkspaceStore
     let auth: AuthController
     @State private var registry = AdapterRegistry(adapters: [
         NativeWorkspaceAdapter(),
-        DebugListAdapter(),
     ])
-    @Environment(InteractionModelRegistry.self) private var models
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(SessionMetrics.self) private var metrics
     @Environment(\.openWindow) private var openWindow
@@ -116,60 +113,22 @@ struct RootView: View {
     }
 
     private var bottomControls: some View {
-        HStack(spacing: 16) {
-            adapterSwitcher
-            Divider().frame(height: 28)
-            windowMenu
-            settingsButton
-        }
-        .padding()
-        .glassBackgroundEffect()
-    }
-
-    private var settingsButton: some View {
-        Button {
-            openWindow(id: SettingsScene.windowID)
-        } label: {
-            Label("Settings", systemImage: "gearshape")
-        }
-    }
-
-    private var adapterSwitcher: some View {
-        HStack(spacing: 12) {
-            ForEach(registry.adapters.indices, id: \.self) { index in
-                let adapter = registry.adapters[index]
-                Button(adapter.displayName) {
-                    registry.activate(adapter.id)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(adapter.id == registry.activeAdapterID ? .accentColor : .gray)
-            }
-        }
+        windowMenu
+            .padding()
+            .glassBackgroundEffect()
     }
 
     private var windowMenu: some View {
         Menu {
-            Picker("Interaction Model", selection: activeModelBinding) {
-                ForEach(models.models) { model in
-                    Text(model.displayName).tag(model.id)
-                }
-            }
-            .pickerStyle(.inline)
-
             if openWindows.openWindowCount > 0 {
                 Button("Consolidate Windows", systemImage: "rectangle.on.rectangle.slash") {
                     WindowRouter.consolidate(except: nil, openWindows: openWindows, dismissWindow: dismissWindow)
                 }
+            } else {
+                Text("No open windows")
             }
         } label: {
             Label("Windows", systemImage: "macwindow.on.rectangle")
         }
-    }
-
-    private var activeModelBinding: Binding<String> {
-        Binding(
-            get: { models.activeModelID },
-            set: { models.activate($0) }
-        )
     }
 }

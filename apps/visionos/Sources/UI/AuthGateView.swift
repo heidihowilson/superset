@@ -9,24 +9,20 @@ import SwiftUI
 /// Also the deep-link entry point (PRD §16.2): `superset://auth/callback` completes the
 /// OAuth handoff; `workspace`/`project`/`session` links open the target window. A link
 /// that arrives signed-out is held as `pendingRoute` and replayed once sign-in lands
-/// (cold-start intent, PRD §11). Injects the interaction-model registry and the
-/// open-windows roster into the environment so the switcher/list/window controls share
-/// one instance of each.
+/// (cold-start intent, PRD §11). Injects the open-windows roster into the environment
+/// so the list and window controls share one instance.
 struct AuthGateView: View {
     let auth: AuthController
     let store: WorkspaceStore
-    let models: InteractionModelRegistry
     let openWindows: OpenWindowsModel
 
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(OnboardingStore.self) private var onboarding
     @Environment(SessionMetrics.self) private var metrics
     @State private var pendingRoute: DeepLinkRoute?
 
     var body: some View {
         content
-            .environment(models)
             .environment(openWindows)
             .onAppear { auth.restore() }
             .onOpenURL { handle($0) }
@@ -78,10 +74,7 @@ struct AuthGateView: View {
         WindowRouter.open(
             route,
             store: store,
-            models: models,
-            openWindows: openWindows,
-            openWindow: openWindow,
-            dismissWindow: dismissWindow
+            openWindow: openWindow
         )
     }
 
