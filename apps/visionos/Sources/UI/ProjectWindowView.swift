@@ -8,18 +8,16 @@ enum ProjectScene {
 
 /// Content of a Project window — a `(sceneKind, domainId)` binding over the shared store
 /// (CONTEXT.md "Window"), keyed by Project id so re-opening focuses the existing window.
-/// Lists the Project's Workspaces and opens each into its own Workspace window (honoring
-/// the active interaction model). Cache-first restoration (PRD §16.2): a restored window
+/// Lists the Project's Workspaces and opens each into its own Workspace window
+/// (multi-window). Cache-first restoration (PRD §16.2): a restored window
 /// onto a still-loading list shows progress; only a Project absent from a *loaded* list
 /// is a deleted-id 404 surface, never a spinner that hangs.
 struct ProjectWindowView: View {
     let projectID: Project.ID?
     let store: WorkspaceStore
 
-    @Environment(InteractionModelRegistry.self) private var models
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneActive = false
 
@@ -102,10 +100,7 @@ struct ProjectWindowView: View {
                         WindowRouter.openWorkspace(
                             workspace.id,
                             store: store,
-                            models: models,
-                            openWindows: openWindows,
-                            openWindow: openWindow,
-                            dismissWindow: dismissWindow
+                            openWindow: openWindow
                         )
                     } label: {
                         HStack(spacing: 16) {

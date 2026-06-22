@@ -5,10 +5,10 @@ import SwiftUI
 /// passes only a `defaultSize` hint (PRD §7.1, PI-1).
 ///
 /// Owns the app-wide singletons the windows share: the `AuthController`, the
-/// cloud-backed `WorkspaceStore`, the `InteractionModelRegistry` (the §10 windowing
-/// flag), and the `OpenWindowsModel` (the roster backing consolidate). Workspace and
-/// Project windows are `WindowGroup(for:)` scenes keyed by domain id, so opening an
-/// already-open id focuses its window instead of spawning a duplicate (PRD §7.1).
+/// cloud-backed `WorkspaceStore`, and the `OpenWindowsModel` (the roster backing the
+/// explicit consolidate action). Workspace and Project windows are `WindowGroup(for:)`
+/// scenes keyed by domain id, so opening an already-open id focuses its window instead
+/// of spawning a duplicate (PRD §7.1).
 /// Both restore on relaunch (intent, not just geometry — PRD §16.2): the restored view
 /// reloads against the shared store and shows a 404 surface for a deleted id.
 @main
@@ -16,7 +16,6 @@ struct SupersetApp: App {
     @State private var auth: AuthController
     @State private var store: WorkspaceStore
     @State private var lock: LockController
-    @State private var models = InteractionModelRegistry()
     @State private var openWindows = OpenWindowsModel()
     @State private var appSettings = AppSettingsStore()
     @State private var onboarding = OnboardingStore()
@@ -53,7 +52,7 @@ struct SupersetApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AuthGateView(auth: auth, store: store, models: models, openWindows: openWindows)
+            AuthGateView(auth: auth, store: store, openWindows: openWindows)
                 .environment(onboarding)
                 .environment(metrics)
                 .lockGate(lock: lock, auth: auth)
@@ -81,7 +80,6 @@ struct SupersetApp: App {
 
         WindowGroup(id: WorkspaceScene.windowID, for: Workspace.ID.self) { $workspaceID in
             WorkspaceWindowView(workspaceID: workspaceID, store: store, auth: auth)
-                .environment(models)
                 .environment(openWindows)
                 .environment(appSettings)
                 .environment(metrics)
@@ -93,7 +91,6 @@ struct SupersetApp: App {
 
         WindowGroup(id: ProjectScene.windowID, for: Project.ID.self) { $projectID in
             ProjectWindowView(projectID: projectID, store: store)
-                .environment(models)
                 .environment(openWindows)
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
@@ -110,5 +107,12 @@ struct SupersetApp: App {
         }
         .defaultSize(width: 560, height: 720)
         .restorationBehavior(.automatic)
+
+        WindowGroup(id: DebugScene.windowID) {
+            DebugDumpView(store: store)
+                .lockGate(lock: lock, auth: auth)
+                .preferredColorScheme(appSettings.appearance.colorScheme)
+        }
+        .defaultSize(width: 560, height: 720)
     }
 }

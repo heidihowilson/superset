@@ -1,9 +1,14 @@
 import SwiftUI
 
-/// The throwaway second adapter's view (M0). Reads the *same* `WorkspaceStore` as
-/// the native list — including live selection — and presents it as a plain text
-/// dump. Deliberately unlike the production UI so the renderer seam is visible at a
-/// glance: same store, different presentation, zero domain change (PRD §17, M0).
+/// The Debug window scene id. A plain `WindowGroup` (no domain value) — one shared
+/// Debug window, opened from the Settings "Debug" category.
+enum DebugScene {
+    static let windowID = "debug"
+}
+
+/// A plain-text dump of the shared `WorkspaceStore` — including live selection — opened
+/// as its own window from Settings. A developer surface for inspecting store state at a
+/// glance, unconnected to the production UI.
 struct DebugDumpView: View {
     let store: WorkspaceStore
 

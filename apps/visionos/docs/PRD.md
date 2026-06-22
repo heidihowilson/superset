@@ -141,7 +141,7 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 | Send prompt (voice/keyboard) | **Must (Host-gated)** | Co-equal modalities; explicit send; agent runs on Host. |
 | Workspace create / delete | **Must (Host-gated)** | Client-driven relay, keyed by `machineId`. |
 | Workspace rename / restore | **Must** | Cloud-only; safe Host-offline. |
-| Multi-window capability | **Must** | Domain-id-keyed; single-window-plus-switcher default. |
+| Multi-window capability | **Must** | Domain-id-keyed; multi-window only (single-window-plus-switcher retired, V1.1/ADR-0011). |
 | Status & in-app notifications | **Must** | Polled list + lifecycle toasts; host-online indicator. |
 | Auth + org switch | **Must** | Bearer handoff (ADR-0005). |
 | Settings (read-mostly) | **Must** | Minimal editable set. |
@@ -176,10 +176,12 @@ Deferred/cut pane kinds stay registered placeholders so synced layouts stay vali
 ## 10. Experimentation Framework
 
 Internal design-iteration tool, not a powered A/B test (dogfood N can't declare winners).
-- An **Interaction Model Registry** of registered, feature-flagged models; switching re-renders the same store at runtime, no rebuild.
-- **Default `single-window-plus-switcher`**; `multi-window` is the opt-in contender. Explicit opt-in / org-role cohorts.
-- **Cost-of-experiment:** a new model = adapter + flag + config; no domain/core change, no migration.
-- **Learning:** qualitative + behavioral + a collapse-to-single-window tripwire. Quantitative events descriptive only. Powered A/B is a population-gated later phase.
+
+> **V1.1 (ADR-0011):** the windowing experiment concluded — **multi-window is the only model**; `single-window-plus-switcher` and the runtime `InteractionModelRegistry` are retired. Opening a workspace always opens/focuses its own window; the explicit "consolidate windows" action stays as the proliferation mitigation (§9). The renderer-seam framing below (adapter + config) still holds for the future spatial-renderer swap.
+
+- **Renderer seam:** registered presentation adapters over one store; a new presentation re-renders the same store at runtime, no rebuild.
+- **Cost-of-experiment:** a new renderer = adapter + config; no domain/core change, no migration.
+- **Learning:** qualitative + behavioral. Quantitative events descriptive only. Powered A/B is a population-gated later phase.
 
 ---
 

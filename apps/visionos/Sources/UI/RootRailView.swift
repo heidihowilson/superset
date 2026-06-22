@@ -33,9 +33,9 @@ enum RailDestination: String, CaseIterable, Identifiable {
 /// left nav, top to bottom: ⬡ Org · ▣ Workspaces · ◷ Automations · ▤ Tasks & PRs · ＋ New.
 ///
 /// Icons only by default — the title is revealed on hover/gaze via `.help()` and a hover
-/// effect. Selecting a destination swaps the content pane in `RootView`; ＋ opens the
-/// create sheet, and ⬡ Org opens the org menu: the active org + the membership list (tap
-/// to switch), a divider, Settings (opens its window), and Sign Out.
+/// effect. Selecting a destination swaps the content pane in `RootView`; ⚙ Settings (below
+/// Tasks & PRs) opens the Settings window; ＋ opens the create sheet; and ⬡ Org opens the
+/// org menu: the active org + the membership list (tap to switch), a divider, and Sign Out.
 struct RootRailView: View {
     @Binding var selection: RailDestination
     let canCreateWorkspace: Bool
@@ -67,6 +67,14 @@ struct RootRailView: View {
                 }
             }
 
+            // Settings sits directly below Tasks & PRs (ADR-0011): a rail item, not an
+            // Org-menu entry. It opens its own window rather than switching the pane.
+            RailItem(
+                title: "Settings",
+                systemImage: "gearshape",
+                action: onOpenSettings
+            )
+
             Divider().frame(width: 40)
 
             RailItem(
@@ -81,9 +89,9 @@ struct RootRailView: View {
         .glassBackgroundEffect()
     }
 
-    /// ⬡ Org — the IA's org menu (mirrors desktop): switch active org, then Settings and
-    /// Sign Out. The rail affordance is icon-first (active-org initials + a plan badge);
-    /// the org name and plan are revealed on hover via `.help()`.
+    /// ⬡ Org — the IA's org menu (mirrors desktop): switch active org, then Sign Out.
+    /// Settings moved to its own rail item (ADR-0011). The rail affordance is icon-first
+    /// (active-org initials + a plan badge); the org name and plan are revealed on hover.
     private var orgItem: some View {
         Menu {
             ForEach(organizations) { org in
@@ -92,7 +100,6 @@ struct RootRailView: View {
 
             Divider()
 
-            Button("Settings", systemImage: "gearshape", action: onOpenSettings)
             Button(role: .destructive, action: onSignOut) {
                 Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
             }

@@ -20,6 +20,7 @@ struct SettingsView: View {
 
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OnboardingStore.self) private var onboarding
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
 
@@ -83,6 +84,8 @@ struct SettingsView: View {
                 projectsSection
             case .about:
                 onboardingSection
+            case .debug:
+                debugSection
             }
         }
         .formStyle(.grouped)
@@ -138,6 +141,18 @@ struct SettingsView: View {
             Text("Onboarding")
         } footer: {
             Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
+        }
+    }
+
+    private var debugSection: some View {
+        Section {
+            Button("Open Debug Window", systemImage: "ladybug") {
+                openWindow(id: DebugScene.windowID)
+            }
+        } header: {
+            Text("Debug")
+        } footer: {
+            Text("Opens a plain-text dump of the workspace store in its own window.")
         }
     }
 
@@ -325,6 +340,7 @@ private enum SettingsCategory: String, CaseIterable, Identifiable {
     case hosts
     case projects
     case about
+    case debug
 
     var id: Self { self }
 
@@ -338,6 +354,7 @@ private enum SettingsCategory: String, CaseIterable, Identifiable {
         case .hosts: "Hosts"
         case .projects: "Projects"
         case .about: "About"
+        case .debug: "Debug"
         }
     }
 
@@ -351,6 +368,7 @@ private enum SettingsCategory: String, CaseIterable, Identifiable {
         case .hosts: "server.rack"
         case .projects: "folder"
         case .about: "info.circle"
+        case .debug: "ladybug"
         }
     }
 }
