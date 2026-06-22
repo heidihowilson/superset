@@ -26,17 +26,31 @@ struct ChatDisplayState: Sendable, Equatable, Codable {
     var isRunning: Bool
     /// A surfaced run error, if the last/active turn failed.
     var errorMessage: String?
+    /// True when the agent is blocked on a user approve/reject decision — the host's
+    /// `pendingApproval` (a tool awaiting permission). Gates the composer's one-tap
+    /// quick-action chips, which only apply while such a decision is pending (PRD §9).
+    var isAwaitingDecision: Bool
 
     static let idle = ChatDisplayState(isRunning: false, errorMessage: nil)
 
     private enum CodingKeys: String, CodingKey {
         case isRunning
         case errorMessage
+        case pendingApproval
+        case isAwaitingDecision
     }
 
-    init(isRunning: Bool, errorMessage: String?) {
+    /// The few `pendingApproval` fields needed to detect presence; a non-null object
+    /// means a tool is awaiting the user's decision. Decoded tolerantly — its mere
+    /// presence is the signal, not any particular field.
+    private struct PendingApprovalProbe: Decodable {
+        let toolCallId: String?
+    }
+
+    init(isRunning: Bool, errorMessage: String?, isAwaitingDecision: Bool = false) {
         self.isRunning = isRunning
         self.errorMessage = errorMessage
+        self.isAwaitingDecision = isAwaitingDecision
     }
 
     init(from decoder: Decoder) throws {
@@ -45,6 +59,18 @@ struct ChatDisplayState: Sendable, Equatable, Codable {
         let raw = (try? container.decodeIfPresent(String.self, forKey: .errorMessage)) ?? nil
         let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines)
         errorMessage = (trimmed?.isEmpty == false) ? trimmed : nil
+        // The host snapshot carries `pendingApproval`; a re-painted cache carries the
+        // derived flag. Either source marks the turn as awaiting a decision.
+        let approval = (try? container.decodeIfPresent(PendingApprovalProbe.self, forKey: .pendingApproval)) ?? nil
+        let cached = ((try? container.decodeIfPresent(Bool.self, forKey: .isAwaitingDecision)) ?? nil) ?? false
+        isAwaitingDecision = approval != nil || cached
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(isRunning, forKey: .isRunning)
+        try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
+        try container.encode(isAwaitingDecision, forKey: .isAwaitingDecision)
     }
 }
 

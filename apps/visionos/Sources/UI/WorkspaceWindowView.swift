@@ -132,7 +132,10 @@ struct WorkspaceWindowView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 TranscriptView(store: chat)
-                ComposerView(store: composer)
+                ComposerView(
+                    store: composer,
+                    awaitingDecision: chat.transcript.displayState.isAwaitingDecision
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
