@@ -91,7 +91,7 @@ struct AuthGateView: View {
         case .loading:
             ProgressView()
         case .signedIn:
-            RootView(store: store)
+            RootView(store: store, auth: auth)
                 // Session status, org switch, host-credential verify, and Sign Out all
                 // live in Settings now (PRD §7.2/§9), so the command-center window carries
                 // no account/session chrome.
