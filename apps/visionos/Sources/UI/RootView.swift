@@ -4,10 +4,11 @@ import SwiftUI
 /// adapter's `workspaceList` pane over the shared, cloud-backed `WorkspaceStore`, which
 /// is polled while any window is visible and paused when the app backgrounds (ADR-0004).
 ///
-/// Three ornaments host the chrome (PRD §9): a leading-edge Workspace switcher that
-/// opens/focuses Workspace windows, a bottom adapter switcher whose flip re-renders the
-/// *same* store (the M0 renderer seam), and a window-controls menu carrying the
-/// interaction-model flag (§10) and the explicit "consolidate windows" action.
+/// Three ornaments host the chrome (PRD §9): a leading-edge icon rail (`RootRailView`,
+/// ADR-0011) that switches the content pane and opens the create sheet, a bottom adapter
+/// switcher whose flip re-renders the *same* store (the M0 renderer seam), and a
+/// window-controls menu carrying the interaction-model flag (§10) and the explicit
+/// "consolidate windows" action.
 struct RootView: View {
     @Bindable var store: WorkspaceStore
     let auth: AuthController
@@ -22,17 +23,27 @@ struct RootView: View {
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneActive = false
+    @State private var railSelection: RailDestination = .workspaces
+    @State private var isCreating = false
 
     var body: some View {
         NavigationStack {
-            registry.activeAdapter.view(for: .workspaceList, store: store)
-                .navigationTitle("Superset")
+            railContent
+                .navigationTitle(railSelection.title)
         }
         .ornament(attachmentAnchor: .scene(.leading)) {
-            WorkspaceSwitcherView(store: store, auth: auth)
+            RootRailView(
+                selection: $railSelection,
+                canCreateWorkspace: store.supportsLifecycle,
+                onNewWorkspace: { isCreating = true },
+                onOpenSettings: { openWindow(id: SettingsScene.windowID) }
+            )
         }
         .ornament(attachmentAnchor: .scene(.bottom)) {
             bottomControls
+        }
+        .sheet(isPresented: $isCreating) {
+            WorkspaceCreateView(store: store)
         }
         .onAppear {
             store.beginPolling()
@@ -58,6 +69,23 @@ struct RootView: View {
         guard active != sceneActive else { return }
         sceneActive = active
         if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
+    }
+
+    /// The content pane for the selected rail item. Workspaces renders the active
+    /// adapter's list (the collapsible project tree lands in a later slice); Automations
+    /// and Tasks & PRs are placeholders until wired.
+    @ViewBuilder
+    private var railContent: some View {
+        switch railSelection {
+        case .workspaces:
+            registry.activeAdapter.view(for: .workspaceList, store: store)
+        case .automations, .tasks:
+            ContentUnavailableView(
+                railSelection.title,
+                systemImage: railSelection.systemImage,
+                description: Text("Coming soon.")
+            )
+        }
     }
 
     private var bottomControls: some View {

@@ -72,6 +72,7 @@
 		BE87A8E9315B404F3D41F9D0 /* WorkspaceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */; };
 		BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */; };
 		BEA166713C42991BC1044B55 /* DictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */; };
+		C0207E8B8A5DD12672434F04 /* RootRailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72768452C20DF59EFB5A2111 /* RootRailView.swift */; };
 		C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF721B84B64BBFA6A277F655 /* SettingsView.swift */; };
 		C7F1C7C4A2991D2DDE633F6C /* LockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714C9E7340031FA6EF71C5A /* LockGate.swift */; };
 		CA1A0EE668C67131AC87D08F /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB289D39EB7C8517A4F924B2 /* JSONValue.swift */; };
@@ -124,6 +125,7 @@
 		66E12DC999DAD3D512CB63A0 /* PaneKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneKind.swift; sourceTree = "<group>"; };
 		6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWorkspaceListCache.swift; sourceTree = "<group>"; };
 		7070DBB6BC8C26868EE3DB1E /* DeviceContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContext.swift; sourceTree = "<group>"; };
+		72768452C20DF59EFB5A2111 /* RootRailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRailView.swift; sourceTree = "<group>"; };
 		7A32857A7A4CE341816F161F /* TelemetryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryValue.swift; sourceTree = "<group>"; };
 		7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEvent.swift; sourceTree = "<group>"; };
 		7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPaneView.swift; sourceTree = "<group>"; };
@@ -319,6 +321,7 @@
 				A6E033B8837C310A1ACC8BF8 /* OpenWindowsModel.swift */,
 				7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */,
 				CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */,
+				72768452C20DF59EFB5A2111 /* RootRailView.swift */,
 				9F36DC5B2A7314017753C666 /* RootView.swift */,
 				2978A7F458C82111FBB5B731 /* SettingsModel.swift */,
 				EF721B84B64BBFA6A277F655 /* SettingsView.swift */,
@@ -459,6 +462,7 @@
 				8235B7201A86FBFA09F8DABB /* Project.swift in Sources */,
 				BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */,
 				04C0E1E65158014FCA476D8E /* RelayTokenProvider.swift in Sources */,
+				C0207E8B8A5DD12672434F04 /* RootRailView.swift in Sources */,
 				B41E3A8CF9DC2C1FB773DBF6 /* RootView.swift in Sources */,
 				253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */,
 				1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */,
