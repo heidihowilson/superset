@@ -62,17 +62,13 @@ final class DictationController {
     /// Request microphone + speech-recognition authorization and resolve `availability`.
     /// Idempotent and safe to call before each dictation start.
     func requestAuthorization() async {
-        let speechStatus = await withCheckedContinuation { continuation in
-            SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0) }
-        }
+        let speechStatus = await Self.requestSpeechAuthorization()
         guard speechStatus == .authorized else {
             availability = speechStatus == .denied || speechStatus == .restricted ? .denied : .unavailable
             return
         }
 
-        let micGranted = await withCheckedContinuation { continuation in
-            AVAudioApplication.requestRecordPermission { continuation.resume(returning: $0) }
-        }
+        let micGranted = await Self.requestRecordPermission()
         guard micGranted else {
             availability = .denied
             return
@@ -83,6 +79,23 @@ final class DictationController {
             return
         }
         availability = .ready(onDevice: recognizer.supportsOnDeviceRecognition)
+    }
+
+    /// Bridges to the TCC authorization callbacks, which fire on an arbitrary background
+    /// queue. These are `nonisolated static` so their completion closures do NOT inherit
+    /// the type's `@MainActor` isolation — otherwise Swift's executor-isolation assertion
+    /// traps when TCC resumes them off the main actor. The continuation is safe to resume
+    /// from any queue; `availability` is assigned back on the main actor after the `await`.
+    private nonisolated static func requestSpeechAuthorization() async -> SFSpeechRecognizerAuthorizationStatus {
+        await withCheckedContinuation { continuation in
+            SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0) }
+        }
+    }
+
+    private nonisolated static func requestRecordPermission() async -> Bool {
+        await withCheckedContinuation { continuation in
+            AVAudioApplication.requestRecordPermission { continuation.resume(returning: $0) }
+        }
     }
 
     /// Begin a live recognition session, configuring the audio graph and forcing
