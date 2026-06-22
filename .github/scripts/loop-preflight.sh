@@ -13,15 +13,20 @@ SSH="ssh -i /home/wilson/.ssh/id_ed25519 -o IdentitiesOnly=yes -o ConnectTimeout
 fail=0
 echo "== visionOS loop preflight $(date -u +%H:%M:%SZ) =="
 
-# 1. Automations pinned to the Mac, workspace set, last run not dispatch_failed (routing/workspace).
+# 1. Each automation pinned to a MATERIALIZED workspace, and worker/reviewer on DISTINCT
+#    workspaces — sharing one makes the reviewer dispatch_failed via session contention
+#    (the hidden cause of the "reviewer stalls"). Checks current state, not run history.
 superset organization switch "$ORG" >/dev/null 2>&1
-for a in "$WORKER" "$REVIEWER"; do
-  j=$(superset automations get "$a" --json 2>/dev/null)
-  ws=$(printf '%s' "$j" | python3 -c "import sys,json;print(json.load(sys.stdin).get('v2WorkspaceId') or '')" 2>/dev/null)
-  [ -z "$ws" ] && { echo "FAIL: automation $a has no workspace pinned (will dispatch_failed)"; fail=1; }
-  last=$(superset automations logs "$a" --limit 1 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);print((d[0].get('error') or d[0].get('status') or '') if d else '')" 2>/dev/null)
-  printf '%s' "$last" | grep -qi "not found\|dispatch_failed" && { echo "FAIL: automation $a last run failed routing/workspace: ${last:0:80}"; fail=1; }
+wslist=$(superset workspaces list --json 2>/dev/null)
+wsw=$(superset automations get "$WORKER"   --json 2>/dev/null | python3 -c "import sys,json;print(json.load(sys.stdin).get('v2WorkspaceId') or '')" 2>/dev/null)
+wsr=$(superset automations get "$REVIEWER" --json 2>/dev/null | python3 -c "import sys,json;print(json.load(sys.stdin).get('v2WorkspaceId') or '')" 2>/dev/null)
+for pair in "worker:$wsw" "reviewer:$wsr"; do
+  role=${pair%%:*}; ws=${pair#*:}
+  if [ -z "$ws" ]; then echo "FAIL: $role automation has no workspace pinned"; fail=1; continue; fi
+  printf '%s' "$wslist" | python3 -c "import sys,json;exit(0 if '$ws' in [w['id'] for w in json.load(sys.stdin)] else 1)" \
+    || { echo "FAIL: $role workspace $ws not materialized (will dispatch_failed: Workspace not found)"; fail=1; }
 done
+[ -n "$wsw" ] && [ "$wsw" = "$wsr" ] && { echo "FAIL: worker & reviewer share workspace $wsw — session contention → reviewer dispatch_failed"; fail=1; }
 
 # 2. gh tokens on the Mac — WARN only (SSH reads the keychain in a different security
 #    context than the GUI worker, so it can false-negative; the worker's in-agent
