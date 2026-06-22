@@ -28,15 +28,13 @@ for pair in "worker:$wsw" "reviewer:$wsr"; do
 done
 [ -n "$wsw" ] && [ "$wsw" = "$wsr" ] && { echo "FAIL: worker & reviewer share workspace $wsw — session contention → reviewer dispatch_failed"; fail=1; }
 
-# 2. gh tokens on the Mac — WARN only (SSH reads the keychain in a different security
-#    context than the GUI worker, so it can false-negative; the worker's in-agent
-#    assertion is the authoritative check). Still useful as an early heads-up.
+# 2. Auth: worker = sethgho on the Mac (SSH spot-check; keychain context can false-
+#    negative → WARN), reviewer = heidihowilson on THIS wilson host (local, authoritative).
 if $SSH 'true' 2>/dev/null; then
-  for u in sethgho 0xNoWater; do
-    login=$($SSH "export PATH=/opt/homebrew/bin:/usr/local/bin:\$PATH; gh auth switch --user $u >/dev/null 2>&1; gh api user -q .login 2>/dev/null" 2>/dev/null)
-    [ -z "$login" ] && echo "WARN: Mac gh '$u' may be unauthenticated (keychain-context caveat — confirm via a worker claim, or re-auth)"
-  done
-else echo "WARN: cannot SSH to Mac to spot-check gh auth"; fi
+  login=$($SSH "export PATH=/opt/homebrew/bin:/usr/local/bin:\$PATH; gh auth switch --user sethgho >/dev/null 2>&1; gh api user -q .login 2>/dev/null" 2>/dev/null)
+  [ -z "$login" ] && echo "WARN: Mac gh 'sethgho' (worker) may be unauthenticated (keychain caveat — confirm via a worker claim)"
+else echo "WARN: cannot SSH to Mac to spot-check the worker's gh"; fi
+[ "$(gh api user -q .login 2>/dev/null)" = "heidihowilson" ] || { echo "FAIL: local (wilson) gh is not heidihowilson — reviewer can't review"; fail=1; }
 
 # 3. Label hygiene — a stray agent-working/agent-review on ANY issue makes the worker STOP
 #    (its pipeline check is repo-wide), and the worker picks the lowest agent-ready repo-wide.
