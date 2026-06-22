@@ -18,6 +18,16 @@ final class SettingsModel {
         case failed(String)
     }
 
+    /// The "Verify host credential" probe: mints the relay JWT that host-service-over-relay
+    /// calls present (PRD §13). The minted token is never stored or surfaced — only the
+    /// success/failure outcome.
+    enum RelayProbe: Equatable {
+        case idle
+        case running
+        case minted
+        case failed(String)
+    }
+
     private(set) var session: SessionInfo?
     private(set) var organizations: [OrganizationSummary] = []
     /// Cloud chat models, the preferred-model picker's options. Best-effort: an empty
@@ -27,6 +37,8 @@ final class SettingsModel {
     /// An active-org switch in flight, driving the picker's pending/disabled state.
     private(set) var isSwitchingOrganization = false
     private(set) var switchError: String?
+    /// Outcome of the most recent "Verify host credential" probe.
+    private(set) var relayProbe: RelayProbe = .idle
 
     private let api: AuthAPIClient
 
@@ -76,6 +88,18 @@ final class SettingsModel {
             session = try await api.fetchSession()
         } catch {
             switchError = Self.message(for: error)
+        }
+    }
+
+    /// Mint the relay JWT to prove the bearer session can obtain a host credential
+    /// (PRD §13). The token is discarded — only the success/failure outcome is kept.
+    func mintRelayCredential() async {
+        relayProbe = .running
+        do {
+            _ = try await api.mintRelayJWT()
+            relayProbe = .minted
+        } catch {
+            relayProbe = .failed(Self.message(for: error))
         }
     }
 
