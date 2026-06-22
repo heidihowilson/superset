@@ -94,6 +94,12 @@ jobs:
           # runner within 30.0s" (Code 10300) — the device, not the app, is the problem.
           xcrun simctl bootstatus "$udid" -b
           xcrun simctl privacy "$udid" grant microphone sh.superset.visionos || true
+          # Bring up the Simulator GUI so the visionOS spatial compositor has a render
+          # surface. Headless `simctl boot` leaves the window server without a drawable, so
+          # the app reports no main window and XCUITest queries fail with
+          # "Error getting main window kAXErrorServerNotFound" — the test hangs, not the app.
+          open -a Simulator --args -CurrentDeviceUDID "$udid"
+          xcrun simctl bootstatus "$udid" -b
           echo "AVP_UDID=$udid" >> "$GITHUB_ENV"
 
       - name: Build & UI test
@@ -101,6 +107,9 @@ jobs:
         run: |
           xcodebuild test -project Superset.xcodeproj -scheme Superset \
             -destination "id=$AVP_UDID" \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 180 \
+            -maximum-test-execution-time-allowance 300 \
             -resultBundlePath TestResults.xcresult
 
       - name: Upload test results
