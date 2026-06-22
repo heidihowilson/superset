@@ -96,7 +96,7 @@ struct HostServiceClient: Sendable {
         do {
             return try await send(procedure, method: method, input: input)
         } catch AuthError.badServerResponse(status: 401) {
-            await tokenProvider.invalidate()
+            tokenProvider.invalidate()
             return try await send(procedure, method: method, input: input)
         }
     }

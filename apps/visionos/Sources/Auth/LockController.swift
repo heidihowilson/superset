@@ -45,7 +45,7 @@ final class LockController {
     private let authenticator: LocalAuthenticating
     private let relay: RelayCredentialGate?
     private let reason: String
-    /// Monotonic token bumped on every seal/release so the relay actor can discard a hop
+    /// Monotonic token bumped on every seal/release so the relay gate can discard a hop
     /// that lands out of order (lock → authenticate → unlock fire as independent tasks).
     private var relayGeneration = 0
 
@@ -97,9 +97,9 @@ final class LockController {
     }
 
     /// Issue a seal/release to the relay gate under a fresh generation and await it landing
-    /// on the actor. The generation still lets the actor settle on whichever intent was
-    /// minted last, since concurrent `lock()`/`unlock()` tasks can interleave at their await
-    /// points and reach the provider out of call order.
+    /// on the provider. The generation still lets the provider settle on whichever intent
+    /// was minted last, since concurrent `lock()`/`unlock()` tasks can interleave at their
+    /// await points and reach the provider out of call order.
     private func sealRelay(_ sealed: Bool) async {
         relayGeneration += 1
         await relay?.setRelayLocked(sealed, generation: relayGeneration)

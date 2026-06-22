@@ -52,6 +52,11 @@ private struct LockGate: ViewModifier {
                 guard signedIn else { return }
                 switch phase {
                 case .background:
+                    // Drop the cached relay JWT inline so the RCE-grade token is gone
+                    // before the OS can suspend the app — the awaited `lock()` runs in a
+                    // Task that may not be scheduled in time. `lock()` then seals
+                    // re-minting until the next Optic ID pass (ADR-0008).
+                    auth.dropRelayToken()
                     Task { await lock.lock() }
                 case .active:
                     if lock.isLocked {

@@ -143,9 +143,10 @@ final class AuthController: RelayCredentialGate {
 
     /// Drop the cached relay JWT — called on background to shrink the RCE-grade token's
     /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). The next poll
-    /// re-mints from the still-stored session token.
+    /// re-mints from the still-stored session token. Runs synchronously (no `Task`) so the
+    /// JWT is gone before the scene-phase handler returns and the OS can suspend the app.
     func dropRelayToken() {
-        Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
+        relayTokenProvider.invalidate()
     }
 
     /// Engage/release the relay-mint gate for the Optic ID lock (ADR-0008). While locked,
@@ -153,10 +154,10 @@ final class AuthController: RelayCredentialGate {
     /// re-acquire the RCE-grade JWT until the owner re-authenticates on foreground.
     /// Awaited by `LockController` within the lock transition, so the seal/release reaches
     /// the provider before the visible `LockState` advances. `generation` carries the
-    /// lock-state transition order onto the actor so a late hop can't reseal the credential
-    /// after a newer unlock (or vice versa).
+    /// lock-state transition order onto the provider so a late hop can't reseal the
+    /// credential after a newer unlock (or vice versa).
     func setRelayLocked(_ locked: Bool, generation: Int) async {
-        await relayTokenProvider.setLocked(locked, generation: generation)
+        relayTokenProvider.setLocked(locked, generation: generation)
     }
 
     private func setToken(_ newToken: AuthToken?) {
