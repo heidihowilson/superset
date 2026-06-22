@@ -10,6 +10,7 @@ import SwiftUI
 /// interaction-model flag (§10) and the explicit "consolidate windows" action.
 struct RootView: View {
     @Bindable var store: WorkspaceStore
+    let auth: AuthController
     @State private var registry = AdapterRegistry(adapters: [
         NativeWorkspaceAdapter(),
         DebugListAdapter(),
@@ -28,7 +29,7 @@ struct RootView: View {
                 .navigationTitle("Superset")
         }
         .ornament(attachmentAnchor: .scene(.leading)) {
-            WorkspaceSwitcherView(store: store)
+            WorkspaceSwitcherView(store: store, auth: auth)
         }
         .ornament(attachmentAnchor: .scene(.bottom)) {
             bottomControls
