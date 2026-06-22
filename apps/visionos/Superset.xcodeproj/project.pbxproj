@@ -10,6 +10,7 @@
 		03572042072CD60937FE9971 /* HostSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */; };
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		04C0E1E65158014FCA476D8E /* RelayTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */; };
+		08ACC86E0A4FC0C48F71A05B /* UITestContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */; };
 		093B1209E89A07CAEDA91E45 /* DebugDumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB47A01B18DFD126CFC793AC /* DebugDumpView.swift */; };
 		0D4FE4F83D6E73977CE7A2B5 /* TelemetryTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C605ADEC56AC4700CDA637C /* TelemetryTransport.swift */; };
 		0D6D0B2BFF7330504E7BDD23 /* FileWorkspaceListCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */; };
@@ -70,18 +71,31 @@
 		BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */; };
 		BEA166713C42991BC1044B55 /* DictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */; };
 		C0207E8B8A5DD12672434F04 /* RootRailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72768452C20DF59EFB5A2111 /* RootRailView.swift */; };
+		C43C7CEB16737D3D032249A2 /* SupersetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA361A8D9F4D702BE13E846 /* SupersetUITests.swift */; };
 		C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF721B84B64BBFA6A277F655 /* SettingsView.swift */; };
 		C7F1C7C4A2991D2DDE633F6C /* LockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714C9E7340031FA6EF71C5A /* LockGate.swift */; };
 		CA1A0EE668C67131AC87D08F /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB289D39EB7C8517A4F924B2 /* JSONValue.swift */; };
 		CBFCC03B6B2DA044692A80BE /* AuthToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F0955CFCBD44D5379F9687F /* AuthToken.swift */; };
 		CE25151ABA3BE952C39ADC89 /* TelemetryConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74BC6EDC2AAC583751A65F5 /* TelemetryConfiguration.swift */; };
+		E906389B2A6C2821BC8A2790 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B6DFB06B2453339BC98E39 /* UITestSupport.swift */; };
 		E9FF1F83E22847605B58B3B6 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */; };
 		F3E655B98BF06D05AB324E38 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A354115CC73B8D78D623386 /* ComposerView.swift */; };
 		F68C9ACC7FCC7FB8A62D4C0B /* ChatTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A752A00CBBF07D23FB817A /* ChatTranscript.swift */; };
 		F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */; };
 		F7FBFFCDCA057CB2DFE6A1B6 /* CloudWorkspaceClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36912B74D7D1879F31FFCB5 /* CloudWorkspaceClient.swift */; };
+		F8CC66B6C6F41F52D2647764 /* UITestContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */; };
 		FEB08DF90C8DE87265FEF0C7 /* WorkspaceCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CD8E03372D3D5EE6DF32053 /* WorkspaceCreateView.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		6CD93485162C367DE3489FB4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E10E0D0C6F0C1782993BD658 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A81E7F139DC661E9C0CC326;
+			remoteInfo = Superset;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		06A752A00CBBF07D23FB817A /* ChatTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscript.swift; sourceTree = "<group>"; };
@@ -97,17 +111,20 @@
 		1F0955CFCBD44D5379F9687F /* AuthToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthToken.swift; sourceTree = "<group>"; };
 		20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStore.swift; sourceTree = "<group>"; };
 		20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthenticating.swift; sourceTree = "<group>"; };
+		24F7DEC826B777B61107FCC7 /* SupersetUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupersetUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2978A7F458C82111FBB5B731 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHandoff.swift; sourceTree = "<group>"; };
 		2A354115CC73B8D78D623386 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		31C300406588D9244173B6DA /* SessionMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMetrics.swift; sourceTree = "<group>"; };
 		360BA75FD53E0FEA0FCCE2F7 /* HostCallOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostCallOutcome.swift; sourceTree = "<group>"; };
+		36B6DFB06B2453339BC98E39 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
 		38AB15580946313EA26FC000 /* AuthGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGateView.swift; sourceTree = "<group>"; };
 		3DDC57904E84BCB8C49B06BC /* AuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthController.swift; sourceTree = "<group>"; };
 		3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
 		48383CE2E272082F5B861F2C /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
 		48499C408B1F829A6FBF864B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWindowView.swift; sourceTree = "<group>"; };
+		4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestContract.swift; sourceTree = "<group>"; };
 		551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRenameView.swift; sourceTree = "<group>"; };
 		5A52EA499D48D24C71C06E1B /* PostHogTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostHogTransport.swift; sourceTree = "<group>"; };
 		5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceStatus+Presentation.swift"; sourceTree = "<group>"; };
@@ -133,6 +150,7 @@
 		9CD8E03372D3D5EE6DF32053 /* WorkspaceCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceCreateView.swift; sourceTree = "<group>"; };
 		9D3C48D92A24056C34E69447 /* Project.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project.swift; sourceTree = "<group>"; };
 		9F36DC5B2A7314017753C666 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		9FA361A8D9F4D702BE13E846 /* SupersetUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupersetUITests.swift; sourceTree = "<group>"; };
 		A34473633D6974E4EDDF25D7 /* SupersetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupersetApp.swift; sourceTree = "<group>"; };
 		A6E033B8837C310A1ACC8BF8 /* OpenWindowsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenWindowsModel.swift; sourceTree = "<group>"; };
 		A714C9E7340031FA6EF71C5A /* LockGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockGate.swift; sourceTree = "<group>"; };
@@ -212,6 +230,14 @@
 			path = Adapters;
 			sourceTree = "<group>";
 		};
+		44E29695F37E77FE1E0BED9F /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				9FA361A8D9F4D702BE13E846 /* SupersetUITests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
 		50BF9B3E16D929C1B06B6FAE /* Cloud */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,6 +286,7 @@
 				2E25C6316507DE62FDD3BBFD /* Domain */,
 				C6861F93373C82B978E891B2 /* Observability */,
 				5217E3080141B8706C31A2A1 /* Renderer */,
+				F73BB2949AA963C63E7C3FD0 /* Support */,
 				B55B99E04A5AB3A18722103B /* UI */,
 			);
 			path = Sources;
@@ -290,6 +317,7 @@
 			isa = PBXGroup;
 			children = (
 				A7EC74FA3E1D90B3BD0C7CAD /* Superset.app */,
+				24F7DEC826B777B61107FCC7 /* SupersetUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -298,6 +326,7 @@
 			isa = PBXGroup;
 			children = (
 				9C20B8EEA8FE80F0403919FE /* Sources */,
+				44E29695F37E77FE1E0BED9F /* UITests */,
 				AC24651113BCD4BCB2A66130 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -347,9 +376,36 @@
 			path = Observability;
 			sourceTree = "<group>";
 		};
+		F73BB2949AA963C63E7C3FD0 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */,
+				36B6DFB06B2453339BC98E39 /* UITestSupport.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5E5B60C5AFE0EE57E48BB4C0 /* SupersetUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 94D427AF1979CD3820BB8CFB /* Build configuration list for PBXNativeTarget "SupersetUITests" */;
+			buildPhases = (
+				830697E504B5A6B0634E4D66 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E84516B88488F5A979D39ACF /* PBXTargetDependency */,
+			);
+			name = SupersetUITests;
+			packageProductDependencies = (
+			);
+			productName = SupersetUITests;
+			productReference = 24F7DEC826B777B61107FCC7 /* SupersetUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		9A81E7F139DC661E9C0CC326 /* Superset */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B6DD5F4FA6456656EE888E80 /* Build configuration list for PBXNativeTarget "Superset" */;
@@ -376,6 +432,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
+					5E5B60C5AFE0EE57E48BB4C0 = {
+						TestTargetID = 9A81E7F139DC661E9C0CC326;
+					};
 					9A81E7F139DC661E9C0CC326 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -397,6 +456,7 @@
 			projectRoot = "";
 			targets = (
 				9A81E7F139DC661E9C0CC326 /* Superset */,
+				5E5B60C5AFE0EE57E48BB4C0 /* SupersetUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -467,6 +527,8 @@
 				F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */,
 				90E0E987240F2B2FAAC6DCA6 /* TranscriptContentWebView.swift in Sources */,
 				2CFDE66105DA99A2CFD51D27 /* TranscriptView.swift in Sources */,
+				F8CC66B6C6F41F52D2647764 /* UITestContract.swift in Sources */,
+				E906389B2A6C2821BC8A2790 /* UITestSupport.swift in Sources */,
 				90EA0BA2EB3790BD092511AE /* WebAuthenticating.swift in Sources */,
 				545E8D04830E2C024962F48B /* WindowRouter.swift in Sources */,
 				8C3E9B4FC201957E4E2B93D6 /* Workspace.swift in Sources */,
@@ -483,7 +545,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		830697E504B5A6B0634E4D66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C43C7CEB16737D3D032249A2 /* SupersetUITests.swift in Sources */,
+				08ACC86E0A4FC0C48F71A05B /* UITestContract.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E84516B88488F5A979D39ACF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A81E7F139DC661E9C0CC326 /* Superset */;
+			targetProxy = 6CD93485162C367DE3489FB4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		60B70455F66F11958CA3A654 /* Release */ = {
@@ -504,6 +583,25 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sh.superset.visionos;
 				SDKROOT = xros;
 				TARGETED_DEVICE_FAMILY = 7;
+			};
+			name = Release;
+		};
+		9B8877A34546BA772D3EB6DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sh.superset.visionos.uitests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_TARGET_NAME = Superset;
 			};
 			name = Release;
 		};
@@ -651,6 +749,25 @@
 			};
 			name = Debug;
 		};
+		F8DC6EC15FC72D1CD6100B45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sh.superset.visionos.uitests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_TARGET_NAME = Superset;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -659,6 +776,15 @@
 			buildConfigurations = (
 				BFD5C7482831CFDA8F9DA660 /* Debug */,
 				A388F55D4DD498FC27C5E946 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		94D427AF1979CD3820BB8CFB /* Build configuration list for PBXNativeTarget "SupersetUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F8DC6EC15FC72D1CD6100B45 /* Debug */,
+				9B8877A34546BA772D3EB6DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

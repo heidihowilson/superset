@@ -89,6 +89,7 @@ struct ComposerView: View {
                 .padding(.horizontal, 16)
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
                 .submitLabel(.send)
+                .accessibilityIdentifier(AccessibilityID.composerInput)
             modelPicker
             agentPicker
             sendButton
@@ -110,6 +111,7 @@ struct ComposerView: View {
             .tint(listening ? .red : nil)
             .disabled(!dictation.isReady && !listening)
             .accessibilityLabel(listening ? "Stop dictation" : "Start dictation")
+            .accessibilityIdentifier(AccessibilityID.composerMicToggle)
             .help(micHelp)
         }
     }

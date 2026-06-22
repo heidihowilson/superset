@@ -8,8 +8,10 @@ Spike answering: **can we drive the visionOS Simulator to exercise the app autom
 - **Multi-window is testable**: `app.windows` queries open `WindowGroup` scenes, so the window-per-workspace open path can be asserted (assert *existence + contents*, not geometry — the system owns placement).
 - **It would have caught our crash**: the dictation trap fires on a real code path (the TCC auth callback in `DictationController`), not anything gaze/hardware-specific. A test that opens a workspace window and toggles the mic hits it.
 
-## The CI cost (the one real tradeoff)
-Our current gate (`.github/workflows/visionos-ci.yml`) builds with `-sdk xrsimulator` and **never boots a runtime** (deliberate). UI tests require `xcodebuild test` to **boot a visionOS Simulator runtime** — slower, and the runner must have the runtime installed (`xcodebuild -downloadPlatform visionOS` if missing). Headless is fine (no GUI session needed; Simulator runs in the background since Xcode 9 — [mokacoding](https://mokacoding.com/blog/running-tests-from-the-terminal/)).
+## Where the UI test runs (corrected — important)
+**visionOS UI tests do NOT run on GitHub-hosted CI runners.** Verified empirically (#58, PR #60): `xcodebuild test` boots a visionOS sim and *builds*, then the app launch under XCUITest **times out** — `Failed to get launch progress: Timed out while requesting launch progress`, alongside a missing `SpringBoardUIServices.axbundle`. The headless hosted runner has no window-server **drawable / compositor**, which the visionOS app needs to finish launching, so the launch never completes. (This is a visionOS-specific gap; iOS UI tests *do* run headlessly — don't generalize from iOS.)
+
+**So the gate is the worker's Mac, not GitHub Actions.** The loop's worker already runs `xcodebuild test` on a real Mac (GUI/compositor present), so the smoke test runs *there* before every PR — which is exactly the gate we want. GitHub-hosted CI stays **build-only** (`-sdk xrsimulator`). If a hosted UI-test signal is ever wanted, it needs a **self-hosted Mac runner with a GUI session** (e.g. an autologin Mac), not `macos-latest`.
 
 ```bash
 xcrun simctl boot "Apple Vision Pro" || true

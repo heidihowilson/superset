@@ -23,6 +23,7 @@ struct AuthGateView: View {
 
     var body: some View {
         content
+            .accessibilityIdentifier(AccessibilityID.authGateRoot)
             .environment(openWindows)
             .onAppear { auth.restore() }
             .onOpenURL { handle($0) }
