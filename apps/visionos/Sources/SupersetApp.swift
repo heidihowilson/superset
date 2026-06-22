@@ -61,11 +61,20 @@ struct SupersetApp: App {
         }
         .defaultSize(width: 760, height: 820)
         // M4/M-Host: a session opens on first activation and closes on background,
-        // independent of which window is frontmost (PRD §17).
+        // independent of which window is frontmost (PRD §17). The app-level `scenePhase`
+        // is the aggregate across scenes, so `.background` here means a true app background
+        // (headset removed / app suspended), not a single window closing — which is exactly
+        // when the Optic ID gate must re-engage (ADR-0008). Driving the lock from here keeps
+        // closing one window from re-locking the others.
         .onChange(of: scenePhase) { _, phase in
             switch phase {
-            case .active: metrics.sessionDidStart()
-            case .background: metrics.sessionDidEnd()
+            case .active:
+                metrics.sessionDidStart()
+            case .background:
+                metrics.sessionDidEnd()
+                if auth.status == .signedIn {
+                    Task { await lock.lock() }
+                }
             default: break
             }
         }
