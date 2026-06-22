@@ -12,109 +12,122 @@ The V1 build ported the **desktop sidebar** verbatim: a fixed 260×520 leading o
 
 ## Principles (visionOS HIG)
 
-- **Navigation is a leading-edge tab ornament**, ~1 icon wide, floating *outside* the window — not an in-window panel. Max **6 tabs**; we use **3**.
-- **Dozens of items → a searchable sidebar/split view, never tabs.** Search is the primary way in at scale, not scrolling.
-- **Two navigation levels max per window**; **one scroll axis per pane**. No detail-of-detail.
-- **`NavigationSplitView`** is master/detail: glass-layered columns, sidebar darker for depth. Sidebar ≈ 280–320pt, content ≈ 360–480pt; `.balanced` style.
-- **60pt min targets, 60–80pt rows. Always a default selection** (no empty detail panes).
-- **New window only for simultaneous, independent contexts**; otherwise push/select. Window-per-workspace stays (the browser is the catalog; each *watched* session gets its own window).
+- **Navigation is a leading-edge icon rail** — **icons only by default**, the label revealed on hover/gaze (`.help()` + hover effect), ~1 icon wide, floating *outside* the window. Mirrors the desktop left nav (Org · Workspaces · Automations · Tasks & PRs · ＋New). This is the fix for "too wide": a rail, not a 260pt panel.
+- **Workspaces is a collapsible project→workspace tree.** Group by **project only** (no status grouping); each project is **foldable** so the list stays short (collapse what you're not in) — that's what makes a nested list work on visionOS vs. the V1 always-expanded scroll. Optional search filters. **Tap a workspace → its own window.**
+- **One scroll axis per pane**; the tree is the single scroll surface (no detail-of-detail).
+- **`NavigationSplitView` for Settings** (master/detail): glass-layered columns, sidebar darker for depth. Sidebar ≈ 280–320pt, detail ≈ 360–480pt.
+- **60pt min targets, 60–80pt rows. Default selection** in master/detail (no empty pane).
+- **New window only for simultaneous, independent contexts.** Window-per-workspace stays: the rail+tree is the catalog; each *watched* session gets its own window.
 
-## Target IA (Option A — `sidebarAdaptable` tabs + searchable split views)
+## Target IA — desktop-mirroring icon rail + collapsible project tree
+
+**Leading ornament = an icon rail** (icons only by default; label on hover/gaze). Mirrors the desktop left nav, top to bottom:
 
 ```
-Leading-ornament TabView  (.tabViewStyle(.sidebarAdaptable), 3 tabs, icons + labels)
-├── Workspaces  (default)
-│     NavigationSplitView (2-col, .balanced)
-│       sidebar : Recents · Active · All           ← pinned pseudo-filters, .searchable("Find a session")
-│       detail  : session list for the chosen filter; tap = openWindow(workspace)  ← window-per-workspace
-├── Projects
-│     NavigationSplitView (2-col, .balanced)
-│       sidebar : project list, .searchable("Find a project")   ← picking a project FILTERS
-│       detail  : that project's workspaces; tap = openWindow(workspace)
-└── Settings
-      NavigationSplitView (2-col)
-        sidebar : Account · Organization · Appearance · Model · Input · Hosts · Projects · About  (default-selected)
-        detail  : the selected category's controls
+⬡  Org            org-switcher — tap = switch org · Settings · Sign out
+▣  Workspaces ◀   default; shows the collapsible project→workspace tree
+◷  Automations    (soon)
+▤  Tasks & PRs    (soon)
+＋ New Workspace   action (create)
 ```
 
-- **Workspaces tab is the home** — answers "get me back into what I was doing" without a project drill-down (Recents pinned at top). This is the top job-to-be-done for an agent control surface.
-- **Projects tab** is the project-first entry; picking a project **filters** the session list (no nesting every session under every project).
-- The **org-switcher moves out of the nav ornament** into the split-view sidebar header (Workspaces/Projects) and Settings → Organization. It is not app-level navigation.
-- `sidebarAdaptable` lets each tab's split view **expand to a full sidebar** on demand — Apple's sanctioned "few destinations + deep hierarchy" shape.
+- **Icons only by default**; the title appears on **hover** (`.help()` tooltip + hover effect) and on gaze. ~1 icon wide — the "too wide" fix.
+- **Projects are NOT a rail item** — they're the grouping *inside* Workspaces.
+- **Settings is reached from the Org menu** (not a rail item); it opens as its own master/detail window.
 
-(Considered and rejected: **Option B**, single project-first drill-down — simpler but forces a project pick before resuming a recent session, wrong for the resume-heavy use case. See ADR-0011.)
+**Workspaces content pane = a collapsible project→workspace tree** (mirrors the desktop sidebar, done right for visionOS):
+
+```
+▾ project A                    ← foldable header (DisclosureGroup), one per project
+   ●  workspace 1   running
+   ●  workspace 2   idle
+▸ project B   (3)              ← collapsed; count hint
+▾ project C
+   ◐  workspace 4   running
+```
+
+- **Foldable per project** — collapse the ones you're not in, so the list stays short (vs. the V1 always-expanded scroll). Fold state persists per window.
+- **No status grouping** — group by project only; status is a per-row indicator (dot + label), never a section.
+- **Tap a workspace → opens it in a NEW window** (window-per-workspace, unchanged). One scroll axis (the tree); rows 60–80pt; optional `.searchable` to filter when there are many projects.
+
+**Settings** (from the Org menu) = a 2-column `NavigationSplitView` master/detail: category sidebar (Account · Organization · Appearance · Model · Input & Notifications · Hosts · Projects · About), default-selected, + the selected category's controls.
+
+Automations and Tasks & PRs are rail items now, but their panes are placeholders until wired.
 
 ## Layout sketches (approximate)
 
-The leading **tab ornament floats just outside the window's left edge** (icons only; gazing at one expands its label). The window itself is a 2-column `NavigationSplitView` on glass; the system window bar sits centered beneath it. `◀` marks the active tab/selection.
+The leading **icon rail floats just outside the window's left edge** — icons only; the label appears on hover/gaze. `◀` marks the active rail item / selection.
 
-**Shell — ornament + split-view window**
+**Shell — icon rail + content window**
 ```
-   ornament                       main window (glass)
-  ┌────────┐    ┌────────────────────┬─────────────────────────────┐
-  │ ▣ Work │    │                    │                             │
-  │ ▦ Proj │    │   sidebar          │   detail                    │
-  │ ⚙ Sett │    │   (~300pt)         │   (selected item)           │
-  └────────┘    │                    │                             │
-   (tabs,       └────────────────────┴─────────────────────────────┘
-    ~64pt)                     ──────◍──────   ← system window bar
-```
-
-**Workspaces tab (default / home)** — Recents·Active·All + search → a *flat* session list; no project nesting.
-```
- ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
- │ ▣ Work◀│  │ ⌕ Find a session         │  pkg/auth-refresh        ⊕   │
- │ ▦ Proj │  ├──────────────────────────┤  acme · running · 2m ago     │
- │ ⚙ Sett │  │ RECENTS                  │                              │
- └────────┘  │  ● pkg/auth-refresh  2m ◀│  ▸ last: "run the tests"     │
-             │  ● web-hotfix        1h  │  ▸ 3 files changed           │
-             │ ACTIVE                   │   ┌────────────────────────┐ │
-             │  ◐ infra-migrate     ⟳   │   │   Open workspace   ⧉   │ │
-             │ ALL                      │   └────────────────────────┘ │
-             │  ○ docs-pass             │                              │
-             └──────────────────────────┴──────────────────────────────┘
-                flat list (one scroll)       opens its own window →
+   rail (icons only;       content window (glass)
+   label on hover/gaze)
+  ┌─────┐   ┌───────────────────────────────────────────────────┐
+  │ ⬡   │   │  Workspaces                                  ⌕     │
+  │ ▣ ◀ │   │  ▾ superset                                        │
+  │ ◷   │   │     ●  pkg/auth-refresh     running   2m    →⧉     │
+  │ ▤   │   │     ●  web-hotfix           idle      1h    →⧉     │
+  │ ＋  │   │  ▸ marketing          (3)                          │
+  └─────┘   │  ▾ infra                                           │
+   ~64pt    │     ◐  infra-migrate        running   ⟳     →⧉     │
+            │     ○  db-backfill          stopped         →⧉     │
+            └───────────────────────────────────────────────────┘
+                            ──────◍──────  ← system window bar
+  hover labels:  ⬡ Org · ▣ Workspaces · ◷ Automations · ▤ Tasks & PRs · ＋ New
 ```
 
-**Projects tab** — pick/search a project → see *only* that project's workspaces (filter, not nest).
+**Workspaces — collapsible project tree** (the default pane). Fold per project; status is a row dot, not a section; tap a workspace (→⧉) opens its own window.
 ```
- ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
- │ ▣ Work │  │ ⌕ Find a project         │  superset            12 ws   │
- │ ▦ Proj◀│  ├──────────────────────────┤                              │
- │ ⚙ Sett │  │  superset          12  ◀ │  ● pkg/auth-refresh   2m     │
- └────────┘  │  marketing          3    │  ● web-hotfix         1h     │
-             │  infra              5    │  ○ docs-pass                 │
-             │  mobile             2    │  ○ …                         │
-             │  …                       │                              │
-             └──────────────────────────┴──────────────────────────────┘
-                projects (searchable)       selected project's workspaces
-```
-
-**Settings** — category sidebar + detail pane (the macOS-Ventura / visionOS master-detail).
-```
- ┌────────┐  ┌──────────────────────────┬──────────────────────────────┐
- │ ▣ Work │  │  Account                 │  Organization                │
- │ ▦ Proj │  │  Organization         ◀  │   Active:  [ acme        ⌄ ] │
- │ ⚙ Sett◀│  │  Appearance              │   Plan:    PRO               │
- └────────┘  │  Model                   │  ───────────────────────────  │
-             │  Input & Notifications   │   Hosts                      │
-             │  Hosts                   │   ● Seths-MacBook  online     │
-             │  Projects                │                              │
-             │  About                   │                              │
-             └──────────────────────────┴──────────────────────────────┘
-                categories (default-sel)    selected category's controls
+ ┌─────┐  ┌──────────────────────────────────────────────────────┐
+ │ ⬡   │  │  Workspaces                                    ⌕      │
+ │ ▣ ◀ │  │  ▾ superset                                           │
+ │ ◷   │  │      ●  pkg/auth-refresh        running   2m    →⧉    │
+ │ ▤   │  │      ●  web-hotfix              idle      1h    →⧉    │
+ │ ＋  │  │  ▸ marketing             (3)                          │  ← collapsed
+ └─────┘  │  ▾ infra                                              │
+          │      ◐  infra-migrate           running   ⟳     →⧉    │
+          │      ○  db-backfill             stopped         →⧉    │
+          │  ▸ mobile                (2)                          │
+          └──────────────────────────────────────────────────────┘
+            foldable per project · grouped by project only · tap = new window
 ```
 
-**Window-per-workspace** — "Open workspace" spawns a *separate* scene you place in space; watch + prompt one agent per window (unchanged from V1).
+**Org menu** — tap the ⬡ rail item.
 ```
-   browser window               workspace window (own scene)
-  ┌──────────────┐             ┌───────────────────────────────┐
-  │  …split view │             │  pkg/auth-refresh · running    │
-  │   (catalog)  │             │ ┌───────────────────────────┐ │
-  └──────────────┘             │ │ transcript (web-rendered) │ │
-        ↘  arranged in         │ │ …agent messages…          │ │
-           a gentle arc        │ └───────────────────────────┘ │
-                               │  [ dictate 🎤 ]  prompt…   ▶  │
+ tap ⬡ →  ┌────────────────────────┐
+          │  ✓ acme           PRO  │   switch active org
+          │    other-org           │
+          │  ────────────────────  │
+          │  ⚙  Settings           │   → opens the master/detail window
+          │  ⎋  Sign Out           │
+          └────────────────────────┘
+```
+
+**Settings** — its own window (from the Org menu): category sidebar + detail pane (macOS-Ventura / visionOS master-detail).
+```
+ ┌──────────────────────────┬──────────────────────────────┐
+ │  Account                 │  Organization                │
+ │  Organization         ◀  │   Active:  [ acme        ⌄ ] │
+ │  Appearance              │   Plan:    PRO               │
+ │  Model                   │  ─────────────────────────── │
+ │  Input & Notifications   │   Hosts                      │
+ │  Hosts                   │   ●  Seths-MacBook  online    │
+ │  Projects                │                              │
+ │  About                   │                              │
+ └──────────────────────────┴──────────────────────────────┘
+   categories (default-sel)     selected category's controls
+```
+
+**Window-per-workspace** — tapping a workspace spawns a *separate* scene you place in space; watch + prompt one agent per window (unchanged from V1).
+```
+   rail + tree (catalog)        workspace window (own scene)
+  ┌─────┬──────────┐           ┌───────────────────────────────┐
+  │ ▣◀  │ ▾ proj   │           │  pkg/auth-refresh · running    │
+  │ ⬡◷▤ │   ● ws →⧉│ ───────▶  │ ┌───────────────────────────┐ │
+  │ ＋  │ ▸ proj   │           │ │ transcript (web-rendered) │ │
+  └─────┴──────────┘           │ │ …agent messages…          │ │
+        ↘ arranged in          │ └───────────────────────────┘ │
+          a gentle arc         │  [ dictate 🎤 ]  prompt…   ▶  │
                                └───────────────────────────────┘
 ```
 
@@ -122,24 +135,23 @@ The leading **tab ornament floats just outside the window's left edge** (icons o
 
 | Current | Change |
 |---|---|
-| `WorkspaceSwitcherView` (260×520 ornament: header+nav+nested list) | **Delete.** Replace with a slim `RootTabView` leading-ornament `TabView(.sidebarAdaptable)`. |
-| `RootView` NavigationStack + duplicated list | `RootView` hosts the `TabView`; each tab is its own split view. |
-| `WorkspaceListView` (grouped-by-project flat list) | Becomes the **Projects** tab's split view (sidebar: projects + search; detail: that project's workspaces). |
-| — (new) | **`WorkspacesBrowserView`** — the Workspaces tab: Recents/Active/All filters + search → flat (un-nested) session list. |
-| `SettingsView` (one `Form`, ~10 sections) | **`SettingsSplitView`** — `NavigationSplitView`, category sidebar (default-selected) + per-category detail. Keep the existing section bodies as detail panes. |
-| org-switcher in the ornament | Move to split-view sidebar header + Settings → Organization. |
+| `WorkspaceSwitcherView` (260×520 ornament: header + nav + nested list) | **Rebuild as a slim icon-rail leading ornament** (`RootRailView`): ⬡ Org · ▣ Workspaces · ◷ Automations · ▤ Tasks & PRs · ＋ New — **icons only**, label on hover (`.help()` + hover effect). |
+| `RootView` (NavigationStack + duplicated list) | Hosts the rail ornament + a **content pane switched by the selected rail item** (Workspaces tree; Automations/Tasks placeholders). |
+| `WorkspaceListView` (grouped-by-project flat list) | Becomes the **collapsible project→workspace tree**: a `DisclosureGroup` per project (fold state persisted), workspaces beneath; **no status grouping**; tap a workspace → **new window**. Optional `.searchable`. |
+| `SettingsView` (one `Form`, ~10 sections) | **`SettingsSplitView`** — `NavigationSplitView` master/detail, **opened from the Org menu**; default-selected category; existing section bodies become detail panes. |
+| org-switcher | **Stays in the rail** as the ⬡ Org item; its menu carries switch-org + **Settings** + Sign out. |
 
 ## "Sessions won't open" (bug, fold into this work)
 
-Tapping a workspace must reliably open/focus its window. Audit `WindowRouter.openWorkspace` → `openWindow(id:value:)` against the new entry points, and verify `UIApplicationSupportsMultipleScenes` is honored (it was added to `Info.plist`). Acceptance: from any tab's detail list, selecting a workspace opens its window on device (Simulator + M-HW).
+Tapping a workspace must reliably open/focus its window. Audit `WindowRouter.openWorkspace` → `openWindow(id:value:)` against the new tree, and verify `UIApplicationSupportsMultipleScenes` is honored (added to `Info.plist`). Acceptance: tapping a workspace in the tree opens its window on device (Simulator + M-HW).
 
 ## Slicing (independently shippable)
 
-1. **Leading-ornament `TabView(.sidebarAdaptable)` shell** (Workspaces/Projects/Settings) replacing the wide switcher ornament — nav only, tabs route to placeholder panes.
-2. **Projects tab**: 2-col split view (projects + `.searchable` → filtered workspace list); reuse/retire `WorkspaceListView`.
-3. **Workspaces tab**: Recents/Active/All + `.searchable` → un-nested session list (the new home).
-4. **Settings master/detail**: `NavigationSplitView` category sidebar + detail panes (port the existing `Form` sections).
-5. **Fix workspace-open** + org-switcher relocation + delete `WorkspaceSwitcherView`.
+1. **Icon-rail ornament shell** (`RootRailView`): ⬡ Org · ▣ Workspaces · ◷ Automations · ▤ Tasks & PRs · ＋ New — icons-only + hover labels; the rail switches the content pane (Automations/Tasks → placeholders). Replaces the wide `WorkspaceSwitcherView`.
+2. **Workspaces collapsible tree**: rebuild the content pane as a `DisclosureGroup`-per-project tree with workspaces beneath — no status grouping, tap → new window, fold state persisted, optional search.
+3. **Org menu**: ⬡ Org → switch-org + **Settings** + Sign out; org-switcher lives in the rail.
+4. **Settings master/detail**: `NavigationSplitView` category sidebar + detail panes (port the existing `Form` sections), opened from the Org menu.
+5. **Fix workspace-open** + delete `WorkspaceSwitcherView` + remove the duplicate list.
 
 Each slice keeps `xcodebuild`+Simulator green; the set gets one batched on-device (M-HW) pass.
 
