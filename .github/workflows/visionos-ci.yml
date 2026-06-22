@@ -33,6 +33,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
+      - name: Select newest installed Xcode
+        # The local gate builds with the latest Xcode/visionOS SDK; the runner's
+        # default Xcode lags (e.g. 16.4 / visionOS 2.5 SDK), which enforces UIKit
+        # main-actor isolation the newer SDK relaxes and fails the build. Pick the
+        # newest installed Xcode so CI matches the documented local toolchain.
+        run: |
+          ls -d /Applications/Xcode_*.app
+          newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "Selecting $newest"
+          sudo xcode-select -s "$newest/Contents/Developer"
+          xcodebuild -version
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
