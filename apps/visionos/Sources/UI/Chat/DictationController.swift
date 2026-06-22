@@ -38,6 +38,20 @@ final class DictationController {
     private(set) var availability: Availability = .unknown
     private(set) var state: State = .idle
 
+    /// In `-uiTestMode` the recognizer and TCC dialog are bypassed: the visionOS Simulator
+    /// can't pre-grant speech recognition (only microphone, via `simctl privacy`) and has no
+    /// `springboard` to tap "Allow", so authorization is synthesized and start/stop never
+    /// touch the audio graph. The smoke test still exercises the mic-toggle UI path; the
+    /// real TCC callback (the executor-isolation regression in `requestAuthorization`) is
+    /// hardware/manual-QA-only because its dialog can't be automated.
+    private let uiTestMode = UITestSupport.isEnabled
+
+    init() {
+        if uiTestMode {
+            availability = .ready(onDevice: true)
+        }
+    }
+
     /// Partial + final transcriptions, delivered on the main actor. The composer assigns
     /// these to its draft so the user reviews/edits before sending.
     var onTranscript: (@MainActor (String) -> Void)?
@@ -62,6 +76,10 @@ final class DictationController {
     /// Request microphone + speech-recognition authorization and resolve `availability`.
     /// Idempotent and safe to call before each dictation start.
     func requestAuthorization() async {
+        if uiTestMode {
+            availability = .ready(onDevice: true)
+            return
+        }
         let speechStatus = await Self.requestSpeechAuthorization()
         guard speechStatus == .authorized else {
             availability = speechStatus == .denied || speechStatus == .restricted ? .denied : .unavailable
@@ -102,6 +120,10 @@ final class DictationController {
     /// on-device recognition when supported. Throws if the audio session or graph can't
     /// start; the caller leaves the mic visually off.
     func start() throws {
+        if uiTestMode {
+            state = .listening
+            return
+        }
         guard let recognizer, state == .idle else { return }
         stop()
 
@@ -148,6 +170,10 @@ final class DictationController {
 
     /// Tear down the live session. Safe to call repeatedly and when already idle.
     func stop() {
+        if uiTestMode {
+            state = .idle
+            return
+        }
         if audioEngine.isRunning {
             audioEngine.stop()
         }

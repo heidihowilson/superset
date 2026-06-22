@@ -1,10 +1,15 @@
 name: visionOS CI
 
-# The M0 build gate (apps/visionos/README.md) wired into GitHub Actions so an agent
-# PR carries a green build signal the API-only reviewer can read. Compiles against the
-# visionOS simulator SDK with `-sdk xrsimulator`, which builds without requiring a
-# matching simulator *runtime* on the runner (the runtime is only needed to launch the
-# app; a Simulator/device launch is the batched human-QA step, not a CI gate).
+# The visionOS gate (apps/visionos/README.md) wired into GitHub Actions so an agent PR
+# carries a green signal the API-only reviewer can read. It runs the XCUITest smoke gate
+# (apps/visionos/docs/research/ui-test-automation.md): launch → open a workspace window →
+# exercise the dictation path. That requires `xcodebuild test`, which boots a visionOS
+# Simulator runtime (the runner installs it if missing) — slower than the old build-only
+# gate, but it upgrades the signal from "builds + launches" to "builds + navigates + opens
+# a window + survives the dictation path", closing the gap that let the dictation-auth
+# crash reach hardware. Optic ID, eye-gaze, and live mic/speech stay hardware/manual-QA-only
+# (the test runs under `-uiTestMode`, which stubs the signed-in session and pre-grants
+# dictation since the Simulator can't automate the permission dialog).
 
 on:
   push:
@@ -26,18 +31,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Build (visionOS simulator SDK)
+  test:
+    name: UI smoke test (visionOS simulator)
     runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Select newest installed Xcode
-        # The local gate builds with the latest Xcode/visionOS SDK; the runner's
-        # default Xcode lags (e.g. 16.4 / visionOS 2.5 SDK), which enforces UIKit
-        # main-actor isolation the newer SDK relaxes and fails the build. Pick the
-        # newest installed Xcode so CI matches the documented local toolchain.
+        # The local gate builds with the latest Xcode/visionOS SDK; the runner's default
+        # Xcode lags, which enforces UIKit main-actor isolation the newer SDK relaxes and
+        # fails the build. Pick the newest installed Xcode so CI matches the local toolchain.
         run: |
           ls -d /Applications/Xcode_*.app
           newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
@@ -52,8 +56,35 @@ jobs:
         working-directory: apps/visionos
         run: xcodegen generate
 
-      - name: Build
+      - name: Ensure visionOS Simulator runtime
+        # `xcodebuild test` needs a booted runtime (unlike the old `-sdk xrsimulator` build).
+        # Download it only if the runner doesn't already ship one.
+        run: |
+          if ! xcrun simctl list runtimes | grep -qi visionOS; then
+            echo "No visionOS runtime — downloading"
+            xcodebuild -downloadPlatform visionOS
+          fi
+          xcrun simctl list runtimes | grep -i visionOS
+
+      - name: Boot Apple Vision Pro
+        # Pre-grant microphone (belt-and-suspenders; `-uiTestMode` already stubs dictation,
+        # and `simctl privacy` can't grant speech-recognition anyway). Boot is best-effort —
+        # xcodebuild boots the destination itself if this is skipped.
+        run: |
+          xcrun simctl boot "Apple Vision Pro" || true
+          xcrun simctl privacy "Apple Vision Pro" grant microphone sh.superset.visionos || true
+
+      - name: Build & UI test
         working-directory: apps/visionos
         run: |
-          xcodebuild -project Superset.xcodeproj -target Superset \
-            -sdk xrsimulator -configuration Debug -arch arm64 build
+          xcodebuild test -project Superset.xcodeproj -scheme Superset \
+            -destination 'platform=visionOS Simulator,name=Apple Vision Pro,OS=latest' \
+            -resultBundlePath TestResults.xcresult
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: visionos-test-results
+          path: apps/visionos/TestResults.xcresult
+          if-no-files-found: ignore

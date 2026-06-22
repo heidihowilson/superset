@@ -17,8 +17,8 @@ struct SupersetApp: App {
     @State private var store: WorkspaceStore
     @State private var lock: LockController
     @State private var openWindows = OpenWindowsModel()
-    @State private var appSettings = AppSettingsStore()
-    @State private var onboarding = OnboardingStore()
+    @State private var appSettings: AppSettingsStore
+    @State private var onboarding: OnboardingStore
     @State private var metrics: SessionMetrics
     @Environment(\.scenePhase) private var scenePhase
 
@@ -27,7 +27,8 @@ struct SupersetApp: App {
     private let crashReporter: CrashReporter
 
     init() {
-        let auth = AuthController()
+        let uiTest = UITestSupport.isEnabled
+        let auth = uiTest ? UITestSupport.makeAuthController() : AuthController()
         _auth = State(initialValue: auth)
 
         // On-device observability from day one (ADR-0007): one telemetry sink feeds both
@@ -35,19 +36,36 @@ struct SupersetApp: App {
         let telemetry = Telemetry.live()
         crashReporter = CrashReporter(telemetry: telemetry)
         _metrics = State(initialValue: SessionMetrics(telemetry: telemetry))
-        let store = WorkspaceStore(
+        // Under UI test the store is seeded with sample workspaces (no network), so a row
+        // exists to tap; production wires the cloud-backed provider/lifecycle.
+        let store = uiTest ? WorkspaceStore.sample() : WorkspaceStore(
             provider: auth.makeWorkspaceListProvider(),
             lifecycle: auth.makeWorkspaceLifecycleClient(),
             cache: FileWorkspaceListCache()
         )
         _store = State(initialValue: store)
+
+        // UI test mode pre-grants dictation (so the mic toggle is reachable) and skips the
+        // first-run tour (so it doesn't cover the workspace list).
+        let appSettings = AppSettingsStore()
+        let onboarding = OnboardingStore()
+        if uiTest {
+            appSettings.dictationEnabled = true
+            onboarding.isPresented = false
+        }
+        _appSettings = State(initialValue: appSettings)
+        _onboarding = State(initialValue: onboarding)
         // The controller owns the sign-out cache reset so it runs on every sign-out
         // path — including a sign-out from Settings while the command-center window
         // (the old observer's host) is closed.
         auth.onSignedOut = { [store] in store.reset() }
         // The Optic ID gate sits over every signed-in window and shares the relay
         // credential with `auth`, so locking seals the RCE-grade JWT app-wide (ADR-0008).
-        _lock = State(initialValue: LockController(relay: auth))
+        // Under UI test the gate degrades to unlocked (the Simulator can't answer an Optic
+        // ID prompt), so the smoke flow reaches the signed-in content.
+        _lock = State(initialValue: uiTest
+            ? UITestSupport.makeLockController(relay: auth)
+            : LockController(relay: auth))
     }
 
     var body: some Scene {

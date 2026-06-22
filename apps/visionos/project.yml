@@ -37,3 +37,26 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: Superset
     scheme:
       gatherCoverageData: false
+      # The XCUITest smoke gate runs as the scheme's test action, so `xcodebuild test`
+      # exercises real flows (research/ui-test-automation.md).
+      testTargets:
+        - SupersetUITests
+
+  SupersetUITests:
+    type: bundle.ui-testing
+    platform: visionOS
+    sources:
+      - path: UITests
+      # The app↔test accessibility-id / launch-arg contract, compiled into both targets so
+      # they can't drift on a string literal.
+      - path: Sources/Support/UITestContract.swift
+    dependencies:
+      - target: Superset
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+        TEST_TARGET_NAME: Superset
+        # The UI runner is unsigned on the simulator gate, mirroring the app target.
+        "CODE_SIGNING_ALLOWED[sdk=xrsimulator*]": "NO"
+        "CODE_SIGNING_REQUIRED[sdk=xrsimulator*]": "NO"

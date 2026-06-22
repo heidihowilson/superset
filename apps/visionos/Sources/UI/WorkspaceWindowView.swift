@@ -154,7 +154,9 @@ struct WorkspaceWindowView: View {
                 .frame(width: 16, height: 16)
                 .accessibilityLabel(workspace.status.label)
             VStack(alignment: .leading, spacing: 4) {
-                Text(workspace.name).font(.largeTitle)
+                Text(workspace.name)
+                    .font(.largeTitle)
+                    .accessibilityIdentifier(AccessibilityID.workspaceWindowTitle)
                 Text(workspace.projectName.isEmpty ? "No project" : workspace.projectName)
                     .font(.title3)
                     .foregroundStyle(.secondary)

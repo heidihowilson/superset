@@ -114,6 +114,7 @@ struct WorkspaceListView: View {
                 ContentUnavailableView.search(text: searchText)
             }
         }
+        .accessibilityIdentifier(AccessibilityID.workspaceList)
     }
 
     private func workspaceRow(_ workspace: Workspace) -> some View {
@@ -131,6 +132,7 @@ struct WorkspaceListView: View {
             )
         }
         .buttonBorderShape(.roundedRectangle)
+        .accessibilityIdentifier(AccessibilityID.workspaceRow(workspace.id))
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if store.supportsLifecycle {
                 Button(role: .destructive) {
