@@ -36,7 +36,6 @@
 		545E8D04830E2C024962F48B /* WindowRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08B5CF265C0A693A32E586A6 /* WindowRouter.swift */; };
 		5537B78F011F29017AFC0888 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */; };
 		553D719B351AD5089ECA5064 /* LockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48383CE2E272082F5B861F2C /* LockView.swift */; };
-		57C72921400D9FFEE6A4C533 /* WorkspaceSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */; };
 		5E0D2502006B85DB858A481B /* InteractionModelRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1FAFF61D8724B174205ECA /* InteractionModelRegistry.swift */; };
 		61FA6007D4DDC406FC6C73C7 /* TelemetryValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A32857A7A4CE341816F161F /* TelemetryValue.swift */; };
 		6315F9471E6591AB2B5FA504 /* AgentPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */; };
@@ -111,7 +110,6 @@
 		48383CE2E272082F5B861F2C /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
 		48499C408B1F829A6FBF864B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWindowView.swift; sourceTree = "<group>"; };
-		4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceSwitcherView.swift; sourceTree = "<group>"; };
 		4FC567F160659F98C450BF75 /* DebugListAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugListAdapter.swift; sourceTree = "<group>"; };
 		551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRenameView.swift; sourceTree = "<group>"; };
 		5A1FAFF61D8724B174205ECA /* InteractionModelRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionModelRegistry.swift; sourceTree = "<group>"; };
@@ -331,7 +329,6 @@
 				AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */,
 				551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */,
 				5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */,
-				4D447CDC7DF35EDC23E88BC9 /* WorkspaceSwitcherView.swift */,
 				4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */,
 				A9BA41B4CA67AD9E60FC4DB3 /* Chat */,
 				3189518095884CDA2ADDE4AC /* Onboarding */,
@@ -490,7 +487,6 @@
 				B30472F1601539A167959744 /* WorkspaceStatus+Presentation.swift in Sources */,
 				BE87A8E9315B404F3D41F9D0 /* WorkspaceStatus.swift in Sources */,
 				5537B78F011F29017AFC0888 /* WorkspaceStore.swift in Sources */,
-				57C72921400D9FFEE6A4C533 /* WorkspaceSwitcherView.swift in Sources */,
 				2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

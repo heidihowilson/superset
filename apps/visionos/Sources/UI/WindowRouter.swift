@@ -42,9 +42,14 @@ enum WindowRouter {
         openWindow: OpenWindowAction,
         dismissWindow: DismissWindowAction
     ) {
-        consolidateIfSingleWindow(except: .workspace(id), models: models, openWindows: openWindows, dismissWindow: dismissWindow)
+        // Open/focus the target before consolidating the rest: dismissing the current
+        // window and opening the new one in the same turn makes SwiftUI coalesce the
+        // dismiss with the open and drop the new scene, so the tap appears to do nothing
+        // (the "sessions won't open" dogfood bug). Opening first guarantees the target
+        // scene is presented; the redundant windows are then closed behind it.
         store.select(id)
         openWindow(id: WorkspaceScene.windowID, value: id)
+        consolidateIfSingleWindow(except: .workspace(id), models: models, openWindows: openWindows, dismissWindow: dismissWindow)
     }
 
     static func openProject(
@@ -54,8 +59,8 @@ enum WindowRouter {
         openWindow: OpenWindowAction,
         dismissWindow: DismissWindowAction
     ) {
-        consolidateIfSingleWindow(except: .project(id), models: models, openWindows: openWindows, dismissWindow: dismissWindow)
         openWindow(id: ProjectScene.windowID, value: id)
+        consolidateIfSingleWindow(except: .project(id), models: models, openWindows: openWindows, dismissWindow: dismissWindow)
     }
 
     /// Close every open content window except `keep`. Backs the explicit consolidate

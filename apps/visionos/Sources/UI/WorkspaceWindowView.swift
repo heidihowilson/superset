@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Identifiers for the Workspace window scene, shared by the App (which declares the
+/// `WindowGroup`) and the router/tree (which open it by Workspace id).
+enum WorkspaceScene {
+    static let windowID = "workspace"
+}
+
 /// Content of a Workspace window — a `(sceneKind, domainId)` binding over the shared
 /// store (CONTEXT.md "Window"). Opened/focused from the switcher by Workspace id, so
 /// re-opening the same Workspace focuses the existing window rather than spawning a
