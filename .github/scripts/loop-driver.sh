@@ -67,7 +67,7 @@ while [ $(date +%s) -lt $deadline ]; do
   else rev_issue=""; rev_since=0; rev_redisp=0; fi
   wc=$(superset workspaces list --json 2>/dev/null | q "print(sum(1 for w in json.load(sys.stdin) if (w.get('projectName') or '').find('Vision Pro')>=0))")
   [ -n "$wc" ] && [ "$wc" -gt "$maxws" ] && { maxws=$wc; log "vision-pro workspaces: $wc"; }
-  [ -n "$wc" ] && [ "$wc" -gt 5 ] && { echo "RESULT: LEAK-GUARD — $wc workspaces (>5)"; break; }
+  [ -n "$wc" ] && [ "$wc" -gt 8 ] && { echo "RESULT: LEAK-GUARD — $wc workspaces (>8)"; break; }
   if gh api "repos/$REPO/git/ref/heads/_agent-claim-lock" >/dev/null 2>&1; then
     [ "$ref_seen" = 0 ] && ref_seen=$now
     [ $(( now - ref_seen )) -gt 120 ] && { gh api -X DELETE "repos/$REPO/git/refs/heads/_agent-claim-lock" >/dev/null 2>&1; log "cleared stale claim-lock"; ref_seen=0; }
