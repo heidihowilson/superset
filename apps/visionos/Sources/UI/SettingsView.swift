@@ -25,6 +25,7 @@ struct SettingsView: View {
 
     @State private var model: SettingsModel
     @State private var sceneActive = false
+    @State private var category: SettingsCategory? = .account
 
     init(auth: AuthController, store: WorkspaceStore) {
         self.auth = auth
@@ -33,67 +34,16 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        @Bindable var appSettings = appSettings
-        NavigationStack {
-            Form {
-                organizationSection
-
-                Section("Appearance") {
-                    Picker("Theme", selection: $appSettings.appearance) {
-                        ForEach(AppSettingsStore.Appearance.allCases) { appearance in
-                            Text(appearance.label).tag(appearance)
-                        }
-                    }
-                }
-
-                Section("Model") {
-                    Picker("Preferred model", selection: $appSettings.preferredModelID) {
-                        Text("Automatic").tag(String?.none)
-                        ForEach(model.models) { chatModel in
-                            Text(chatModel.name).tag(Optional(chatModel.id))
-                        }
-                    }
-                }
-
-                Section {
-                    Toggle("Voice dictation", isOn: $appSettings.dictationEnabled)
-                    Toggle("In-app notifications", isOn: $appSettings.notificationsEnabled)
-                } header: {
-                    Text("Input & Notifications")
-                } footer: {
-                    Text("These preferences are stored on this device.")
-                }
-
-                Section {
-                    Button("Show Welcome Tour") {
-                        // The tour presents over the command-center window (FR-ONB), so
-                        // close Settings to surface it unobstructed there.
-                        onboarding.replay()
-                        dismissWindow(id: SettingsScene.windowID)
-                    }
-                } header: {
-                    Text("Onboarding")
-                } footer: {
-                    Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
-                }
-
-                accountSection
-                hostCredentialSection
-                planSection
-                hostsSection
-                projectsSection
-
-                Section {
-                    Button("Sign Out", role: .destructive) {
-                        auth.signOut()
-                        dismissWindow(id: SettingsScene.windowID)
-                    }
-                }
+        NavigationSplitView {
+            List(SettingsCategory.allCases, selection: $category) { category in
+                Label(category.label, systemImage: category.symbol)
+                    .tag(category)
             }
-            .formStyle(.grouped)
             .navigationTitle("Settings")
+        } detail: {
+            detail(for: category ?? .account)
         }
-        .frame(minWidth: 480, minHeight: 600)
+        .frame(minWidth: 720, minHeight: 600)
         .task { await model.load() }
         .onAppear {
             store.beginPolling()
@@ -105,6 +55,98 @@ struct SettingsView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             syncForeground(phase)
+        }
+    }
+
+    /// The detail column for the selected category. Each pane is a `Form` reusing the same
+    /// section bodies the flat Settings list used (PRD §7.2) — IA only, no behavior change.
+    @ViewBuilder
+    private func detail(for category: SettingsCategory) -> some View {
+        Form {
+            switch category {
+            case .account:
+                accountSection
+                planSection
+                signOutSection
+            case .organization:
+                organizationSection
+            case .appearance:
+                appearanceSection
+            case .model:
+                modelSection
+            case .inputNotifications:
+                inputNotificationsSection
+            case .hosts:
+                hostsSection
+                hostCredentialSection
+            case .projects:
+                projectsSection
+            case .about:
+                onboardingSection
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(category.label)
+    }
+
+    // MARK: Editable — device-local prefs
+
+    private var appearanceSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section("Appearance") {
+            Picker("Theme", selection: $appSettings.appearance) {
+                ForEach(AppSettingsStore.Appearance.allCases) { appearance in
+                    Text(appearance.label).tag(appearance)
+                }
+            }
+        }
+    }
+
+    private var modelSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section("Model") {
+            Picker("Preferred model", selection: $appSettings.preferredModelID) {
+                Text("Automatic").tag(String?.none)
+                ForEach(model.models) { chatModel in
+                    Text(chatModel.name).tag(Optional(chatModel.id))
+                }
+            }
+        }
+    }
+
+    private var inputNotificationsSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section {
+            Toggle("Voice dictation", isOn: $appSettings.dictationEnabled)
+            Toggle("In-app notifications", isOn: $appSettings.notificationsEnabled)
+        } header: {
+            Text("Input & Notifications")
+        } footer: {
+            Text("These preferences are stored on this device.")
+        }
+    }
+
+    private var onboardingSection: some View {
+        Section {
+            Button("Show Welcome Tour") {
+                // The tour presents over the command-center window (FR-ONB), so
+                // close Settings to surface it unobstructed there.
+                onboarding.replay()
+                dismissWindow(id: SettingsScene.windowID)
+            }
+        } header: {
+            Text("Onboarding")
+        } footer: {
+            Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
+        }
+    }
+
+    private var signOutSection: some View {
+        Section {
+            Button("Sign Out", role: .destructive) {
+                auth.signOut()
+                dismissWindow(id: SettingsScene.windowID)
+            }
         }
     }
 
@@ -269,6 +311,47 @@ struct SettingsView: View {
         guard active != sceneActive else { return }
         sceneActive = active
         if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
+    }
+}
+
+/// The Settings sidebar categories, mirroring the desktop's master/detail layout
+/// (ADR-0011). `.account` is the default-selected detail.
+private enum SettingsCategory: String, CaseIterable, Identifiable {
+    case account
+    case organization
+    case appearance
+    case model
+    case inputNotifications
+    case hosts
+    case projects
+    case about
+
+    var id: Self { self }
+
+    var label: String {
+        switch self {
+        case .account: "Account"
+        case .organization: "Organization"
+        case .appearance: "Appearance"
+        case .model: "Model"
+        case .inputNotifications: "Input & Notifications"
+        case .hosts: "Hosts"
+        case .projects: "Projects"
+        case .about: "About"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .account: "person.crop.circle"
+        case .organization: "building.2"
+        case .appearance: "paintbrush"
+        case .model: "cpu"
+        case .inputNotifications: "bell"
+        case .hosts: "server.rack"
+        case .projects: "folder"
+        case .about: "info.circle"
+        }
     }
 }
 
