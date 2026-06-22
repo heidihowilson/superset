@@ -25,6 +25,15 @@ struct RootView: View {
     @State private var sceneActive = false
     @State private var railSelection: RailDestination = .workspaces
     @State private var isCreating = false
+    /// The org menu's cloud read model (session + memberships). Owned per-window like
+    /// Settings', so the rail can switch the active org without the Settings window open.
+    @State private var settings: SettingsModel
+
+    init(store: WorkspaceStore, auth: AuthController) {
+        self.store = store
+        self.auth = auth
+        _settings = State(initialValue: SettingsModel(api: auth.makeAPIClient()))
+    }
 
     var body: some View {
         NavigationStack {
@@ -35,8 +44,15 @@ struct RootView: View {
             RootRailView(
                 selection: $railSelection,
                 canCreateWorkspace: store.supportsLifecycle,
+                organizations: settings.organizations,
+                activeOrganizationID: settings.activeOrganizationID,
+                activeOrganizationName: settings.activeOrganizationName,
+                isSwitchingOrganization: settings.isSwitchingOrganization,
+                paidPlan: store.paidPlan,
                 onNewWorkspace: { isCreating = true },
-                onOpenSettings: { openWindow(id: SettingsScene.windowID) }
+                onSwitchOrganization: switchOrganization,
+                onOpenSettings: { openWindow(id: SettingsScene.windowID) },
+                onSignOut: { auth.signOut() }
             )
         }
         .ornament(attachmentAnchor: .scene(.bottom)) {
@@ -45,6 +61,7 @@ struct RootView: View {
         .sheet(isPresented: $isCreating) {
             WorkspaceCreateView(store: store)
         }
+        .task { await settings.load() }
         .onAppear {
             store.beginPolling()
             syncForeground(scenePhase)
@@ -58,6 +75,16 @@ struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             syncForeground(phase)
+        }
+    }
+
+    /// Switch the session's active org from the rail menu, then refresh the shared list so
+    /// the tree reflects the new org without waiting for the next poll tick (mirrors the
+    /// Settings org flow).
+    private func switchOrganization(to id: String) {
+        Task {
+            await settings.switchOrganization(to: id)
+            if settings.switchError == nil { await store.refresh() }
         }
     }
 
