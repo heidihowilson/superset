@@ -46,7 +46,7 @@ actor HostChatTranscriptProvider: ChatTranscriptProviding {
 
     func fetchTranscript() async throws -> ChatTranscript {
         let organizationID = try await resolveOrganizationID()
-        await ensureSessionRegistered(organizationID: organizationID)
+        try await ensureSessionRegistered(organizationID: organizationID)
 
         let client = HostServiceClient(
             configuration: configuration,
@@ -78,7 +78,7 @@ actor HostChatTranscriptProvider: ChatTranscriptProviding {
     /// Idempotent (`onConflictDoNothing`) and retried until it lands; a failure does
     /// not block watching — the Host runtime keys off `sessionId` directly, so a
     /// `createSession` hiccup must never blank the transcript.
-    private func ensureSessionRegistered(organizationID: String) async {
+    private func ensureSessionRegistered(organizationID: String) async throws {
         if sessionEnsured { return }
         do {
             try await api.createChatSession(
@@ -87,6 +87,15 @@ actor HostChatTranscriptProvider: ChatTranscriptProviding {
                 organizationID: organizationID
             )
             sessionEnsured = true
+        } catch is CancellationError {
+            // Cancellation isn't a registration failure — propagate it so the poll
+            // honors the cancellation contract instead of pressing on to fetch.
+            throw CancellationError()
+        } catch let error as URLError where error.code == .cancelled {
+            // URLSession surfaces a cancelled request as `URLError.cancelled`, not
+            // `CancellationError`. Normalize it so the cancellation contract holds and the
+            // poll doesn't fall through to `fetchSnapshot` after the task was cancelled.
+            throw CancellationError()
         } catch {
             // Leave `sessionEnsured` false to retry on the next poll.
         }

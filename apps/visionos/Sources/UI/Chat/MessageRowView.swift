@@ -51,17 +51,7 @@ struct MessageRowView: View {
             }
         case let .reasoning(text):
             if leanIn {
-                DisclosureGroup {
-                    Text(text)
-                        .font(.system(.callout, design: .monospaced))
-                        .foregroundStyle(.secondary)
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                } label: {
-                    Label("Thinking", systemImage: "brain")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+                ReasoningDisclosure(text: text)
             } else {
                 EmptyView()
             }
@@ -75,6 +65,28 @@ struct MessageRowView: View {
             Label(type, systemImage: "ellipsis.rectangle")
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
+        }
+    }
+}
+
+/// Agent reasoning in lean-in mode. Expanded by default so the thinking is visible on
+/// glance (PRD §9), while still collapsible to reclaim space. Owns its own expansion
+/// state so each reasoning block tracks independently.
+private struct ReasoningDisclosure: View {
+    let text: String
+    @State private var isExpanded = true
+
+    var body: some View {
+        DisclosureGroup(isExpanded: $isExpanded) {
+            Text(text)
+                .font(.system(.callout, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } label: {
+            Label("Thinking", systemImage: "brain")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
     }
 }

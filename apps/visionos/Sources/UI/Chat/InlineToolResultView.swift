@@ -12,6 +12,10 @@ struct InlineToolResultView: View {
     let expanded: Bool
 
     private static let previewLimit = 600
+    /// Lean-in shows far more than the ambient preview, but stays bounded so a giant
+    /// payload can't flood the transcript (the "open full" host fetch, PRD §7.2, is the
+    /// later affordance for the untruncated body).
+    private static let expandedLimit = 20_000
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -43,13 +47,9 @@ struct InlineToolResultView: View {
 
     private var payloadText: String? {
         guard let payload = part.payload else { return nil }
-        let full = payload.compactText()
-        guard expanded else {
-            return full.count > Self.previewLimit
-                ? String(full.prefix(Self.previewLimit)) + "…"
-                : full
-        }
-        return full
+        // `compactText` bounds the projection itself, so pass the lean-in/ambient limit
+        // directly — ambient previews tightly, lean-in shows the larger bounded body.
+        return payload.compactText(limit: expanded ? Self.expandedLimit : Self.previewLimit)
     }
 
     /// Map a tool name to one of the bounded inline kinds' icons; anything unrecognized

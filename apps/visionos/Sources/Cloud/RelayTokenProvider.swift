@@ -22,10 +22,15 @@ typealias SessionExpiredHandler = @Sendable () -> Void
 /// backgrounding (proactive drop ahead of the ~1h revocation lag).
 final class RelayTokenProvider: @unchecked Sendable {
     private let api: AuthAPIClient
+    /// Reads the live bearer principal (the session-token value) the relay JWT is minted
+    /// from. `AuthController.setToken` updates it synchronously — before any actor hop — so
+    /// the cache can be pinned to the principal it was minted under and a hit refused the
+    /// instant the principal changes, independent of when the queued `invalidate()` lands.
+    private let currentPrincipal: @Sendable () -> String?
     /// Conservative of the ~1h TTL, matching the web client's 50-minute reuse window.
     private let ttl: TimeInterval = 50 * 60
     private let lock = NSLock()
-    private var cached: (token: String, fetchedAt: Date)?
+    private var cached: (token: String, fetchedAt: Date, principal: String?)?
     /// Set while the Optic ID gate is engaged (ADR-0008). Blocks minting so a poll that
     /// ticks behind the lock screen can't re-acquire the RCE-grade JWT before re-auth.
     private var locked = false
@@ -38,8 +43,9 @@ final class RelayTokenProvider: @unchecked Sendable {
     /// at wiring time; read under the lock since the poll loops mint off the main actor.
     private var onSessionExpired: SessionExpiredHandler?
 
-    init(api: AuthAPIClient) {
+    init(api: AuthAPIClient, currentPrincipal: @escaping @Sendable () -> String?) {
         self.api = api
+        self.currentPrincipal = currentPrincipal
     }
 
     /// Wire the forced-re-auth handler (`AuthController.handleSessionExpired`). Called once
@@ -57,11 +63,15 @@ final class RelayTokenProvider: @unchecked Sendable {
     }
 
     func token() async throws -> String {
+        let principal = currentPrincipal()
         // Read the gate and cache together under the lock so a concurrent seal can't slip
-        // between the gate check and the cache read.
+        // between the gate check and the cache read. The cache is pinned to the principal
+        // it was minted under: a hit is refused the instant the principal changes, so a
+        // sign-out/sign-in/account switch can't reuse the old RCE-grade relay JWT.
         if let reusable = try lock.withLock({ () throws -> String? in
             if locked { throw RelayTokenError.locked }
-            if let cached, Date().timeIntervalSince(cached.fetchedAt) < ttl {
+            if let cached, cached.principal == principal,
+               Date().timeIntervalSince(cached.fetchedAt) < ttl {
                 return cached.token
             }
             return nil
@@ -83,7 +93,7 @@ final class RelayTokenProvider: @unchecked Sendable {
         // rather than caching or returning an RCE-grade token after the gate locked.
         return try lock.withLock {
             if locked { throw RelayTokenError.locked }
-            cached = (minted, Date())
+            cached = (minted, Date(), principal)
             return minted
         }
     }

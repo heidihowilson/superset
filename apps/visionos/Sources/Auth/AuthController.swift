@@ -58,7 +58,8 @@ final class AuthController: RelayCredentialGate {
         self.webAuth = webAuth
         self.pendingStateStore = pendingStateStore
         self.relayTokenProvider = RelayTokenProvider(
-            api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value })
+            api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value }),
+            currentPrincipal: { [tokenBox] in tokenBox.value?.value }
         )
         // A dead-session 401 from the shared relay/host path forces re-auth. The provider
         // fires this off the main actor, so hop back on before mutating auth state.
@@ -169,6 +170,11 @@ final class AuthController: RelayCredentialGate {
     private func setToken(_ newToken: AuthToken?) {
         token = newToken
         tokenBox.value = newToken
+        // The relay/host JWT is minted from this principal, so any token change —
+        // sign-out, sign-in, or an account switch — must drop the cache; otherwise the
+        // RCE-grade token outlives its credentials for up to the 50-minute reuse window
+        // (PRD §13, ADR-0008). The relay cache lives off the main actor, so hop to it.
+        Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
     }
 
     /// Enter the signed-out state and run its side effects (the cache reset) so every

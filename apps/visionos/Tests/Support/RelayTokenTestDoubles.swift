@@ -101,7 +101,7 @@ func makeRelayTokenProvider(http: HTTPPerforming) -> RelayTokenProvider {
     let box = TokenBox()
     box.value = AuthToken(value: "session-token", expiresAt: Date(timeIntervalSinceNow: 3600))
     let api = AuthAPIClient(configuration: .default, http: http) { box.value }
-    return RelayTokenProvider(api: api)
+    return RelayTokenProvider(api: api, currentPrincipal: { box.value?.value })
 }
 
 /// A fake `HTTPPerforming` that answers every request with a fixed HTTP status and empty
