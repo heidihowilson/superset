@@ -22,6 +22,11 @@ enum AuthError: Error, Equatable {
     case noActiveOrganization
     /// The server returned a non-2xx status or an undecodable body.
     case badServerResponse(status: Int)
+    /// The server answered HTTP 200 but the body was a tRPC error envelope
+    /// (`{"error":{"json":{"message":…}}}`) rather than a result — an in-band
+    /// auth/validation rejection that must be treated as a failure, not mis-decoded
+    /// as a successful (empty) payload. Carries the server's message for diagnostics.
+    case trpcError(message: String)
     /// A bearer-authed call proved the stored session token itself is dead — a relay-JWT
     /// mint 401, or a host call that 401s even on a freshly minted JWT. Unlike a transient
     /// `badServerResponse`, no retry recovers it: the only path back is re-running the
