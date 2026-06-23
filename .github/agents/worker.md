@@ -8,6 +8,11 @@ shared **reuse** workspace. `gh` is authenticated. Spec: `apps/visionos/docs/PRD
 > Hard rules: smallest correct change · one issue per run · never push to upstream
 > `superset-sh/superset` · `xcodebuild` must be green · a human merges, you never merge.
 
+## 0. IDENTITY + AUTH ASSERTION (first line)
+Author as `sethgho`: `gh auth switch --user sethgho` (the Mac has both `sethgho` and `0xnowater`). The reviewer reviews as `0xnowater`, a **different** account — that's what lets it formally review your PR (GitHub blocks reviewing your own).
+
+**Assert auth before doing anything else:** run `gh api user`. If it does NOT return a login (e.g. "Requires authentication"), the token is dead — **do not proceed silently** (that's the loop's #1 failure mode). Label the lowest open `agent-ready` issue `needs-human`, comment exactly: `loop blocked: gh auth invalid for sethgho — re-auth on the Mac (gh auth login)`, release any lock, and STOP. Surfacing the reason beats a silent no-op.
+
 ## 1. ACQUIRE THE CLAIM LOCK (atomic — first, no exceptions)
 The pipeline is single-flight and the claim must be **atomic**. The old "list the label then
 add it" was a check-then-act race: two workers dispatched close together both read "no lock,"
@@ -49,7 +54,9 @@ Check for an existing open PR: `gh pr list --repo $REPO --head agent/issue-<N> -
 - **FRESH** (no PR): `git fetch origin && git switch vision-pro-app && git reset --hard origin/vision-pro-app && git clean -fd && git switch -c agent/issue-<N>`. Implement the smallest correct slice for **that issue only** (read the issue body + cited PRD/ADRs). No drive-by refactors. Ambiguous/large/risky → label `needs-human`, remove `agent-working`, STOP.
 
 ## 4. Verify (macOS — the external gate)
-`xcodebuild` build + test must be green (+ a Simulator launch where UI is involved). Red never ships — fix within the slice or bail to `needs-human` (release the lock). **Real Vision Pro hardware launch is OUT OF SCOPE for you** — never block on it; `xcodebuild` + Simulator is the bar (hardware is a batched human-QA step before V1 ship).
+Run the test gate via **`bash apps/visionos/scripts/smoke-test.sh`** — never call `xcodebuild test` against a visionOS Simulator directly. The script boots the sim, runs the scheme's test action (build + unit + XCUITest), and **always reaps the sim it booted** (shutdown + quit Simulator.app) via a `trap`. Booting a sim and leaving it open is a resource leak that degrades the Mac — treat a left-behind booted Simulator exactly like a leaked agent process. If for any reason you boot a sim outside the script, you MUST shut it down before you finish: `xcrun simctl shutdown <udid> && osascript -e 'tell application "Simulator" to quit'`.
+
+Build + test must be green. Red never ships — fix within the slice or bail to `needs-human` (release the lock). **Real Vision Pro hardware launch is OUT OF SCOPE for you** — never block on it; `xcodebuild` + Simulator is the bar (hardware is a batched human-QA step before V1 ship).
 
 ## 5. Push / PR
 `git push -u origin agent/issue-<N>`.

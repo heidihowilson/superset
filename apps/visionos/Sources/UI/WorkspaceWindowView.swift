@@ -1,5 +1,11 @@
 import SwiftUI
 
+/// Identifiers for the Workspace window scene, shared by the App (which declares the
+/// `WindowGroup`) and the router/tree (which open it by Workspace id).
+enum WorkspaceScene {
+    static let windowID = "workspace"
+}
+
 /// Content of a Workspace window — a `(sceneKind, domainId)` binding over the shared
 /// store (CONTEXT.md "Window"). Opened/focused from the switcher by Workspace id, so
 /// re-opening the same Workspace focuses the existing window rather than spawning a
@@ -20,8 +26,6 @@ struct WorkspaceWindowView: View {
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(SessionMetrics.self) private var metrics
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var sceneActive = false
     private let clock = ContinuousClock()
     @State private var focusStart: ContinuousClock.Instant?
 
@@ -51,15 +55,28 @@ struct WorkspaceWindowView: View {
             }
         }
         .onAppear {
-            store.beginPolling()
             chat.hostCallRecorder = metrics
-            syncForeground(scenePhase)
             if let workspaceID { openWindows.registerWorkspace(workspaceID) }
         }
+        // Enroll in the shared list poll, and layer this window's per-active work on the
+        // foreground boundary: the watch poll runs only while the window is active (dropping
+        // the relay JWT on background, ADR-0006/0008) and M3 records foreground dwell.
+        .scenePollingMembership(store: store) { active in
+            if active {
+                focusStart = clock.now
+                chat.startPolling()
+            } else {
+                // M3: this window's foreground dwell (foreground time, never gaze — §13).
+                if let start = focusStart {
+                    metrics.recordWindowFocus(kind: "workspace", seconds: Self.seconds(clock.now - start))
+                    focusStart = nil
+                }
+                chat.stopPolling()
+                auth.dropRelayToken()
+            }
+        }
         .onDisappear {
-            syncForeground(.background)
             chat.stopPolling()
-            store.endPolling()
             if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
         }
         // Bind/start the watch poll once the Workspace resolves. Keyed off the resolved
@@ -76,36 +93,6 @@ struct WorkspaceWindowView: View {
                     Task { await chat.refresh() }
                 }
                 await composer.loadPickers(preferredModelID: appSettings.preferredModelID)
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            syncForeground(phase)
-            if phase == .active {
-                chat.startPolling()
-            } else {
-                chat.stopPolling()
-                auth.dropRelayToken()
-            }
-        }
-    }
-
-    /// Report this scene's active-ness to the shared store, contributing exactly one to
-    /// its active-scene count and keeping register/unregister balanced across phase
-    /// changes and window close (so one inactive window can't pause the shared list poll
-    /// for others). The per-window watch poll is gated separately above.
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active {
-            store.sceneBecameActive()
-            focusStart = clock.now
-        } else {
-            store.sceneResignedActive()
-            // M3: this window's foreground dwell (foreground time, never gaze — §13).
-            if let start = focusStart {
-                metrics.recordWindowFocus(kind: "workspace", seconds: Self.seconds(clock.now - start))
-                focusStart = nil
             }
         }
     }
@@ -132,7 +119,10 @@ struct WorkspaceWindowView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 TranscriptView(store: chat)
-                ComposerView(store: composer)
+                ComposerView(
+                    store: composer,
+                    awaitingDecision: chat.transcript.displayState.isAwaitingDecision
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -145,7 +135,9 @@ struct WorkspaceWindowView: View {
                 .frame(width: 16, height: 16)
                 .accessibilityLabel(workspace.status.label)
             VStack(alignment: .leading, spacing: 4) {
-                Text(workspace.name).font(.largeTitle)
+                Text(workspace.name)
+                    .font(.largeTitle)
+                    .accessibilityIdentifier(AccessibilityID.workspaceWindowTitle)
                 Text(workspace.projectName.isEmpty ? "No project" : workspace.projectName)
                     .font(.title3)
                     .foregroundStyle(.secondary)

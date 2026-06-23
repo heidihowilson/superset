@@ -35,7 +35,14 @@ struct SignInView: View {
             }
 
             if isAuthenticating {
-                ProgressView()
+                VStack(spacing: 12) {
+                    ProgressView()
+                    Button("Cancel") {
+                        controller.cancelSignIn()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                }
             } else if case let .failed(message) = controller.status {
                 Text(message)
                     .font(.callout)

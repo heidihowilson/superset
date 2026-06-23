@@ -11,10 +11,13 @@ import Observation
 @MainActor
 @Observable
 final class SettingsModel {
-    enum LoadState: Equatable {
+    /// The "Verify host credential" probe: mints the relay JWT that host-service-over-relay
+    /// calls present (PRD §13). The minted token is never stored or surfaced — only the
+    /// success/failure outcome.
+    enum RelayProbe: Equatable {
         case idle
-        case loading
-        case loaded
+        case running
+        case minted
         case failed(String)
     }
 
@@ -27,6 +30,8 @@ final class SettingsModel {
     /// An active-org switch in flight, driving the picker's pending/disabled state.
     private(set) var isSwitchingOrganization = false
     private(set) var switchError: String?
+    /// Outcome of the most recent "Verify host credential" probe.
+    private(set) var relayProbe: RelayProbe = .idle
 
     private let api: AuthAPIClient
 
@@ -79,16 +84,19 @@ final class SettingsModel {
         }
     }
 
-    private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status):
-            return "Server returned HTTP \(status)."
-        default:
-            return "Something went wrong. Please try again."
+    /// Mint the relay JWT to prove the bearer session can obtain a host credential
+    /// (PRD §13). The token is discarded — only the success/failure outcome is kept.
+    func mintRelayCredential() async {
+        relayProbe = .running
+        do {
+            _ = try await api.mintRelayJWT()
+            relayProbe = .minted
+        } catch {
+            relayProbe = .failed(Self.message(for: error))
         }
+    }
+
+    private static func message(for error: Error) -> String {
+        AuthError.userFacingMessage(for: error, default: "Something went wrong. Please try again.")
     }
 }

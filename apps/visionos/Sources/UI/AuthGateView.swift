@@ -9,24 +9,21 @@ import SwiftUI
 /// Also the deep-link entry point (PRD §16.2): `superset://auth/callback` completes the
 /// OAuth handoff; `workspace`/`project`/`session` links open the target window. A link
 /// that arrives signed-out is held as `pendingRoute` and replayed once sign-in lands
-/// (cold-start intent, PRD §11). Injects the interaction-model registry and the
-/// open-windows roster into the environment so the switcher/list/window controls share
-/// one instance of each.
+/// (cold-start intent, PRD §11). Injects the open-windows roster into the environment
+/// so the list and window controls share one instance.
 struct AuthGateView: View {
     let auth: AuthController
     let store: WorkspaceStore
-    let models: InteractionModelRegistry
     let openWindows: OpenWindowsModel
 
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(OnboardingStore.self) private var onboarding
     @Environment(SessionMetrics.self) private var metrics
     @State private var pendingRoute: DeepLinkRoute?
 
     var body: some View {
         content
-            .environment(models)
+            .accessibilityIdentifier(AccessibilityID.authGateRoot)
             .environment(openWindows)
             .onAppear { auth.restore() }
             .onOpenURL { handle($0) }
@@ -78,10 +75,7 @@ struct AuthGateView: View {
         WindowRouter.open(
             route,
             store: store,
-            models: models,
-            openWindows: openWindows,
-            openWindow: openWindow,
-            dismissWindow: dismissWindow
+            openWindow: openWindow
         )
     }
 
@@ -91,17 +85,10 @@ struct AuthGateView: View {
         case .loading:
             ProgressView()
         case .signedIn:
-            RootView(store: store)
-                .ornament(attachmentAnchor: .scene(.topLeading)) {
-                    SessionStatusView(client: auth.makeAPIClient())
-                }
-                .ornament(attachmentAnchor: .scene(.topTrailing)) {
-                    Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right") {
-                        auth.signOut()
-                    }
-                    .padding()
-                    .glassBackgroundEffect()
-                }
+            RootView(store: store, auth: auth)
+                // Session status, org switch, host-credential verify, and Sign Out all
+                // live in Settings now (PRD §7.2/§9), so the command-center window carries
+                // no account/session chrome.
                 // First-run onboarding presents over the command-center window only
                 // (FR-ONB). Any dismissal — Done, Skip, or an interactive swipe — routes
                 // through `complete()`, so first-run is recorded however the user leaves.

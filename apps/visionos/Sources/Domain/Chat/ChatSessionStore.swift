@@ -13,15 +13,6 @@ import Observation
 @MainActor
 @Observable
 final class ChatSessionStore {
-    /// Drives only the empty-state UI. A populated transcript is always shown — a poll
-    /// that is loading or has failed never blanks it.
-    enum LoadState: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
-
     private(set) var transcript: ChatTranscript = .empty
     private(set) var loadState: LoadState = .idle
 
@@ -32,14 +23,18 @@ final class ChatSessionStore {
 
     private var provider: ChatTranscriptProviding?
     private let pollInterval: Duration
+    /// Ceiling the poll backoff climbs to while the host stays unreachable (the common case
+    /// for a watch session — the host sleeps). Healthy polls stay at `pollInterval`.
+    private let maxPollInterval: Duration
     private var pollingTask: Task<Void, Never>?
     private var refreshGeneration: UInt64 = 0
     /// The Workspace the bound provider serves, so re-binding the same Workspace is a
     /// no-op (keeps the transcript) while switching Workspaces resets it.
     private var boundWorkspaceID: String?
 
-    init(pollInterval: Duration = .seconds(2)) {
+    init(pollInterval: Duration = .seconds(2), maxPollInterval: Duration = .seconds(30)) {
         self.pollInterval = pollInterval
+        self.maxPollInterval = maxPollInterval
     }
 
     /// Bind the provider for `workspaceID`. Re-binding the same Workspace keeps the
@@ -57,26 +52,33 @@ final class ChatSessionStore {
 
     /// Pull one fresh transcript. Cache-first: a populated transcript stays on screen
     /// while the poll runs and even if it fails; `loadState` reflects errors only for
-    /// the empty case.
-    func refresh() async {
-        guard let provider else { return }
+    /// the empty case. Returns whether the poll reached the host, so the loop can back off
+    /// on a run of failures and recover at the fast interval on the next success. A
+    /// cancelled or superseded poll is not a failure (the loop is pausing or a newer poll
+    /// owns the state).
+    @discardableResult
+    func refresh() async -> Bool {
+        guard let provider else { return true }
         refreshGeneration &+= 1
         let generation = refreshGeneration
         if transcript.isEmpty { loadState = .loading }
         let start = ContinuousClock().now
         do {
             let fetched = try await provider.fetchTranscript()
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             transcript = fetched
             loadState = .loaded
             hostCallRecorder?.record(.poll(latency: ContinuousClock().now - start), workspaceID: boundWorkspaceID ?? "")
+            return true
         } catch is CancellationError {
             // Polling was cancelled (hidden/backgrounded) — keep the last good transcript
             // and don't log it as a host-call outcome; it's an intentional pause.
+            return true
         } catch {
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             loadState = transcript.isEmpty ? .failed(Self.message(for: error)) : .loaded
             recordFailure(error)
+            return false
         }
     }
 
@@ -95,12 +97,13 @@ final class ChatSessionStore {
     /// Begin polling while the window is visible. Idempotent.
     func startPolling() {
         guard provider != nil, pollingTask == nil else { return }
-        let interval = pollInterval
+        var backoff = PollBackoff(base: pollInterval, maxInterval: maxPollInterval)
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.refresh()
+                let succeeded = await self?.refresh() ?? false
                 if Task.isCancelled { break }
-                try? await Task.sleep(for: interval)
+                backoff.record(success: succeeded)
+                try? await Task.sleep(for: backoff.currentInterval)
             }
         }
     }
@@ -113,17 +116,11 @@ final class ChatSessionStore {
     }
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status) where status == 403:
-            return "Watch needs a reachable Host on a paid plan."
-        case let AuthError.badServerResponse(status):
-            return "Host returned HTTP \(status)."
-        default:
-            return "Couldn't reach the Host. Retrying…"
-        }
+        AuthError.userFacingMessage(
+            for: error,
+            hostGated403: "Watch needs a reachable Host on a paid plan.",
+            serverStatus: { "Host returned HTTP \($0)." },
+            default: "Couldn't reach the Host. Retrying…"
+        )
     }
 }

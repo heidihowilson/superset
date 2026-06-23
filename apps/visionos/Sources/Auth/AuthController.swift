@@ -61,6 +61,11 @@ final class AuthController: RelayCredentialGate {
             api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value }),
             currentPrincipal: { [tokenBox] in tokenBox.value?.value }
         )
+        // A dead-session 401 from the shared relay/host path forces re-auth. The provider
+        // fires this off the main actor, so hop back on before mutating auth state.
+        relayTokenProvider.setSessionExpiredHandler { [weak self] in
+            Task { @MainActor in self?.handleSessionExpired() }
+        }
     }
 
     /// Keep the in-memory nonce and its durable copy in lockstep — assign through
@@ -143,10 +148,11 @@ final class AuthController: RelayCredentialGate {
     }
 
     /// Drop the cached relay JWT — called on background to shrink the RCE-grade token's
-    /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). The next poll
-    /// re-mints from the still-stored session token.
+    /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). Runs synchronously
+    /// (no `Task`) so the JWT is cleared before the scene-phase handler returns and the OS
+    /// can suspend the app. The next poll re-mints from the still-stored session token.
     func dropRelayToken() {
-        Task { [relayTokenProvider] in await relayTokenProvider.invalidate() }
+        relayTokenProvider.invalidate()
     }
 
     /// Engage/release the relay-mint gate for the Optic ID lock (ADR-0008). While locked,
@@ -154,10 +160,11 @@ final class AuthController: RelayCredentialGate {
     /// re-acquire the RCE-grade JWT until the owner re-authenticates on foreground.
     /// Awaited by `LockController` within the lock transition, so the seal/release reaches
     /// the provider before the visible `LockState` advances. `generation` carries the
-    /// lock-state transition order onto the actor so a late hop can't reseal the credential
-    /// after a newer unlock (or vice versa).
+    /// lock-state transition order onto the provider so a late call can't reseal the
+    /// credential after a newer unlock (or vice versa). The provider applies the seal under
+    /// its lock, so this completes synchronously — the gate is engaged before `await` returns.
     func setRelayLocked(_ locked: Bool, generation: Int) async {
-        await relayTokenProvider.setLocked(locked, generation: generation)
+        relayTokenProvider.setLocked(locked, generation: generation)
     }
 
     private func setToken(_ newToken: AuthToken?) {
@@ -227,6 +234,14 @@ final class AuthController: RelayCredentialGate {
         setPendingState(nil)
     }
 
+    /// Cancel an in-flight handoff (the `SignInView` Cancel affordance). Tears down the
+    /// browser session, which resumes its continuation as `userCanceled`, returning `status`
+    /// to a retryable idle state via `signIn`'s cancellation branch. A no-op otherwise.
+    func cancelSignIn() {
+        guard status == .authenticating else { return }
+        webAuth.cancel()
+    }
+
     /// Resolve a `superset://auth/callback` deep link that arrived outside the
     /// browser session (a cold-start pending link, PRD §11). Recovers the nonce from
     /// durable storage when the in-memory copy was lost to a process restart. Ignored
@@ -251,6 +266,18 @@ final class AuthController: RelayCredentialGate {
         setToken(nil)
         setPendingState(nil)
         enterSignedOut()
+    }
+
+    /// Force the app back to signed-out when a bearer-authed call proves the stored session
+    /// token is dead (`AuthError.sessionExpired` — a relay-JWT mint 401, or a host call that
+    /// 401s even on a freshly minted JWT). There is no refresh endpoint, so re-running the
+    /// handoff is the only recovery: drop the token and surface the sign-in gate, making real
+    /// the claim at `AuthAPIClient.mintRelayJWT` that a 401 re-runs the handoff. Idempotent —
+    /// a no-op unless currently signed in, so the many poll loops that all hit the dead
+    /// session collapse to one transition and an in-flight re-auth is left undisturbed.
+    func handleSessionExpired() {
+        guard status == .signedIn else { return }
+        signOut()
     }
 
     private func complete(callbackURL: URL) throws {
@@ -278,6 +305,8 @@ final class AuthController: RelayCredentialGate {
             return "Sign-in could not be verified. Please try again."
         case AuthError.missingToken, AuthError.malformedCallback:
             return "The sign-in response was invalid. Please try again."
+        case AuthError.cannotPresentBrowser:
+            return "Could not open the sign-in browser. Please try again."
         case AuthError.keychain:
             return "Could not securely store your session. Please try again."
         default:

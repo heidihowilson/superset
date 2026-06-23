@@ -35,5 +35,53 @@ targets:
         "CODE_SIGNING_ALLOWED[sdk=xrsimulator*]": "NO"
         "CODE_SIGNING_REQUIRED[sdk=xrsimulator*]": "NO"
         INFOPLIST_KEY_CFBundleDisplayName: Superset
+      configs:
+        # `@testable import Superset` from the unit-test target needs the app compiled
+        # with testability so its internal symbols (RelayTokenProvider et al.) are visible.
+        Debug:
+          ENABLE_TESTABILITY: "YES"
     scheme:
       gatherCoverageData: false
+      # The XCUITest smoke gate plus the RelayTokenProvider unit tests run as the scheme's
+      # test action, so `xcodebuild test` exercises real flows (research/ui-test-automation.md)
+      # and the relay-seal logic (mint-vs-seal ordering, #62).
+      testTargets:
+        - SupersetTests
+        - SupersetUITests
+
+  SupersetTests:
+    type: bundle.unit-test
+    platform: visionOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Superset
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos.tests
+        GENERATE_INFOPLIST_FILE: "YES"
+        # Host the logic tests in the app so `@testable import Superset` resolves.
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Superset.app/Superset"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        # The unit runner is unsigned on the simulator gate, mirroring the app target.
+        "CODE_SIGNING_ALLOWED[sdk=xrsimulator*]": "NO"
+        "CODE_SIGNING_REQUIRED[sdk=xrsimulator*]": "NO"
+
+  SupersetUITests:
+    type: bundle.ui-testing
+    platform: visionOS
+    sources:
+      - path: UITests
+      # The app↔test accessibility-id / launch-arg contract, compiled into both targets so
+      # they can't drift on a string literal.
+      - path: Sources/Support/UITestContract.swift
+    dependencies:
+      - target: Superset
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos.uitests
+        GENERATE_INFOPLIST_FILE: "YES"
+        TEST_TARGET_NAME: Superset
+        # The UI runner is unsigned on the simulator gate, mirroring the app target.
+        "CODE_SIGNING_ALLOWED[sdk=xrsimulator*]": "NO"
+        "CODE_SIGNING_REQUIRED[sdk=xrsimulator*]": "NO"

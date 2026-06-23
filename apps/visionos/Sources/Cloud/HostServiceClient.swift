@@ -47,13 +47,17 @@ struct HostServiceClient: Sendable {
 
     /// Provision a Workspace on the Host (`workspaces.create`): the Host builds the git
     /// worktree and registers the cloud row itself (the saga lives host-side, mirroring
-    /// the desktop CollectionsProvider create path). Host-gated by construction (relay):
-    /// a sleeping/unreachable Host throws, never queued (ADR-0006). `branch` is omitted so
-    /// the Host derives it; the result is not decoded — the next list poll shows the row.
-    func createWorkspace(projectID: String, name: String) async throws {
+    /// the desktop create path). Host-gated by construction (relay): a sleeping/unreachable
+    /// Host throws, never queued (ADR-0006). The org and Host are carried by the routing key,
+    /// so the body only threads `projectId`, `name`, and the chosen `branch`; an empty/nil
+    /// branch is omitted and the Host derives one. The result is not decoded — the next list
+    /// poll shows the row.
+    func createWorkspace(projectID: String, name: String, branch: String?) async throws {
         var input: [String: Any] = ["projectId": projectID]
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmed.isEmpty { input["name"] = trimmed }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedName.isEmpty { input["name"] = trimmedName }
+        let trimmedBranch = branch?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let trimmedBranch, !trimmedBranch.isEmpty { input["branch"] = trimmedBranch }
         _ = try await requestData("workspaces.create", method: .post, input: input)
     }
 
@@ -92,12 +96,21 @@ struct HostServiceClient: Sendable {
 
     /// Perform one relay round-trip, re-minting the JWT once on a 401 (the token aged out
     /// or was dropped on background). Returns the raw body so void mutations skip decoding.
+    /// A *second* consecutive 401 — the host rejecting a freshly minted JWT — means the
+    /// session itself is dead, not just the cached JWT: surface `sessionExpired` so the
+    /// app forces re-auth instead of polling stale data forever (issue #67). (A mint 401
+    /// short-circuits here too: `send` rethrows `sessionExpired` from `RelayTokenProvider`.)
     private func requestData(_ procedure: String, method: HTTPMethod, input: Any?) async throws -> Data {
         do {
             return try await send(procedure, method: method, input: input)
         } catch AuthError.badServerResponse(status: 401) {
-            await tokenProvider.invalidate()
-            return try await send(procedure, method: method, input: input)
+            tokenProvider.invalidate()
+            do {
+                return try await send(procedure, method: method, input: input)
+            } catch AuthError.badServerResponse(status: 401) {
+                tokenProvider.notifySessionExpired()
+                throw AuthError.sessionExpired
+            }
         }
     }
 
@@ -132,17 +145,8 @@ struct HostServiceClient: Sendable {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await http.data(for: request)
-        try Self.ensureOK(response)
+        try ensureSuccessStatus(response)
         return data
-    }
-
-    private static func ensureOK(_ response: URLResponse) throws {
-        guard let http = response as? HTTPURLResponse else {
-            throw AuthError.badServerResponse(status: -1)
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AuthError.badServerResponse(status: http.statusCode)
-        }
     }
 }
 
@@ -150,9 +154,5 @@ struct HostServiceClient: Sendable {
 /// SuperJSON `meta` (Date revival, etc.) is intentionally ignored — the hand-typed
 /// watch models read the few fields they need from `json` directly.
 private struct RelayResult<Payload: Decodable>: Decodable {
-    struct ResultBox: Decodable {
-        struct DataBox: Decodable { let json: Payload }
-        let data: DataBox
-    }
-    let result: ResultBox
+    let result: SuperJSONResult<Payload>
 }

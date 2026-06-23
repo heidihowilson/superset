@@ -115,17 +115,11 @@ final class ComposerStore {
     }
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status) where status == 403:
-            return "Sending needs a reachable Host on a paid plan."
-        case let AuthError.badServerResponse(status):
-            return "Host returned HTTP \(status)."
-        default:
-            return "Couldn't reach the Host. Try again."
-        }
+        AuthError.userFacingMessage(
+            for: error,
+            hostGated403: "Sending needs a reachable Host on a paid plan.",
+            serverStatus: { "Host returned HTTP \($0)." },
+            default: "Couldn't reach the Host. Try again."
+        )
     }
 }

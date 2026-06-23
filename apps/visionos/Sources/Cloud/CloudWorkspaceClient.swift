@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 /// Reads the Host-independent surface over cloud tRPC: `v2Project.list` and
 /// `v2Workspace.list`, both bearer-authed `jwtProcedure`s the stored session token
@@ -12,17 +13,19 @@ import Foundation
 struct CloudWorkspaceClient: WorkspaceListProviding {
     let api: AuthAPIClient
 
+    private static let logger = Logger(subsystem: Logging.subsystem, category: "cloud-list")
+
     func fetchSnapshot() async throws -> WorkspaceListSnapshot {
         let organizationID = try await resolveOrganizationID()
 
         // Projects + workspaces are the critical surface: a failure here fails the
         // poll. Host status (online + plan gate) is fetched best-effort alongside —
         // it enriches the badge but must never blank the list (PRD §6.3).
-        async let projectRows: [ProjectRow] = fetch(
+        async let projectRows: [ProjectRow] = fetchList(
             "v2Project.list",
             input: ["organizationId": organizationID]
         )
-        async let workspaceRows: [WorkspaceRow] = fetch(
+        async let workspaceRows: [WorkspaceRow] = fetchList(
             "v2Workspace.list",
             input: ["organizationId": organizationID]
         )
@@ -85,7 +88,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
     /// list poll (PRD §6.3). Names feed the create Host picker; `online` keys reachability.
     private func fetchHosts(_ organizationID: String) async -> [HostRow] {
         do {
-            return try await fetch("host.list", input: ["organizationId": organizationID])
+            return try await fetchList("host.list", input: ["organizationId": organizationID])
         } catch {
             return []
         }
@@ -118,6 +121,24 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
     }
 
     private func fetch<Payload: Decodable>(_ path: String, input: [String: String]) async throws -> Payload {
+        let data = try await performTRPC(path, input: input)
+        return try Self.decodeEnvelope(data)
+    }
+
+    /// List variant: decodes the rows best-effort, skipping any single row that fails to
+    /// decode (a removed/retyped required field) rather than throwing and blanking the whole
+    /// list. One drifted Workspace can't take the rest of the browser down with it (PRD §6.3).
+    private func fetchList<Row: Decodable>(_ path: String, input: [String: String]) async throws -> [Row] {
+        let data = try await performTRPC(path, input: input)
+        let rows: [FailableDecodable<Row>] = try Self.decodeEnvelope(data)
+        let decoded = rows.compactMap(\.value)
+        if decoded.count != rows.count {
+            Self.logger.error("\(path, privacy: .public): skipped \(rows.count - decoded.count) undecodable row(s)")
+        }
+        return decoded
+    }
+
+    private func performTRPC(_ path: String, input: [String: String]) async throws -> Data {
         let envelope = ["json": input]
         let inputData = try JSONSerialization.data(withJSONObject: envelope)
         let inputString = String(decoding: inputData, as: UTF8.self)
@@ -133,27 +154,45 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         try api.authorize(&request)
 
         let (data, response) = try await api.http.data(for: request)
-        try Self.ensureOK(response)
-        return try JSONDecoder().decode(TRPCResult<Payload>.self, from: data).result.data.json
+        try ensureSuccessStatus(response)
+        return data
     }
 
-    private static func ensureOK(_ response: URLResponse) throws {
-        guard let http = response as? HTTPURLResponse else {
-            throw AuthError.badServerResponse(status: -1)
+    /// Unwraps the SuperJSON tRPC envelope, treating a 200 error-envelope as the failure it
+    /// is: `error.json.message` surfaces as `AuthError.trpcError` rather than being mistaken
+    /// for a successful decode, and a body that carries neither result nor error is rejected.
+    private static func decodeEnvelope<Payload: Decodable>(_ data: Data) throws -> Payload {
+        let envelope = try JSONDecoder().decode(TRPCEnvelope<Payload>.self, from: data)
+        if let error = envelope.error {
+            throw AuthError.trpcError(message: error.json?.message ?? "tRPC error")
         }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AuthError.badServerResponse(status: http.statusCode)
+        guard let json = envelope.result?.data.json else {
+            throw AuthError.badServerResponse(status: 200)
         }
+        return json
     }
 }
 
-/// The SuperJSON-wrapped tRPC success envelope: `{ "result": { "data": { "json": … } } }`.
-private struct TRPCResult<Payload: Decodable>: Decodable {
-    struct ResultBox: Decodable {
-        struct DataBox: Decodable { let json: Payload }
-        let data: DataBox
+/// The SuperJSON-wrapped tRPC envelope. A response carries EITHER `result.data.json`
+/// (success) OR `error.json.message` (a tRPC error returned with HTTP 200 — an in-band
+/// auth/validation rejection the transport reports without a non-2xx status). Both keys are
+/// optional so an error-on-200 is recognized as a failure instead of mis-decoded as success.
+private struct TRPCEnvelope<Payload: Decodable>: Decodable {
+    struct ErrorBox: Decodable {
+        struct JSONBox: Decodable { let message: String? }
+        let json: JSONBox?
     }
-    let result: ResultBox
+    let result: SuperJSONResult<Payload>?
+    let error: ErrorBox?
+}
+
+/// Decodes `Wrapped` when it can, capturing `nil` otherwise — lets a list skip a single
+/// drifted row (a removed/retyped required field) instead of failing the whole decode.
+private struct FailableDecodable<Wrapped: Decodable>: Decodable {
+    let value: Wrapped?
+    init(from decoder: Decoder) throws {
+        value = try? decoder.singleValueContainer().decode(Wrapped.self)
+    }
 }
 
 /// `v2Project.list` row — only the fields the browser groups by are decoded.

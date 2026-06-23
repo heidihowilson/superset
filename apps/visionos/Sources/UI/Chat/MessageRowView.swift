@@ -10,7 +10,7 @@ struct MessageRowView: View {
     let leanIn: Bool
 
     var body: some View {
-        VStack(alignment: alignment, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             roleLabel
             ForEach(Array(message.content.enumerated()), id: \.offset) { _, part in
                 partView(part)
@@ -19,8 +19,6 @@ struct MessageRowView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-
-    private var alignment: HorizontalAlignment { .leading }
 
     private var roleLabel: some View {
         Text(roleTitle)

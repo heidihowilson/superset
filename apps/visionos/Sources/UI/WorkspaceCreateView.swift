@@ -10,6 +10,11 @@ struct WorkspaceCreateView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name = ""
+    @State private var branch = ""
+    /// True once the user types in the Branch field, which stops the name→branch
+    /// auto-slug from overwriting their explicit choice (matches the desktop, whose
+    /// branchName field pre-fills from the name until the user edits it).
+    @State private var branchEdited = false
     @State private var projectID: String?
     @State private var hostID: String?
 
@@ -30,6 +35,14 @@ struct WorkspaceCreateView: View {
                     Section("Name") {
                         TextField("Workspace name", text: $name)
                             .textInputAutocapitalization(.never)
+                            .onChange(of: name) { _, newValue in
+                                if !branchEdited { branch = Self.branchSlug(from: newValue) }
+                            }
+                    }
+                    Section("Branch") {
+                        TextField("Branch name", text: $branch)
+                            .textInputAutocapitalization(.never)
+                            .onChange(of: branch) { _, _ in branchEdited = true }
                     }
                     Section("Project") {
                         Picker("Project", selection: $projectID) {
@@ -37,7 +50,7 @@ struct WorkspaceCreateView: View {
                                 Text(project.name).tag(Optional(project.id))
                             }
                         }
-                        .pickerStyle(.inline)
+                        .pickerStyle(.menu)
                         .labelsHidden()
                     }
                     Section("Host") {
@@ -53,7 +66,7 @@ struct WorkspaceCreateView: View {
                                     Text(host.name).tag(Optional(host.id))
                                 }
                             }
-                            .pickerStyle(.inline)
+                            .pickerStyle(.menu)
                             .labelsHidden()
                         }
                     }
@@ -73,21 +86,71 @@ struct WorkspaceCreateView: View {
                     }
                 }
             }
-            .onAppear {
-                if projectID == nil { projectID = store.projects.first?.id }
-                if hostID == nil { hostID = store.onlineHosts.first?.id }
-            }
+            .onAppear { reseedSelection() }
+            .onChange(of: store.projects) { _, _ in reseedSelection() }
+            .onChange(of: store.onlineHosts) { _, _ in reseedSelection() }
         }
         .frame(minWidth: 420, minHeight: 480)
     }
 
+    /// (Re)seed the Project/Host pickers to a still-valid default. In this host-awake app the
+    /// sheet often opens before the first poll lands (both lists empty → nothing selected →
+    /// Create greyed with no obvious reason); a later poll can also delete the selected Project
+    /// or drop the Host from `onlineHosts`, leaving the selection dangling. Run from `onAppear`
+    /// and on every list change so the selection follows the data (issue #68).
+    private func reseedSelection() {
+        projectID = Self.resolveSelection(current: projectID, available: store.projects.map(\.id))
+        hostID = Self.resolveSelection(current: hostID, available: store.onlineHosts.map(\.id))
+    }
+
+    /// Keep `current` when it's still present in `available`, else fall back to the first
+    /// available id (nil when the list is empty). Pure so the seeding rule is unit-testable.
+    static func resolveSelection(current: String?, available: [String]) -> String? {
+        if let current, available.contains(current) { return current }
+        return available.first
+    }
+
     private func submit() {
-        guard let projectID, let hostID else { return }
-        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let projectID, store.projects.contains(where: { $0.id == projectID }),
+              let hostID, store.canCreate(onHostID: hostID)
+        else {
+            // The selection went stale between render and tap (a poll deleted the Project or
+            // dropped the Host). Re-seed to a valid default instead of dialing a dead id.
+            reseedSelection()
+            return
+        }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedBranch = branch.trimmingCharacters(in: .whitespacesAndNewlines)
+        let resolvedBranch = trimmedBranch.isEmpty ? Self.branchSlug(from: trimmedName) : trimmedBranch
         Task {
-            await store.createWorkspace(projectID: projectID, name: trimmed, hostID: hostID)
+            await store.createWorkspace(
+                projectID: projectID,
+                name: trimmedName,
+                branch: resolvedBranch,
+                hostID: hostID
+            )
             if store.lifecycleError == nil { dismiss() }
         }
+    }
+
+    /// A git-safe branch slug derived from the workspace name: lowercased, with runs of
+    /// non-`[a-z0-9._/]` characters collapsed to a single hyphen and leading/trailing
+    /// separators trimmed. The Host re-prefixes and de-duplicates the final branch, so this
+    /// only needs to be a reasonable starting point (mirrors the desktop's branchName default).
+    static func branchSlug(from name: String) -> String {
+        let allowed = Set("abcdefghijklmnopqrstuvwxyz0123456789._/")
+        var slug = ""
+        var pendingSeparator = false
+        for character in name.lowercased() {
+            if allowed.contains(character) {
+                if pendingSeparator, !slug.isEmpty { slug.append("-") }
+                pendingSeparator = false
+                slug.append(character)
+            } else {
+                pendingSeparator = true
+            }
+        }
+        return slug.trimmingCharacters(in: CharacterSet(charactersIn: "-._/"))
     }
 }
 

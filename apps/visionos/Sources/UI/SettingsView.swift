@@ -20,11 +20,11 @@ struct SettingsView: View {
 
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OnboardingStore.self) private var onboarding
+    @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.scenePhase) private var scenePhase
 
     @State private var model: SettingsModel
-    @State private var sceneActive = false
+    @State private var category: SettingsCategory? = .account
 
     init(auth: AuthController, store: WorkspaceStore) {
         self.auth = auth
@@ -33,77 +33,123 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        @Bindable var appSettings = appSettings
-        NavigationStack {
-            Form {
-                organizationSection
+        NavigationSplitView {
+            List(SettingsCategory.allCases, selection: $category) { category in
+                Label(category.label, systemImage: category.symbol)
+                    .tag(category)
+            }
+            .navigationTitle("Settings")
+        } detail: {
+            detail(for: category ?? .account)
+        }
+        .frame(minWidth: 720, minHeight: 600)
+        .task { await model.load() }
+        .scenePollingMembership(store: store)
+    }
 
-                Section("Appearance") {
-                    Picker("Theme", selection: $appSettings.appearance) {
-                        ForEach(AppSettingsStore.Appearance.allCases) { appearance in
-                            Text(appearance.label).tag(appearance)
-                        }
-                    }
-                }
-
-                Section("Model") {
-                    Picker("Preferred model", selection: $appSettings.preferredModelID) {
-                        Text("Automatic").tag(String?.none)
-                        ForEach(model.models) { chatModel in
-                            Text(chatModel.name).tag(Optional(chatModel.id))
-                        }
-                    }
-                }
-
-                Section {
-                    Toggle("Voice dictation", isOn: $appSettings.dictationEnabled)
-                    Toggle("In-app notifications", isOn: $appSettings.notificationsEnabled)
-                } header: {
-                    Text("Input & Notifications")
-                } footer: {
-                    Text("These preferences are stored on this device.")
-                }
-
-                Section {
-                    Button("Show Welcome Tour") {
-                        // The tour presents over the command-center window (FR-ONB), so
-                        // close Settings to surface it unobstructed there.
-                        onboarding.replay()
-                        dismissWindow(id: SettingsScene.windowID)
-                    }
-                } header: {
-                    Text("Onboarding")
-                } footer: {
-                    Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
-                }
-
+    /// The detail column for the selected category. Each pane is a `Form` reusing the same
+    /// section bodies the flat Settings list used (PRD §7.2) — IA only, no behavior change.
+    @ViewBuilder
+    private func detail(for category: SettingsCategory) -> some View {
+        Form {
+            switch category {
+            case .account:
                 accountSection
                 planSection
+                signOutSection
+            case .organization:
+                organizationSection
+            case .appearance:
+                appearanceSection
+            case .model:
+                modelSection
+            case .inputNotifications:
+                inputNotificationsSection
+            case .hosts:
                 hostsSection
+                hostCredentialSection
+            case .projects:
                 projectsSection
+            case .about:
+                onboardingSection
+            case .debug:
+                debugSection
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle(category.label)
+    }
 
-                Section {
-                    Button("Sign Out", role: .destructive) {
-                        auth.signOut()
-                        dismissWindow(id: SettingsScene.windowID)
-                    }
+    // MARK: Editable — device-local prefs
+
+    private var appearanceSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section("Appearance") {
+            Picker("Theme", selection: $appSettings.appearance) {
+                ForEach(AppSettingsStore.Appearance.allCases) { appearance in
+                    Text(appearance.label).tag(appearance)
                 }
             }
-            .formStyle(.grouped)
-            .navigationTitle("Settings")
         }
-        .frame(minWidth: 480, minHeight: 600)
-        .task { await model.load() }
-        .onAppear {
-            store.beginPolling()
-            syncForeground(scenePhase)
+    }
+
+    private var modelSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section("Model") {
+            Picker("Preferred model", selection: $appSettings.preferredModelID) {
+                Text("Automatic").tag(String?.none)
+                ForEach(model.models) { chatModel in
+                    Text(chatModel.name).tag(Optional(chatModel.id))
+                }
+            }
         }
-        .onDisappear {
-            syncForeground(.background)
-            store.endPolling()
+    }
+
+    private var inputNotificationsSection: some View {
+        @Bindable var appSettings = appSettings
+        return Section {
+            Toggle("Voice dictation", isOn: $appSettings.dictationEnabled)
+            Toggle("In-app notifications", isOn: $appSettings.notificationsEnabled)
+        } header: {
+            Text("Input & Notifications")
+        } footer: {
+            Text("These preferences are stored on this device.")
         }
-        .onChange(of: scenePhase) { _, phase in
-            syncForeground(phase)
+    }
+
+    private var onboardingSection: some View {
+        Section {
+            Button("Show Welcome Tour") {
+                // The tour presents over the command-center window (FR-ONB), so
+                // close Settings to surface it unobstructed there.
+                onboarding.replay()
+                dismissWindow(id: SettingsScene.windowID)
+            }
+        } header: {
+            Text("Onboarding")
+        } footer: {
+            Text("Replay the first-run walkthrough of gaze, the switcher, and Host status.")
+        }
+    }
+
+    private var debugSection: some View {
+        Section {
+            Button("Open Debug Window", systemImage: "ladybug") {
+                openWindow(id: DebugScene.windowID)
+            }
+        } header: {
+            Text("Debug")
+        } footer: {
+            Text("Opens a plain-text dump of the workspace store in its own window.")
+        }
+    }
+
+    private var signOutSection: some View {
+        Section {
+            Button("Sign Out", role: .destructive) {
+                auth.signOut()
+                dismissWindow(id: SettingsScene.windowID)
+            }
         }
     }
 
@@ -162,6 +208,42 @@ struct SettingsView: View {
         Section("Account") {
             LabeledContent("Email", value: model.session?.userEmail ?? "—")
             LabeledContent("Organization", value: model.activeOrganizationName ?? "—")
+        }
+    }
+
+    /// Verify the bearer session can mint the relay JWT host-service-over-relay calls
+    /// present (PRD §13). Moved here from the command-center ornament; the minted token is
+    /// never shown.
+    private var hostCredentialSection: some View {
+        Section {
+            Button("Verify host credential") {
+                Task { await model.mintRelayCredential() }
+            }
+            .disabled(model.relayProbe == .running)
+            relayStatus
+        } header: {
+            Text("Host Credential")
+        } footer: {
+            Text("Mints the relay token your hosts present. The token is never shown.")
+        }
+    }
+
+    @ViewBuilder
+    private var relayStatus: some View {
+        switch model.relayProbe {
+        case .idle:
+            EmptyView()
+        case .running:
+            HStack(spacing: 8) {
+                ProgressView()
+                Text("Verifying…").foregroundStyle(.secondary)
+            }
+        case .minted:
+            Label("Relay credential minted", systemImage: "checkmark.seal")
+                .foregroundStyle(.green)
+        case let .failed(message):
+            Label(message, systemImage: "exclamationmark.triangle")
+                .foregroundStyle(.red)
         }
     }
 
@@ -224,14 +306,49 @@ struct SettingsView: View {
         }
     }
 
-    /// Report this scene's active-ness to the shared store so the host-online indicator
-    /// polls while Settings is visible — the same balanced register/unregister `RootView`
-    /// uses so one inactive window can't pause the shared poll for others.
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
+}
+
+/// The Settings sidebar categories, mirroring the desktop's master/detail layout
+/// (ADR-0011). `.account` is the default-selected detail.
+private enum SettingsCategory: String, CaseIterable, Identifiable {
+    case account
+    case organization
+    case appearance
+    case model
+    case inputNotifications
+    case hosts
+    case projects
+    case about
+    case debug
+
+    var id: Self { self }
+
+    var label: String {
+        switch self {
+        case .account: "Account"
+        case .organization: "Organization"
+        case .appearance: "Appearance"
+        case .model: "Model"
+        case .inputNotifications: "Input & Notifications"
+        case .hosts: "Hosts"
+        case .projects: "Projects"
+        case .about: "About"
+        case .debug: "Debug"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .account: "person.crop.circle"
+        case .organization: "building.2"
+        case .appearance: "paintbrush"
+        case .model: "cpu"
+        case .inputNotifications: "bell"
+        case .hosts: "server.rack"
+        case .projects: "folder"
+        case .about: "info.circle"
+        case .debug: "ladybug"
+        }
     }
 }
 

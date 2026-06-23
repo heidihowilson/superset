@@ -10,6 +10,9 @@ import SwiftUI
 /// rather than on-device, a privacy notice is shown (§13).
 struct ComposerView: View {
     let store: ComposerStore
+    /// Whether the agent is blocked on a user approve/reject decision (the host's
+    /// `pendingApproval`). The Approve/Reject/Retry chips show only then (PRD §9).
+    let awaitingDecision: Bool
     @State private var dictation = DictationController()
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(\.scenePhase) private var scenePhase
@@ -50,12 +53,15 @@ struct ComposerView: View {
 
     // MARK: Quick actions
 
+    @ViewBuilder
     private var quickActions: some View {
-        HStack(spacing: 12) {
-            quickActionChip("Approve", systemImage: "checkmark")
-            quickActionChip("Reject", systemImage: "xmark")
-            quickActionChip("Retry", systemImage: "arrow.clockwise")
-            Spacer(minLength: 0)
+        if awaitingDecision {
+            HStack(spacing: 12) {
+                quickActionChip("Approve", systemImage: "checkmark")
+                quickActionChip("Reject", systemImage: "xmark")
+                quickActionChip("Retry", systemImage: "arrow.clockwise")
+                Spacer(minLength: 0)
+            }
         }
     }
 
@@ -83,6 +89,7 @@ struct ComposerView: View {
                 .padding(.horizontal, 16)
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
                 .submitLabel(.send)
+                .accessibilityIdentifier(AccessibilityID.composerInput)
             modelPicker
             agentPicker
             sendButton
@@ -104,6 +111,7 @@ struct ComposerView: View {
             .tint(listening ? .red : nil)
             .disabled(!dictation.isReady && !listening)
             .accessibilityLabel(listening ? "Stop dictation" : "Start dictation")
+            .accessibilityIdentifier(AccessibilityID.composerMicToggle)
             .help(micHelp)
         }
     }

@@ -8,20 +8,16 @@ enum ProjectScene {
 
 /// Content of a Project window — a `(sceneKind, domainId)` binding over the shared store
 /// (CONTEXT.md "Window"), keyed by Project id so re-opening focuses the existing window.
-/// Lists the Project's Workspaces and opens each into its own Workspace window (honoring
-/// the active interaction model). Cache-first restoration (PRD §16.2): a restored window
+/// Lists the Project's Workspaces and opens each into its own Workspace window
+/// (multi-window). Cache-first restoration (PRD §16.2): a restored window
 /// onto a still-loading list shows progress; only a Project absent from a *loaded* list
 /// is a deleted-id 404 surface, never a spinner that hangs.
 struct ProjectWindowView: View {
     let projectID: Project.ID?
     let store: WorkspaceStore
 
-    @Environment(InteractionModelRegistry.self) private var models
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var sceneActive = false
 
     private var project: Project? {
         guard let projectID else { return nil }
@@ -38,29 +34,13 @@ struct ProjectWindowView: View {
     var body: some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .scenePollingMembership(store: store)
             .onAppear {
-                store.beginPolling()
-                syncForeground(scenePhase)
                 if let projectID { openWindows.registerProject(projectID) }
             }
             .onDisappear {
-                syncForeground(.background)
-                store.endPolling()
                 if let projectID { openWindows.unregisterProject(projectID) }
             }
-            .onChange(of: scenePhase) { _, phase in
-                syncForeground(phase)
-            }
-    }
-
-    /// Report this scene's active-ness to the shared store, contributing exactly one to
-    /// its active-scene count and keeping register/unregister balanced across phase
-    /// changes and window close (so one inactive window can't pause polling for others).
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     @ViewBuilder
@@ -102,27 +82,10 @@ struct ProjectWindowView: View {
                         WindowRouter.openWorkspace(
                             workspace.id,
                             store: store,
-                            models: models,
-                            openWindows: openWindows,
-                            openWindow: openWindow,
-                            dismissWindow: dismissWindow
+                            openWindow: openWindow
                         )
                     } label: {
-                        HStack(spacing: 16) {
-                            Circle()
-                                .fill(workspace.status.tint)
-                                .frame(width: 14, height: 14)
-                                .accessibilityLabel(workspace.status.label)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(workspace.name).font(.headline)
-                                Text(workspace.status.label)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 0)
-                        }
-                        .frame(minHeight: 60)
-                        .contentShape(Rectangle())
+                        WorkspaceRowView(workspace: workspace)
                     }
                     .buttonBorderShape(.roundedRectangle)
                 }

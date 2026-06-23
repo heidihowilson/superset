@@ -39,7 +39,7 @@ Superset orchestrates coding agents across Hosts. Domain model: `Organization �
 - **G1 — Native app.** SwiftUI/RealityKit at `apps/visionos`. No Electron, no Node/Bun runtime, no host-native packages on device (ADR-0003).
 - **G2 — Watch loop (Host-gated).** Follow a Workspace's agent Chat session — live + history — read from **host-service over the relay**. Requires a reachable Host (ADR-0006).
 - **G3 — Prompt loop (Host-gated).** Send prompts via **voice dictation or virtual keyboard, as co-equal modalities** (dictation gated on an accuracy bar, §9), reviewable composer, explicit send. The agent runs on the Host.
-- **G4 — Multi-window capability.** Window-per-Workspace and Window-per-Project as `WindowGroup(for:)` scenes keyed on domain id (system de-dupe → open-or-focus). Single-window-plus-switcher is the **default**; multi-window is opt-in (§10).
+- **G4 — Multi-window capability.** Window-per-Workspace and Window-per-Project as `WindowGroup(for:)` scenes keyed on domain id (system de-dupe → open-or-focus). **Multi-window is the only model** (single-window-plus-switcher retired, V1.1/ADR-0011); the explicit "consolidate windows" action mitigates proliferation (§9, §10).
 - **G5 — Workspace lifecycle (Host-gated).** Create / delete from the headset (worktree provisioning/teardown on the Host, client-driven relay calls mirroring the web app); rename/restore are cloud-only.
 - **G6 — Presentation-agnostic core.** Native domain/state layer + a minimum-viable renderer seam (pane kind → SwiftUI view in V1; → RealityKit entity in V2), so V2 spatial is a renderer swap (§17 M0).
 - **G7 — Auth.** Reuse the desktop token handoff (verified): ASWebAuthenticationSession → `/api/auth/desktop/connect` → OAuth → `superset://auth/callback?token=` (a 30-day better-auth session-table token) → Keychain → `Authorization: Bearer`; mint a JWT from `/api/auth/token` for relay/host calls (ADR-0005).
@@ -141,7 +141,7 @@ Host-offline state: the list renders; everything else shows an explicit "Host of
 | Send prompt (voice/keyboard) | **Must (Host-gated)** | Co-equal modalities; explicit send; agent runs on Host. |
 | Workspace create / delete | **Must (Host-gated)** | Client-driven relay, keyed by `machineId`. |
 | Workspace rename / restore | **Must** | Cloud-only; safe Host-offline. |
-| Multi-window capability | **Must** | Domain-id-keyed; single-window-plus-switcher default. |
+| Multi-window capability | **Must** | Domain-id-keyed; multi-window only (single-window-plus-switcher retired, V1.1/ADR-0011). |
 | Status & in-app notifications | **Must** | Polled list + lifecycle toasts; host-online indicator. |
 | Auth + org switch | **Must** | Bearer handoff (ADR-0005). |
 | Settings (read-mostly) | **Must** | Minimal editable set. |
@@ -176,10 +176,12 @@ Deferred/cut pane kinds stay registered placeholders so synced layouts stay vali
 ## 10. Experimentation Framework
 
 Internal design-iteration tool, not a powered A/B test (dogfood N can't declare winners).
-- An **Interaction Model Registry** of registered, feature-flagged models; switching re-renders the same store at runtime, no rebuild.
-- **Default `single-window-plus-switcher`**; `multi-window` is the opt-in contender. Explicit opt-in / org-role cohorts.
-- **Cost-of-experiment:** a new model = adapter + flag + config; no domain/core change, no migration.
-- **Learning:** qualitative + behavioral + a collapse-to-single-window tripwire. Quantitative events descriptive only. Powered A/B is a population-gated later phase.
+
+> **V1.1 (ADR-0011):** the windowing experiment concluded — **multi-window is the only model**; `single-window-plus-switcher` and the runtime `InteractionModelRegistry` are retired. Opening a workspace always opens/focuses its own window; the explicit "consolidate windows" action stays as the proliferation mitigation (§9). The renderer-seam framing below (adapter + config) still holds for the future spatial-renderer swap.
+
+- **Renderer seam:** registered presentation adapters over one store; a new presentation re-renders the same store at runtime, no rebuild.
+- **Cost-of-experiment:** a new renderer = adapter + config; no domain/core change, no migration.
+- **Learning:** qualitative + behavioral. Quantitative events descriptive only. Powered A/B is a population-gated later phase.
 
 ---
 
@@ -237,11 +239,11 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 
 ## 14. Phased Roadmap
 
-- **V1 — Native flat multi-window, host-awake.** Shell + windowing; watch (Host-gated, ambient + full-fidelity) + prompt (voice/keyboard); lifecycle (Host-gated create/delete, cloud rename); bearer-handoff auth; cloud list polling + host-service-over-relay reads; settings; 5-beat onboarding; observability; register `visionos`. Single-window-plus-switcher default.
+- **V1 — Native flat multi-window, host-awake.** Shell + windowing; watch (Host-gated, ambient + full-fidelity) + prompt (voice/keyboard); lifecycle (Host-gated create/delete, cloud rename); bearer-handoff auth; cloud list polling + host-service-over-relay reads; settings; 5-beat onboarding; observability; register `visionos`. Multi-window only (V1.1/ADR-0011).
 - **V1.1 — Host-gated power features.** Native terminal (PTY-over-relay-WS + backgrounding reconnect; spike first) and review panes (diff/file/comment).
 - **V2 — Resilience + spatial.** **True live chat streaming** (host-service chat `.subscription()` + relay subscription forwarding, replacing V1 polling). Optionally the **Durable Stream producer + native consumer + cloud chat history** for host-resilient watch. **Native Electric** for live queries/optimistic writes/offline. **Volume-per-Workspace** (`windowStyle(.volumetric)`) with a RealityKit renderer set. (**Cloud-mediated host-wake is deprioritized** — remote always-on Hosts make a sleeping Host rare; revisit only if personal-Mac roaming becomes a goal.)
 - **V3 — Immersive command deck (optional).** `ImmersiveSpace`, in-app exit.
-- **Later (population-gated):** powered interaction-model A/B; APNs server-push.
+- **Later (population-gated):** powered design A/B (§10); APNs server-push.
 
 ---
 
@@ -279,7 +281,7 @@ Internal design-iteration tool, not a powered A/B test (dogfood N can't declare 
 ## 17. Success Metrics
 
 **Acceptance (V1 ship gates).** Every M0* gate below is **auto-verifiable**: `xcodebuild` build + test + a **Simulator** launch — **no real-hardware launch is required per gate or per PR**. Real Vision Pro hardware verification is a **single batched human pass (M-HW)** before V1 ship, not a per-issue gate.
-- **M0 — Renderer seam (minimum-viable):** same store drives the 2D adapter + a throwaway second adapter, zero domain change. Hard gate.
+- **M0 — Renderer seam (minimum-viable):** one store drives the native adapter through the `AdapterRegistry` seam, zero domain change — so a future spatial renderer is an adapter swap, not a rewrite. Hard gate.
 - **M0a — Auth handoff (Simulator):** system-browser sign-in → token in Keychain → a cloud call AND a host-service-over-relay call succeed; org switch via `setActive()` without re-auth. Hard gate.
 - **M0c — Watch (Simulator):** open a Workspace against a **live Host**, render the transcript from host-service `getDisplayState`/`listMessages` over the relay, and **refresh (poll) across a backgrounding cycle without blanking**. Hard gate.
 - **M0d — Prompt + dictation bar:** voice-dictate a real technical prompt, review, send, see the run; dictation meets the WER bar on a fixed prompt set or ships disabled/keyboard-first.

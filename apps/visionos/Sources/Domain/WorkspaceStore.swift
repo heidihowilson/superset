@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import os
 
 /// Presentation-agnostic source of truth for the Workspace browser — the one
 /// Host-independent surface (PRD §7.2). Renderer adapters observe it and emit
@@ -12,15 +13,6 @@ import Observation
 @MainActor
 @Observable
 final class WorkspaceStore {
-    /// Drives only the empty-state UI. Cached/loaded rows are always shown — a poll
-    /// that is in flight or has failed never blanks an existing list.
-    enum LoadState: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
-
     private(set) var projects: [Project]
     private(set) var workspaces: [Workspace]
     /// The org's Hosts, the targets a create can be dialed at — surfaced from the same
@@ -45,19 +37,26 @@ final class WorkspaceStore {
     private let lifecycle: WorkspaceLifecycleProviding?
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
+    /// Ceiling the poll backoff climbs to while the list keeps failing (host asleep is the
+    /// common case). Healthy polls stay at `pollInterval`; see `PollBackoff`.
+    private let maxPollInterval: Duration
     private var pollingTask: Task<Void, Never>?
-    /// Number of visible windows holding the poll open. Multi-window scenes share this one
-    /// store (PRD §13), so polling is reference-counted: it runs while ≥1 window is visible
-    /// and stops only when the last closes — a Workspace window restored on its own keeps the
-    /// list fresh, so it resolves to content or a 404 rather than a hung spinner (PRD §16.2).
-    private var pollingWindowCount = 0
-    /// Number of scenes currently reporting `.active`. visionOS backgrounds the whole app,
-    /// but each scene phases independently, so foreground is "≥1 active scene" — a single
-    /// boolean would be last-writer-wins, letting one inactive window pause the shared poll
-    /// for windows that are still visible. Ref-counted so one scene going inactive can't
-    /// stop polling while another stays active.
-    private var activeSceneCount = 0
-    private var isForeground: Bool { activeSceneCount > 0 }
+    private let logger = Logger(subsystem: Logging.subsystem, category: "polling")
+    /// Tokens of the visible windows holding the poll open. Multi-window scenes share this
+    /// one store (PRD §13), so polling is reference-counted: it runs while ≥1 window is
+    /// visible and stops only when the last closes — a Workspace window restored on its own
+    /// keeps the list fresh, so it resolves to content or a 404 rather than a hung spinner
+    /// (PRD §16.2). Membership is keyed by a per-scene token rather than a bare counter so
+    /// a duplicated `beginPolling`/`endPolling` for the same scene can't over- or
+    /// under-count: re-adding a present token is a no-op, removing an absent one is logged.
+    private var pollingWindowTokens: Set<UUID> = []
+    /// Tokens of the scenes currently reporting `.active`. visionOS backgrounds the whole
+    /// app, but each scene phases independently, so foreground is "≥1 active scene" — a
+    /// single boolean would be last-writer-wins, letting one inactive window pause the
+    /// shared poll for windows that are still visible. Token-keyed (like the window set) so
+    /// repeated lifecycle callbacks for one scene stay balanced.
+    private var activeSceneTokens: Set<UUID> = []
+    private var isForeground: Bool { !activeSceneTokens.isEmpty }
     /// Monotonic token guarding against out-of-order applies: a `refresh` only commits
     /// its snapshot if the generation it captured is still current. Bumped on every
     /// refresh start and on `reset`, so a slow in-flight fetch can't clobber newer state
@@ -68,12 +67,14 @@ final class WorkspaceStore {
         provider: WorkspaceListProviding? = nil,
         lifecycle: WorkspaceLifecycleProviding? = nil,
         cache: WorkspaceListCaching? = nil,
-        pollInterval: Duration = .seconds(7)
+        pollInterval: Duration = .seconds(7),
+        maxPollInterval: Duration = .seconds(60)
     ) {
         self.provider = provider
         self.lifecycle = lifecycle
         self.cache = cache
         self.pollInterval = pollInterval
+        self.maxPollInterval = maxPollInterval
         let cached = cache?.load() ?? .empty
         self.projects = cached.projects
         self.workspaces = cached.workspaces
@@ -185,7 +186,7 @@ final class WorkspaceStore {
 
     /// Create a Workspace on `hostID`'s Host (Host-gated saga over the relay). Non-optimistic:
     /// the new row appears only after the post-create poll lands it.
-    func createWorkspace(projectID: String, name: String, hostID: String) async {
+    func createWorkspace(projectID: String, name: String, branch: String, hostID: String) async {
         guard let lifecycle else { return }
         guard canCreate(onHostID: hostID) else {
             lifecycleError = "Host unavailable. The Host must be online and the organization on an active plan to create this workspace."
@@ -195,7 +196,7 @@ final class WorkspaceStore {
         isCreatingWorkspace = true
         defer { isCreatingWorkspace = false }
         do {
-            try await lifecycle.create(projectID: projectID, name: name, hostID: hostID)
+            try await lifecycle.create(projectID: projectID, name: name, branch: branch, hostID: hostID)
             await refresh()
         } catch {
             lifecycleError = Self.lifecycleMessage(for: error)
@@ -230,22 +231,29 @@ final class WorkspaceStore {
 
     /// Pull one fresh snapshot. Cache-first: a populated list stays on screen while the
     /// poll runs and even if it fails; `loadState` reflects errors for the empty case.
-    func refresh() async {
-        guard let provider else { return }
+    /// Returns whether the poll reached the provider, so the loop can back off on a run of
+    /// failures and recover at the fast interval on the next success. A cancelled or
+    /// superseded poll is not a failure (the loop is stopping or a newer poll owns the state).
+    @discardableResult
+    func refresh() async -> Bool {
+        guard let provider else { return true }
         refreshGeneration &+= 1
         let generation = refreshGeneration
         if workspaces.isEmpty { loadState = .loading }
         do {
             let snapshot = try await provider.fetchSnapshot()
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             apply(snapshot)
             cache?.save(snapshot)
             loadState = .loaded
+            return true
         } catch is CancellationError {
             // Polling was cancelled (hidden/backgrounded) — keep the last good data.
+            return true
         } catch {
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             loadState = workspaces.isEmpty ? .failed(Self.message(for: error)) : .loaded
+            return false
         }
     }
 
@@ -268,49 +276,57 @@ final class WorkspaceStore {
         cache?.clear()
     }
 
-    /// A newly-visible window joins the shared poll. Reference-counted so multiple windows
-    /// keep one loop alive; balanced by `endPolling` on disappear.
-    func beginPolling() {
-        pollingWindowCount += 1
+    /// A newly-visible window joins the shared poll, identified by its per-scene `token`.
+    /// Idempotent: a duplicate `beginPolling` for a window already counted is a no-op, so
+    /// the membership can't over-count. Balanced by `endPolling` on disappear.
+    func beginPolling(token: UUID) {
+        guard pollingWindowTokens.insert(token).inserted else { return }
         ensurePolling()
     }
 
     /// A window disappearing leaves the shared poll; the loop stops once the last window is
-    /// gone. Clamped at zero so an unbalanced extra call can't drive the count negative.
-    func endPolling() {
-        assert(pollingWindowCount > 0, "endPolling called without a matching beginPolling")
-        pollingWindowCount = max(0, pollingWindowCount - 1)
-        if pollingWindowCount == 0 { stopPolling() }
+    /// gone. Idempotent: releasing a `token` that isn't a member is logged and ignored
+    /// rather than driving a counter negative (the membership set is its own clamp).
+    func endPolling(token: UUID) {
+        guard pollingWindowTokens.remove(token) != nil else {
+            logger.error("endPolling called without a matching beginPolling for token \(token.uuidString, privacy: .public)")
+            return
+        }
+        if pollingWindowTokens.isEmpty { stopPolling() }
     }
 
-    /// A scene became foregrounded (`.active`). Ref-counted across scenes so the shared
-    /// poll resumes on the first active scene and is unaffected by later ones; balanced by
-    /// `sceneResignedActive` (ADR-0004).
-    func sceneBecameActive() {
-        activeSceneCount += 1
-        if activeSceneCount == 1 { ensurePolling() }
+    /// A scene became foregrounded (`.active`), identified by its per-scene `token`. The
+    /// shared poll resumes on the first active scene and is unaffected by later ones;
+    /// balanced by `sceneResignedActive` (ADR-0004). Idempotent on the token.
+    func sceneBecameActive(token: UUID) {
+        guard activeSceneTokens.insert(token).inserted else { return }
+        if activeSceneTokens.count == 1 { ensurePolling() }
     }
 
     /// A scene left the foreground (inactive/background) or closed while active. The loop
     /// pauses only once the *last* active scene resigns — an inactive window can't stop
-    /// polling for windows that are still visible. The window count is left untouched so a
-    /// later foreground can resume while windows are still open.
-    func sceneResignedActive() {
-        assert(activeSceneCount > 0, "sceneResignedActive called without a matching sceneBecameActive")
-        activeSceneCount = max(0, activeSceneCount - 1)
-        if activeSceneCount == 0 { stopPolling() }
+    /// polling for windows that are still visible. The window set is left untouched so a
+    /// later foreground can resume while windows are still open. Idempotent: an unmatched
+    /// resign is logged and ignored.
+    func sceneResignedActive(token: UUID) {
+        guard activeSceneTokens.remove(token) != nil else {
+            logger.error("sceneResignedActive called without a matching sceneBecameActive for token \(token.uuidString, privacy: .public)")
+            return
+        }
+        if activeSceneTokens.isEmpty { stopPolling() }
     }
 
     /// Start the shared loop when a window is visible and the app is foregrounded. Idempotent —
     /// a second call while a loop is running is a no-op.
     private func ensurePolling() {
-        guard provider != nil, pollingTask == nil, pollingWindowCount > 0, isForeground else { return }
-        let interval = pollInterval
+        guard provider != nil, pollingTask == nil, !pollingWindowTokens.isEmpty, isForeground else { return }
+        var backoff = PollBackoff(base: pollInterval, maxInterval: maxPollInterval)
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.refresh()
+                let succeeded = await self?.refresh() ?? false
                 if Task.isCancelled { break }
-                try? await Task.sleep(for: interval)
+                backoff.record(success: succeeded)
+                try? await Task.sleep(for: backoff.currentInterval)
             }
         }
     }
@@ -346,34 +362,19 @@ final class WorkspaceStore {
     private static let embeddedKeyPrefix = "__embedded:"
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status):
-            return "Server returned HTTP \(status)."
-        default:
-            return "Couldn't load workspaces. Retrying…"
-        }
+        AuthError.userFacingMessage(for: error, default: "Couldn't load workspaces. Retrying…")
     }
 
     /// User-facing copy for a failed lifecycle op. A relay 403 means the Host is offline or
     /// the org's plan doesn't allow host access (`checkHostAccess`), the dominant failure for
     /// the Host-gated create/delete — surfaced plainly rather than as a raw status.
     private static func lifecycleMessage(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case AuthError.badServerResponse(status: 403):
-            return "Host unavailable. The Host must be online and the organization on an active plan."
-        case let AuthError.badServerResponse(status):
-            return "The operation failed (HTTP \(status)). Please try again."
-        default:
-            return "The operation failed. Please try again."
-        }
+        AuthError.userFacingMessage(
+            for: error,
+            hostGated403: "Host unavailable. The Host must be online and the organization on an active plan.",
+            serverStatus: { "The operation failed (HTTP \($0)). Please try again." },
+            default: "The operation failed. Please try again."
+        )
     }
 }
 
@@ -413,7 +414,7 @@ extension WorkspaceStore {
 
     private struct SampleLifecycle: WorkspaceLifecycleProviding {
         func rename(workspaceID: String, to name: String) async throws {}
-        func create(projectID: String, name: String, hostID: String) async throws {}
+        func create(projectID: String, name: String, branch: String, hostID: String) async throws {}
         func delete(workspaceID: String, hostID: String) async throws {}
     }
 }

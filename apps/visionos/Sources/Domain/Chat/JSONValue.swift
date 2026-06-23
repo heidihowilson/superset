@@ -57,28 +57,37 @@ enum JSONValue: Sendable, Equatable, Decodable {
         case let .string(value):
             rendered = value
         case let .number(value):
-            // Render whole numbers without a decimal, but only when they fit in `Int`:
-            // `Int(value)` traps on a value past `Int` range, so fall back to the Double
-            // string for integral-but-out-of-range payloads.
-            if value == value.rounded(),
-               value >= Double(Int.min), value < Double(Int.max) {
-                rendered = String(Int(value))
-            } else {
-                rendered = String(value)
-            }
+            rendered = Self.formatNumber(value)
         case let .bool(value):
             rendered = value ? "true" : "false"
         case .null:
             rendered = ""
         case .array, .object:
-            rendered = prettyJSON() ?? ""
+            rendered = prettyJSON(byteCap: limit * 8) ?? ""
         }
         return rendered.count > limit ? String(rendered.prefix(limit)) + "…" : rendered
     }
 
-    private func prettyJSON() -> String? {
-        guard let data = try? JSONEncoder().encode(self),
-              let object = try? JSONSerialization.jsonObject(with: data),
+    /// Stringify a numeric value without trapping. `Int(Double)` traps for any value
+    /// outside `Int` range (a byte count, epoch-nanos, or number-shaped hash past
+    /// `Int.max` ≈ 9.2e18) and for non-finite input, so the integral fast-path is
+    /// range-guarded; everything else formats through `String`/`%.0f`.
+    private static func formatNumber(_ value: Double) -> String {
+        guard value.isFinite, value == value.rounded() else { return String(value) }
+        guard value.magnitude < 9e18 else { return String(format: "%.0f", value) }
+        return String(Int(value))
+    }
+
+    /// Pretty-print, but cap the work: a multi-MB tool result would otherwise be
+    /// materialized twice per paint (the encode round-trip plus the pretty-print)
+    /// only for `compactText` to discard all but a bounded prefix. Past `byteCap`
+    /// the compact encoding is truncated instead of pretty-printed.
+    private func prettyJSON(byteCap: Int) -> String? {
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        if data.count > byteCap {
+            return String(decoding: data.prefix(byteCap), as: UTF8.self)
+        }
+        guard let object = try? JSONSerialization.jsonObject(with: data),
               let pretty = try? JSONSerialization.data(
                   withJSONObject: object,
                   options: [.prettyPrinted, .sortedKeys]

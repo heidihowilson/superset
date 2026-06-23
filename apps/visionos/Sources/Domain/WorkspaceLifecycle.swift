@@ -11,7 +11,7 @@ protocol WorkspaceLifecycleProviding: Sendable {
     /// Cloud-only rename — provisions nothing on the Host, so it succeeds Host-offline.
     func rename(workspaceID: String, to name: String) async throws
     /// Provision a Workspace on `hostID`'s Host over the relay (Host-gated, never queued).
-    func create(projectID: String, name: String, hostID: String) async throws
+    func create(projectID: String, name: String, branch: String, hostID: String) async throws
     /// Tear down a Workspace on `hostID`'s Host over the relay (Host-gated, never queued).
     func delete(workspaceID: String, hostID: String) async throws
 }
@@ -49,10 +49,10 @@ actor HostWorkspaceLifecycleClient: WorkspaceLifecycleProviding {
         try await api.renameWorkspace(id: workspaceID, name: name, organizationID: organizationID)
     }
 
-    func create(projectID: String, name: String, hostID: String) async throws {
+    func create(projectID: String, name: String, branch: String, hostID: String) async throws {
         let organizationID = try await resolveOrganizationID()
         try await hostClient(organizationID: organizationID, hostID: hostID)
-            .createWorkspace(projectID: projectID, name: name)
+            .createWorkspace(projectID: projectID, name: name, branch: branch)
     }
 
     func delete(workspaceID: String, hostID: String) async throws {
