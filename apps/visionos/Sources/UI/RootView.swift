@@ -102,7 +102,7 @@ struct RootView: View {
         Menu {
             if openWindows.openWindowCount > 0 {
                 Button("Consolidate Windows", systemImage: "rectangle.on.rectangle.slash") {
-                    WindowRouter.consolidate(except: nil, openWindows: openWindows, dismissWindow: dismissWindow)
+                    WindowRouter.consolidate(openWindows: openWindows, dismissWindow: dismissWindow)
                 }
             } else {
                 Text("No open windows")
