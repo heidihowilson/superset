@@ -56,6 +56,12 @@ while [ $(date +%s) -lt $deadline ]; do
     [ "$arv" != "$rev_issue" ] && { rev_issue=$arv; rev_since=$now; rev_redisp=0; }
     el=$(( now - rev_since ))
     if [ "$el" -gt 720 ]; then
+      # SECURITY issues never fallback-merge — they require a real adversarial review.
+      sec=$(gh issue view "$arv" --repo $REPO --json labels -q '[.labels[].name]|index("security")' 2>/dev/null)
+      if [ "$sec" != "null" ] && [ -n "$sec" ]; then
+        gh issue edit "$arv" --repo $REPO --add-label needs-human >/dev/null 2>&1
+        echo "RESULT: TRIAGE — security #$arv stalled review (no fallback-merge; needs human)"; break
+      fi
       p=$(gh pr list --repo $REPO --head "agent/issue-$arv" --state open --json number,mergeable -q '.[0]|"\(.number) \(.mergeable)"' 2>/dev/null); pn=${p%% *}; mg=${p##* }
       cr=$(gh pr view "$pn" --repo $REPO --json reviews -q '[.reviews[]|select(.author.login=="coderabbitai")]|length' 2>/dev/null)
       if [ -n "$pn" ] && [ "$mg" = "MERGEABLE" ] && [ "${cr:-0}" -gt 0 ]; then
