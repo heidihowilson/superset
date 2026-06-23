@@ -154,7 +154,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         try api.authorize(&request)
 
         let (data, response) = try await api.http.data(for: request)
-        try Self.ensureOK(response)
+        try ensureSuccessStatus(response)
         return data
     }
 
@@ -171,15 +171,6 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
         }
         return json
     }
-
-    private static func ensureOK(_ response: URLResponse) throws {
-        guard let http = response as? HTTPURLResponse else {
-            throw AuthError.badServerResponse(status: -1)
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AuthError.badServerResponse(status: http.statusCode)
-        }
-    }
 }
 
 /// The SuperJSON-wrapped tRPC envelope. A response carries EITHER `result.data.json`
@@ -187,15 +178,11 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
 /// auth/validation rejection the transport reports without a non-2xx status). Both keys are
 /// optional so an error-on-200 is recognized as a failure instead of mis-decoded as success.
 private struct TRPCEnvelope<Payload: Decodable>: Decodable {
-    struct ResultBox: Decodable {
-        struct DataBox: Decodable { let json: Payload }
-        let data: DataBox
-    }
     struct ErrorBox: Decodable {
         struct JSONBox: Decodable { let message: String? }
         let json: JSONBox?
     }
-    let result: ResultBox?
+    let result: SuperJSONResult<Payload>?
     let error: ErrorBox?
 }
 

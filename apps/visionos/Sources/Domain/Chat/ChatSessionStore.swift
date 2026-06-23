@@ -13,15 +13,6 @@ import Observation
 @MainActor
 @Observable
 final class ChatSessionStore {
-    /// Drives only the empty-state UI. A populated transcript is always shown — a poll
-    /// that is loading or has failed never blanks it.
-    enum LoadState: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
-
     private(set) var transcript: ChatTranscript = .empty
     private(set) var loadState: LoadState = .idle
 
@@ -113,17 +104,11 @@ final class ChatSessionStore {
     }
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status) where status == 403:
-            return "Watch needs a reachable Host on a paid plan."
-        case let AuthError.badServerResponse(status):
-            return "Host returned HTTP \(status)."
-        default:
-            return "Couldn't reach the Host. Retrying…"
-        }
+        AuthError.userFacingMessage(
+            for: error,
+            hostGated403: "Watch needs a reachable Host on a paid plan.",
+            serverStatus: { "Host returned HTTP \($0)." },
+            default: "Couldn't reach the Host. Retrying…"
+        )
     }
 }

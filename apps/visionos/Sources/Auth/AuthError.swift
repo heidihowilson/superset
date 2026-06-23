@@ -35,3 +35,29 @@ enum AuthError: Error, Equatable {
     /// A Keychain operation failed with the given `OSStatus`.
     case keychain(status: Int32)
 }
+
+extension AuthError {
+    /// Shared user-facing copy for the cloud/host failure cases the stores all map the same
+    /// way. `notAuthenticated` and `noActiveOrganization` resolve to fixed strings; a relay
+    /// 403 uses `hostGated403` when the call site is Host-gated (else it falls through to
+    /// `serverStatus`); any other non-2xx uses `serverStatus`; everything else (transport
+    /// failure, decode error) uses `fallback`. Each store passes only the copy that differs.
+    static func userFacingMessage(
+        for error: Error,
+        hostGated403: String? = nil,
+        serverStatus: (Int) -> String = { "Server returned HTTP \($0)." },
+        default fallback: String
+    ) -> String {
+        switch error {
+        case AuthError.notAuthenticated:
+            return "Not signed in."
+        case AuthError.noActiveOrganization:
+            return "No organization available."
+        case let AuthError.badServerResponse(status):
+            if status == 403, let hostGated403 { return hostGated403 }
+            return serverStatus(status)
+        default:
+            return fallback
+        }
+    }
+}

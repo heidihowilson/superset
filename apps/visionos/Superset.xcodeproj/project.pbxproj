@@ -76,6 +76,7 @@
 		BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */; };
 		BEA166713C42991BC1044B55 /* DictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */; };
 		C0207E8B8A5DD12672434F04 /* RootRailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72768452C20DF59EFB5A2111 /* RootRailView.swift */; };
+		C330E7C36FD0F5B360DDC593 /* LoadState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D12A1AE63700A219133875E /* LoadState.swift */; };
 		C43C7CEB16737D3D032249A2 /* SupersetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FA361A8D9F4D702BE13E846 /* SupersetUITests.swift */; };
 		C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF721B84B64BBFA6A277F655 /* SettingsView.swift */; };
 		C7F1C7C4A2991D2DDE633F6C /* LockGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A714C9E7340031FA6EF71C5A /* LockGate.swift */; };
@@ -86,6 +87,7 @@
 		E906389B2A6C2821BC8A2790 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B6DFB06B2453339BC98E39 /* UITestSupport.swift */; };
 		E9FF1F83E22847605B58B3B6 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */; };
 		EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */; };
+		F19C590D42FD0FB7E767B7AB /* SuperJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7130DDC0A184574C23EC8E82 /* SuperJSON.swift */; };
 		F3E655B98BF06D05AB324E38 /* ComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A354115CC73B8D78D623386 /* ComposerView.swift */; };
 		F68C9ACC7FCC7FB8A62D4C0B /* ChatTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06A752A00CBBF07D23FB817A /* ChatTranscript.swift */; };
 		F777437C5416A319F088E9C0 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */; };
@@ -136,6 +138,7 @@
 		360BA75FD53E0FEA0FCCE2F7 /* HostCallOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostCallOutcome.swift; sourceTree = "<group>"; };
 		36B6DFB06B2453339BC98E39 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
 		38AB15580946313EA26FC000 /* AuthGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGateView.swift; sourceTree = "<group>"; };
+		3D12A1AE63700A219133875E /* LoadState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadState.swift; sourceTree = "<group>"; };
 		3DDC57904E84BCB8C49B06BC /* AuthController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthController.swift; sourceTree = "<group>"; };
 		3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthConfiguration.swift; sourceTree = "<group>"; };
 		48383CE2E272082F5B861F2C /* LockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockView.swift; sourceTree = "<group>"; };
@@ -156,6 +159,7 @@
 		6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenTestDoubles.swift; sourceTree = "<group>"; };
 		701B2DA6403630C0415730ED /* SupersetTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupersetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7070DBB6BC8C26868EE3DB1E /* DeviceContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContext.swift; sourceTree = "<group>"; };
+		7130DDC0A184574C23EC8E82 /* SuperJSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperJSON.swift; sourceTree = "<group>"; };
 		72768452C20DF59EFB5A2111 /* RootRailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRailView.swift; sourceTree = "<group>"; };
 		7A32857A7A4CE341816F161F /* TelemetryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryValue.swift; sourceTree = "<group>"; };
 		7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEvent.swift; sourceTree = "<group>"; };
@@ -223,6 +227,7 @@
 			children = (
 				6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */,
 				B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */,
+				3D12A1AE63700A219133875E /* LoadState.swift */,
 				9D3C48D92A24056C34E69447 /* Project.swift */,
 				951C8B061117E946C12C674B /* Workspace.swift */,
 				130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */,
@@ -280,6 +285,7 @@
 				C36912B74D7D1879F31FFCB5 /* CloudWorkspaceClient.swift */,
 				9C4F66798274C0C2405DA556 /* HostServiceClient.swift */,
 				604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */,
+				7130DDC0A184574C23EC8E82 /* SuperJSON.swift */,
 			);
 			path = Cloud;
 			sourceTree = "<group>";
@@ -560,6 +566,7 @@
 				03572042072CD60937FE9971 /* HostSummary.swift in Sources */,
 				15CD9DC3E3A2A38948445F26 /* InlineToolResultView.swift in Sources */,
 				CA1A0EE668C67131AC87D08F /* JSONValue.swift in Sources */,
+				C330E7C36FD0F5B360DDC593 /* LoadState.swift in Sources */,
 				90F31E6C569BE9EF2B99AB38 /* LocalAuthenticating.swift in Sources */,
 				AD8953B11C3496035E2E7355 /* LockController.swift in Sources */,
 				C7F1C7C4A2991D2DDE633F6C /* LockGate.swift in Sources */,
@@ -583,6 +590,7 @@
 				46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */,
 				C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
+				F19C590D42FD0FB7E767B7AB /* SuperJSON.swift in Sources */,
 				8D53CDE375B2AF87C04BF4FC /* SupersetApp.swift in Sources */,
 				2708DC24F7DDD9F6C4BC9BF3 /* Telemetry.swift in Sources */,
 				CE25151ABA3BE952C39ADC89 /* TelemetryConfiguration.swift in Sources */,

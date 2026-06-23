@@ -11,13 +11,6 @@ import Observation
 @MainActor
 @Observable
 final class SettingsModel {
-    enum LoadState: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
-
     /// The "Verify host credential" probe: mints the relay JWT that host-service-over-relay
     /// calls present (PRD §13). The minted token is never stored or surfaced — only the
     /// success/failure outcome.
@@ -104,15 +97,6 @@ final class SettingsModel {
     }
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status):
-            return "Server returned HTTP \(status)."
-        default:
-            return "Something went wrong. Please try again."
-        }
+        AuthError.userFacingMessage(for: error, default: "Something went wrong. Please try again.")
     }
 }

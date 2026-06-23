@@ -145,17 +145,8 @@ struct HostServiceClient: Sendable {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await http.data(for: request)
-        try Self.ensureOK(response)
+        try ensureSuccessStatus(response)
         return data
-    }
-
-    private static func ensureOK(_ response: URLResponse) throws {
-        guard let http = response as? HTTPURLResponse else {
-            throw AuthError.badServerResponse(status: -1)
-        }
-        guard (200..<300).contains(http.statusCode) else {
-            throw AuthError.badServerResponse(status: http.statusCode)
-        }
     }
 }
 
@@ -163,9 +154,5 @@ struct HostServiceClient: Sendable {
 /// SuperJSON `meta` (Date revival, etc.) is intentionally ignored — the hand-typed
 /// watch models read the few fields they need from `json` directly.
 private struct RelayResult<Payload: Decodable>: Decodable {
-    struct ResultBox: Decodable {
-        struct DataBox: Decodable { let json: Payload }
-        let data: DataBox
-    }
-    let result: ResultBox
+    let result: SuperJSONResult<Payload>
 }
