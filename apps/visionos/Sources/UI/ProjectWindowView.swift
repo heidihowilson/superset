@@ -18,8 +18,6 @@ struct ProjectWindowView: View {
 
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var sceneActive = false
 
     private var project: Project? {
         guard let projectID else { return nil }
@@ -36,29 +34,13 @@ struct ProjectWindowView: View {
     var body: some View {
         content
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .scenePollingMembership(store: store)
             .onAppear {
-                store.beginPolling()
-                syncForeground(scenePhase)
                 if let projectID { openWindows.registerProject(projectID) }
             }
             .onDisappear {
-                syncForeground(.background)
-                store.endPolling()
                 if let projectID { openWindows.unregisterProject(projectID) }
             }
-            .onChange(of: scenePhase) { _, phase in
-                syncForeground(phase)
-            }
-    }
-
-    /// Report this scene's active-ness to the shared store, contributing exactly one to
-    /// its active-scene count and keeping register/unregister balanced across phase
-    /// changes and window close (so one inactive window can't pause polling for others).
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     @ViewBuilder

@@ -18,8 +18,6 @@ struct RootView: View {
     @Environment(SessionMetrics.self) private var metrics
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.scenePhase) private var scenePhase
-    @State private var sceneActive = false
     @State private var railSelection: RailDestination = .workspaces
     @State private var isCreating = false
     /// The org menu's cloud read model (session + memberships). Owned per-window like
@@ -59,19 +57,11 @@ struct RootView: View {
             WorkspaceCreateView(store: store)
         }
         .task { await settings.load() }
+        .scenePollingMembership(store: store)
         .onAppear {
-            store.beginPolling()
-            syncForeground(scenePhase)
             // M1: the Workspace browser is the first meaningful Workspace surface
             // (PRD §17). Once-only — guarded inside `SessionMetrics`.
             metrics.markFirstMeaningfulView()
-        }
-        .onDisappear {
-            syncForeground(.background)
-            store.endPolling()
-        }
-        .onChange(of: scenePhase) { _, phase in
-            syncForeground(phase)
         }
     }
 
@@ -83,16 +73,6 @@ struct RootView: View {
             await settings.switchOrganization(to: id)
             if settings.switchError == nil { await store.refresh() }
         }
-    }
-
-    /// Report this scene's active-ness to the shared store, contributing exactly one to
-    /// its active-scene count and keeping register/unregister balanced across phase
-    /// changes and window close (so one inactive window can't pause polling for others).
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
     }
 
     /// The content pane for the selected rail item. Workspaces renders the active

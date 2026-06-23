@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import os
 
 /// Presentation-agnostic source of truth for the Workspace browser — the one
 /// Host-independent surface (PRD §7.2). Renderer adapters observe it and emit
@@ -46,18 +47,22 @@ final class WorkspaceStore {
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
     private var pollingTask: Task<Void, Never>?
-    /// Number of visible windows holding the poll open. Multi-window scenes share this one
-    /// store (PRD §13), so polling is reference-counted: it runs while ≥1 window is visible
-    /// and stops only when the last closes — a Workspace window restored on its own keeps the
-    /// list fresh, so it resolves to content or a 404 rather than a hung spinner (PRD §16.2).
-    private var pollingWindowCount = 0
-    /// Number of scenes currently reporting `.active`. visionOS backgrounds the whole app,
-    /// but each scene phases independently, so foreground is "≥1 active scene" — a single
-    /// boolean would be last-writer-wins, letting one inactive window pause the shared poll
-    /// for windows that are still visible. Ref-counted so one scene going inactive can't
-    /// stop polling while another stays active.
-    private var activeSceneCount = 0
-    private var isForeground: Bool { activeSceneCount > 0 }
+    private let logger = Logger(subsystem: Logging.subsystem, category: "polling")
+    /// Tokens of the visible windows holding the poll open. Multi-window scenes share this
+    /// one store (PRD §13), so polling is reference-counted: it runs while ≥1 window is
+    /// visible and stops only when the last closes — a Workspace window restored on its own
+    /// keeps the list fresh, so it resolves to content or a 404 rather than a hung spinner
+    /// (PRD §16.2). Membership is keyed by a per-scene token rather than a bare counter so
+    /// a duplicated `beginPolling`/`endPolling` for the same scene can't over- or
+    /// under-count: re-adding a present token is a no-op, removing an absent one is logged.
+    private var pollingWindowTokens: Set<UUID> = []
+    /// Tokens of the scenes currently reporting `.active`. visionOS backgrounds the whole
+    /// app, but each scene phases independently, so foreground is "≥1 active scene" — a
+    /// single boolean would be last-writer-wins, letting one inactive window pause the
+    /// shared poll for windows that are still visible. Token-keyed (like the window set) so
+    /// repeated lifecycle callbacks for one scene stay balanced.
+    private var activeSceneTokens: Set<UUID> = []
+    private var isForeground: Bool { !activeSceneTokens.isEmpty }
     /// Monotonic token guarding against out-of-order applies: a `refresh` only commits
     /// its snapshot if the generation it captured is still current. Bumped on every
     /// refresh start and on `reset`, so a slow in-flight fetch can't clobber newer state
@@ -268,43 +273,50 @@ final class WorkspaceStore {
         cache?.clear()
     }
 
-    /// A newly-visible window joins the shared poll. Reference-counted so multiple windows
-    /// keep one loop alive; balanced by `endPolling` on disappear.
-    func beginPolling() {
-        pollingWindowCount += 1
+    /// A newly-visible window joins the shared poll, identified by its per-scene `token`.
+    /// Idempotent: a duplicate `beginPolling` for a window already counted is a no-op, so
+    /// the membership can't over-count. Balanced by `endPolling` on disappear.
+    func beginPolling(token: UUID) {
+        guard pollingWindowTokens.insert(token).inserted else { return }
         ensurePolling()
     }
 
     /// A window disappearing leaves the shared poll; the loop stops once the last window is
-    /// gone. Clamped at zero so an unbalanced extra call can't drive the count negative.
-    func endPolling() {
-        assert(pollingWindowCount > 0, "endPolling called without a matching beginPolling")
-        pollingWindowCount = max(0, pollingWindowCount - 1)
-        if pollingWindowCount == 0 { stopPolling() }
+    /// gone. Idempotent: releasing a `token` that isn't a member is logged and ignored
+    /// rather than driving a counter negative (the membership set is its own clamp).
+    func endPolling(token: UUID) {
+        guard pollingWindowTokens.remove(token) != nil else {
+            logger.error("endPolling called without a matching beginPolling for token \(token.uuidString, privacy: .public)")
+            return
+        }
+        if pollingWindowTokens.isEmpty { stopPolling() }
     }
 
-    /// A scene became foregrounded (`.active`). Ref-counted across scenes so the shared
-    /// poll resumes on the first active scene and is unaffected by later ones; balanced by
-    /// `sceneResignedActive` (ADR-0004).
-    func sceneBecameActive() {
-        activeSceneCount += 1
-        if activeSceneCount == 1 { ensurePolling() }
+    /// A scene became foregrounded (`.active`), identified by its per-scene `token`. The
+    /// shared poll resumes on the first active scene and is unaffected by later ones;
+    /// balanced by `sceneResignedActive` (ADR-0004). Idempotent on the token.
+    func sceneBecameActive(token: UUID) {
+        guard activeSceneTokens.insert(token).inserted else { return }
+        if activeSceneTokens.count == 1 { ensurePolling() }
     }
 
     /// A scene left the foreground (inactive/background) or closed while active. The loop
     /// pauses only once the *last* active scene resigns — an inactive window can't stop
-    /// polling for windows that are still visible. The window count is left untouched so a
-    /// later foreground can resume while windows are still open.
-    func sceneResignedActive() {
-        assert(activeSceneCount > 0, "sceneResignedActive called without a matching sceneBecameActive")
-        activeSceneCount = max(0, activeSceneCount - 1)
-        if activeSceneCount == 0 { stopPolling() }
+    /// polling for windows that are still visible. The window set is left untouched so a
+    /// later foreground can resume while windows are still open. Idempotent: an unmatched
+    /// resign is logged and ignored.
+    func sceneResignedActive(token: UUID) {
+        guard activeSceneTokens.remove(token) != nil else {
+            logger.error("sceneResignedActive called without a matching sceneBecameActive for token \(token.uuidString, privacy: .public)")
+            return
+        }
+        if activeSceneTokens.isEmpty { stopPolling() }
     }
 
     /// Start the shared loop when a window is visible and the app is foregrounded. Idempotent —
     /// a second call while a loop is running is a no-op.
     private func ensurePolling() {
-        guard provider != nil, pollingTask == nil, pollingWindowCount > 0, isForeground else { return }
+        guard provider != nil, pollingTask == nil, !pollingWindowTokens.isEmpty, isForeground else { return }
         let interval = pollInterval
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
