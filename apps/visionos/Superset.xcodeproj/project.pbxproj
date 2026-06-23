@@ -25,6 +25,7 @@
 		2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */; };
 		253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */; };
 		265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */; };
+		26CBB384F966D74A83B921F1 /* ChatTranscriptIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */; };
 		26D182223694CF2CD5296B36 /* WorkspaceRenameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */; };
 		2708DC24F7DDD9F6C4BC9BF3 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48499C408B1F829A6FBF864B /* Telemetry.swift */; };
 		28F345036BA3A958F0734DBA /* ChatSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */; };
@@ -189,6 +190,7 @@
 		A74BC6EDC2AAC583751A65F5 /* TelemetryConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryConfiguration.swift; sourceTree = "<group>"; };
 		A7EC74FA3E1D90B3BD0C7CAD /* Superset.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Superset.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceListView.swift; sourceTree = "<group>"; };
+		AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscriptIdentityTests.swift; sourceTree = "<group>"; };
 		B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAdapter.swift; sourceTree = "<group>"; };
 		B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStatus.swift; sourceTree = "<group>"; };
 		B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostSummary.swift; sourceTree = "<group>"; };
@@ -277,6 +279,7 @@
 		4F2837046E487098645555F9 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */,
 				2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */,
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
 				7C5D057607CD34AEEA55B811 /* PollBackoffTests.swift */,
@@ -645,6 +648,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				26CBB384F966D74A83B921F1 /* ChatTranscriptIdentityTests.swift in Sources */,
 				2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */,
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
 				D351888F88396D38902271EC /* PollBackoffTests.swift in Sources */,
