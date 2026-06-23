@@ -96,12 +96,34 @@ struct TranscriptView: View {
                 }
                 .padding(24)
             }
-            .onChange(of: store.transcript.messages.last?.id) { _, _ in
+            .onChange(of: scrollSignal) { _, _ in
                 withAnimation(.easeOut(duration: 0.2)) {
                     proxy.scrollTo(Self.bottomAnchor, anchor: .bottom)
                 }
             }
         }
+    }
+
+    /// The transcript facts that should pull the view to the bottom: a new message, the
+    /// last message's id changing, a new part on it, or it growing in place while it
+    /// streams. Keying only on `last.id` missed in-place growth — streamed prose rendered
+    /// off-screen until a new id landed.
+    private var scrollSignal: TranscriptScrollSignal {
+        let messages = store.transcript.messages
+        let last = messages.last
+        return TranscriptScrollSignal(
+            count: messages.count,
+            lastID: last?.id,
+            lastPartCount: last?.content.count ?? 0,
+            lastContentLength: last?.contentLength ?? 0
+        )
+    }
+
+    private struct TranscriptScrollSignal: Equatable {
+        let count: Int
+        let lastID: String?
+        let lastPartCount: Int
+        let lastContentLength: Int
     }
 
     private static let bottomAnchor = "transcript-bottom"

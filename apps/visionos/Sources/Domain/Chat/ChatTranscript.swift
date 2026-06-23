@@ -15,6 +15,28 @@ struct ChatTranscript: Sendable, Equatable, Codable {
     static let empty = ChatTranscript(displayState: .idle, messages: [])
 
     var isEmpty: Bool { messages.isEmpty }
+
+    private enum CodingKeys: String, CodingKey {
+        case displayState
+        case messages
+    }
+
+    init(displayState: ChatDisplayState, messages: [ChatMessage]) {
+        self.displayState = displayState
+        self.messages = messages
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        displayState = ((try? container.decodeIfPresent(ChatDisplayState.self, forKey: .displayState)) ?? nil) ?? .idle
+        let decoded = ((try? container.decodeIfPresent([ChatMessage].self, forKey: .messages)) ?? nil) ?? []
+        // Fold transcript position into the ids the decoder synthesized for id-less
+        // messages, so structurally identical ones stay distinct. Host-id'd messages are
+        // untouched.
+        messages = decoded.enumerated().map { index, message in
+            message.disambiguatedFallbackID(at: index)
+        }
+    }
 }
 
 /// The watch-relevant slice of the host-service `ChatDisplayState`. Hand-typed to the
@@ -95,6 +117,11 @@ struct ChatMessage: Sendable, Equatable, Codable, Identifiable {
     let id: String
     var role: ChatRole
     var content: [ChatMessagePart]
+    /// False when `id` was derived from content because the host sent none. The transcript
+    /// folds in list position for these (and only these) so two structurally identical
+    /// id-less messages keep distinct SwiftUI identities — see `disambiguatedFallbackID`.
+    /// Not part of message identity, so it is excluded from `Equatable`.
+    let hasHostID: Bool
 
     private enum CodingKeys: String, CodingKey {
         case id
@@ -103,22 +130,70 @@ struct ChatMessage: Sendable, Equatable, Codable, Identifiable {
     }
 
     init(id: String, role: ChatRole, content: [ChatMessagePart]) {
+        self.init(id: id, role: role, content: content, hasHostID: true)
+    }
+
+    private init(id: String, role: ChatRole, content: [ChatMessagePart], hasHostID: Bool) {
         self.id = id
         self.role = role
         self.content = content
+        self.hasHostID = hasHostID
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        // The Host keys message ids off the memory store; tolerate an absent id by
-        // synthesizing a stable-enough fallback so SwiftUI identity still holds.
-        if let decoded = (try? container.decodeIfPresent(String.self, forKey: .id)) ?? nil {
-            id = decoded
-        } else {
-            id = UUID().uuidString
-        }
         role = (try? container.decode(ChatRole.self, forKey: .role)) ?? .other
         content = ((try? container.decodeIfPresent([ChatMessagePart].self, forKey: .content)) ?? nil) ?? []
+        // The Host keys message ids off the memory store; tolerate an absent id by
+        // deriving a deterministic id from the content so SwiftUI identity holds steady
+        // across the 2s poll. A fresh `UUID()` per decode changed the row's identity every
+        // tick — teardown/rebuild, lost scroll, flicker.
+        if let decoded = ((try? container.decodeIfPresent(String.self, forKey: .id)) ?? nil),
+           !decoded.isEmpty {
+            id = decoded
+            hasHostID = true
+        } else {
+            id = Self.derivedID(role: role, content: content)
+            hasHostID = false
+        }
+    }
+
+    /// Total prose length across the message's parts — grows as a streaming message
+    /// extends in place (same id), so the transcript can auto-scroll on growth, not just
+    /// when a new id lands.
+    var contentLength: Int { content.reduce(0) { $0 + $1.textLength } }
+
+    /// For a message whose id was derived from content (the host sent none), fold its
+    /// transcript position into the id so two structurally identical id-less messages keep
+    /// distinct identities. Host-id'd messages are returned unchanged.
+    func disambiguatedFallbackID(at index: Int) -> ChatMessage {
+        guard !hasHostID else { return self }
+        return ChatMessage(id: "\(id)-\(index)", role: role, content: content, hasHostID: false)
+    }
+
+    static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
+        lhs.id == rhs.id && lhs.role == rhs.role && lhs.content == rhs.content
+    }
+
+    /// Deterministic id for an id-less message: a stable hash of role + ordered content.
+    /// Stable across re-decodes (same content → same id), unlike `UUID()`.
+    private static func derivedID(role: ChatRole, content: [ChatMessagePart]) -> String {
+        var canonical = role.rawValue
+        for part in content {
+            canonical += "\u{1f}\(part.identitySignature)"
+        }
+        return "synthetic-\(stableHash(canonical))"
+    }
+
+    /// FNV-1a (64-bit), deterministic across process launches — unlike `Hasher`, whose
+    /// per-launch seed would change a re-decoded message's id and reintroduce the flicker.
+    private static func stableHash(_ string: String) -> String {
+        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
+        for byte in string.utf8 {
+            hash ^= UInt64(byte)
+            hash = hash &* 0x0000_0100_0000_01b3
+        }
+        return String(hash, radix: 16)
     }
 }
 
@@ -216,6 +291,27 @@ enum ChatMessagePart: Sendable, Equatable, Codable {
             try container.encodeIfPresent(mediaType, forKey: .mediaType)
         case let .other(type):
             try container.encode(type, forKey: .type)
+        }
+    }
+
+    /// Character count of prose this part carries (text or reasoning); tool/attachment/
+    /// other parts contribute 0. Summed per message to detect in-place streaming growth.
+    var textLength: Int {
+        switch self {
+        case let .text(value), let .reasoning(value): value.count
+        case .tool, .attachment, .other: 0
+        }
+    }
+
+    /// A stable per-part string used to derive an id-less message's identity. Captures the
+    /// part's kind and salient content so a re-decode of the same message yields the same id.
+    var identitySignature: String {
+        switch self {
+        case let .text(value): "t:\(value)"
+        case let .reasoning(value): "r:\(value)"
+        case let .tool(part): "tool:\(part.name):\(part.isResult)"
+        case let .attachment(name, mediaType): "att:\(name ?? ""):\(mediaType ?? "")"
+        case let .other(type): "other:\(type)"
         }
     }
 }
