@@ -31,6 +31,7 @@
 		2CFDE66105DA99A2CFD51D27 /* TranscriptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D3EF11E67F134FB9961295 /* TranscriptView.swift */; };
 		314387A8B8FB6C1F6CB1352B /* WorkspaceListSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2273016C45A53B43C22679 /* WorkspaceListSnapshot.swift */; };
 		318AE87A0DB1984EC684CBA5 /* ChatSending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6082965EE16AC8180EE852AB /* ChatSending.swift */; };
+		36D6664EBE8F4504F6E1E2CD /* WorkspaceCreateSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601C4AF0F9ECFC92D83AA9F1 /* WorkspaceCreateSelectionTests.swift */; };
 		4677A02239BCFDAB2528C883 /* MessageRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74435601BA60CDC6A6783E5 /* MessageRowView.swift */; };
 		46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2978A7F458C82111FBB5B731 /* SettingsModel.swift */; };
 		48D6739261B886DC0ADEB607 /* OpenWindowsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6E033B8837C310A1ACC8BF8 /* OpenWindowsModel.swift */; };
@@ -145,6 +146,7 @@
 		5A8A7A18E62DCF32AB8E573D /* WorkspaceStatus+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WorkspaceStatus+Presentation.swift"; sourceTree = "<group>"; };
 		5C0E3C21E889FF2852E2BCF6 /* TranscriptContentWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptContentWebView.swift; sourceTree = "<group>"; };
 		5EED7FB9FF22843A554207FA /* AuthAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAPIClient.swift; sourceTree = "<group>"; };
+		601C4AF0F9ECFC92D83AA9F1 /* WorkspaceCreateSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceCreateSelectionTests.swift; sourceTree = "<group>"; };
 		604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenProvider.swift; sourceTree = "<group>"; };
 		6082965EE16AC8180EE852AB /* ChatSending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSending.swift; sourceTree = "<group>"; };
 		64FD4BDCD99524147416F507 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
 				197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */,
 				C69E5837111CD3CA0EF38BEB /* WindowRosterAndPollMembershipTests.swift */,
+				601C4AF0F9ECFC92D83AA9F1 /* WorkspaceCreateSelectionTests.swift */,
 				B2955D84D9651633A564D752 /* Support */,
 			);
 			path = Tests;
@@ -626,6 +629,7 @@
 				265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */,
 				8DD58AC0F4341C00664EB56A /* WebAuthenticationContinuationTests.swift in Sources */,
 				94510D35F675F5FE8ABB2D2E /* WindowRosterAndPollMembershipTests.swift in Sources */,
+				36D6664EBE8F4504F6E1E2CD /* WorkspaceCreateSelectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
