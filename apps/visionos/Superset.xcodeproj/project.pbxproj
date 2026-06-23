@@ -53,6 +53,7 @@
 		8C3E9B4FC201957E4E2B93D6 /* Workspace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 951C8B061117E946C12C674B /* Workspace.swift */; };
 		8D2AD532F7C04553E750A2BA /* WorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */; };
 		8D53CDE375B2AF87C04BF4FC /* SupersetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A34473633D6974E4EDDF25D7 /* SupersetApp.swift */; };
+		8DD58AC0F4341C00664EB56A /* WebAuthenticationContinuationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */; };
 		8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */; };
 		90E0E987240F2B2FAAC6DCA6 /* TranscriptContentWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0E3C21E889FF2852E2BCF6 /* TranscriptContentWebView.swift */; };
 		90EA0BA2EB3790BD092511AE /* WebAuthenticating.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D2F3DAE171CCC12EC7866B /* WebAuthenticating.swift */; };
@@ -117,6 +118,7 @@
 		130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceLifecycle.swift; sourceTree = "<group>"; };
 		16D3DBDE2668834DDADB7C18 /* DeepLinkRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkRoute.swift; sourceTree = "<group>"; };
 		194E32D705561C5BE2FAC96F /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
+		197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebAuthenticationContinuationTests.swift; sourceTree = "<group>"; };
 		1C51BD34DAB68F9E5DA00CC3 /* DictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationController.swift; sourceTree = "<group>"; };
 		1C605ADEC56AC4700CDA637C /* TelemetryTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryTransport.swift; sourceTree = "<group>"; };
 		1F0955CFCBD44D5379F9687F /* AuthToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthToken.swift; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 			children = (
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
 				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
+				197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */,
 				B2955D84D9651633A564D752 /* Support */,
 			);
 			path = Tests;
@@ -614,6 +617,7 @@
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
 				6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */,
 				265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */,
+				8DD58AC0F4341C00664EB56A /* WebAuthenticationContinuationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

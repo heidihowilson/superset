@@ -223,6 +223,14 @@ final class AuthController: RelayCredentialGate {
         setPendingState(nil)
     }
 
+    /// Cancel an in-flight handoff (the `SignInView` Cancel affordance). Tears down the
+    /// browser session, which resumes its continuation as `userCanceled`, returning `status`
+    /// to a retryable idle state via `signIn`'s cancellation branch. A no-op otherwise.
+    func cancelSignIn() {
+        guard status == .authenticating else { return }
+        webAuth.cancel()
+    }
+
     /// Resolve a `superset://auth/callback` deep link that arrived outside the
     /// browser session (a cold-start pending link, PRD §11). Recovers the nonce from
     /// durable storage when the in-memory copy was lost to a process restart. Ignored
@@ -274,6 +282,8 @@ final class AuthController: RelayCredentialGate {
             return "Sign-in could not be verified. Please try again."
         case AuthError.missingToken, AuthError.malformedCallback:
             return "The sign-in response was invalid. Please try again."
+        case AuthError.cannotPresentBrowser:
+            return "Could not open the sign-in browser. Please try again."
         case AuthError.keychain:
             return "Could not securely store your session. Please try again."
         default:

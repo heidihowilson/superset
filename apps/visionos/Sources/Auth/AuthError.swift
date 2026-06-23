@@ -6,6 +6,10 @@ import Foundation
 enum AuthError: Error, Equatable {
     /// The browser flow was dismissed by the user before completing.
     case userCanceled
+    /// The system browser could not be presented — no key window to anchor against, or
+    /// `ASWebAuthenticationSession.start()` returned `false`. Surfaced so the attempt fails
+    /// loudly instead of leaking the continuation into a forever-spinner.
+    case cannotPresentBrowser
     /// The deep link was not a well-formed `superset://auth/callback?token=…`.
     case malformedCallback
     /// The callback's `state` did not match the nonce we generated — possible CSRF.
