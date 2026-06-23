@@ -65,7 +65,9 @@ while [ $(date +%s) -lt $deadline ]; do
         echo "RESULT: TRIAGE — security #$arv stalled review (no fallback-merge; needs human)"; break
       fi
       p=$(gh pr list --repo $REPO --head "agent/issue-$arv" --state open --json number,mergeable -q '.[0]|"\(.number) \(.mergeable)"' 2>/dev/null); pn=${p%% *}; mg=${p##* }
-      cr=$(gh pr view "$pn" --repo $REPO --json reviews -q '[.reviews[]|select(.author.login=="coderabbitai")]|length' 2>/dev/null)
+      # Gate on the CodeRabbit CHECK passing (reliable + earlier than a review entry, which
+      # CodeRabbit posts late/inconsistently — that timing was causing spurious REVIEW-STALLs).
+      cr=$(gh pr checks "$pn" --repo $REPO 2>/dev/null | grep -i coderabbit | grep -ci pass)
       if [ -n "$pn" ] && [ "$mg" = "MERGEABLE" ] && [ "${cr:-0}" -gt 0 ]; then
         gh pr merge "$pn" --repo $REPO --squash --delete-branch >/dev/null 2>&1 && log "FALLBACK-MERGED #$arv (PR #$pn; reviewer slow, CodeRabbit+CI gate)"
       elif [ "$el" -gt 1080 ]; then echo "RESULT: REVIEW-STALL on #$arv"; break; fi
