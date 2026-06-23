@@ -47,24 +47,16 @@ enum WindowRouter {
         openWindow(id: ProjectScene.windowID, value: id)
     }
 
-    /// Close every open content window except `keep`. Backs the explicit consolidate
-    /// action (`keep == nil` closes all).
+    /// Close every open content window. Backs the explicit consolidate action (§9).
     static func consolidate(
-        except keep: WindowKey?,
         openWindows: OpenWindowsModel,
         dismissWindow: DismissWindowAction
     ) {
-        for id in openWindows.openWorkspaceIDs where keep != .workspace(id) {
+        for id in openWindows.openWorkspaceIDs {
             dismissWindow(id: WorkspaceScene.windowID, value: id)
         }
-        for id in openWindows.openProjectIDs where keep != .project(id) {
+        for id in openWindows.openProjectIDs {
             dismissWindow(id: ProjectScene.windowID, value: id)
         }
     }
-}
-
-/// Identifies an open content window for consolidation (which kind + which domain id).
-enum WindowKey: Equatable {
-    case workspace(Workspace.ID)
-    case project(Project.ID)
 }
