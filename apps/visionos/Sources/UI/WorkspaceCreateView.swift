@@ -86,16 +86,39 @@ struct WorkspaceCreateView: View {
                     }
                 }
             }
-            .onAppear {
-                if projectID == nil { projectID = store.projects.first?.id }
-                if hostID == nil { hostID = store.onlineHosts.first?.id }
-            }
+            .onAppear { reseedSelection() }
+            .onChange(of: store.projects) { _, _ in reseedSelection() }
+            .onChange(of: store.onlineHosts) { _, _ in reseedSelection() }
         }
         .frame(minWidth: 420, minHeight: 480)
     }
 
+    /// (Re)seed the Project/Host pickers to a still-valid default. In this host-awake app the
+    /// sheet often opens before the first poll lands (both lists empty → nothing selected →
+    /// Create greyed with no obvious reason); a later poll can also delete the selected Project
+    /// or drop the Host from `onlineHosts`, leaving the selection dangling. Run from `onAppear`
+    /// and on every list change so the selection follows the data (issue #68).
+    private func reseedSelection() {
+        projectID = Self.resolveSelection(current: projectID, available: store.projects.map(\.id))
+        hostID = Self.resolveSelection(current: hostID, available: store.onlineHosts.map(\.id))
+    }
+
+    /// Keep `current` when it's still present in `available`, else fall back to the first
+    /// available id (nil when the list is empty). Pure so the seeding rule is unit-testable.
+    static func resolveSelection(current: String?, available: [String]) -> String? {
+        if let current, available.contains(current) { return current }
+        return available.first
+    }
+
     private func submit() {
-        guard let projectID, let hostID else { return }
+        guard let projectID, store.projects.contains(where: { $0.id == projectID }),
+              let hostID, store.canCreate(onHostID: hostID)
+        else {
+            // The selection went stale between render and tap (a poll deleted the Project or
+            // dropped the Host). Re-seed to a valid default instead of dialing a dead id.
+            reseedSelection()
+            return
+        }
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedBranch = branch.trimmingCharacters(in: .whitespacesAndNewlines)
         let resolvedBranch = trimmedBranch.isEmpty ? Self.branchSlug(from: trimmedName) : trimmedBranch
