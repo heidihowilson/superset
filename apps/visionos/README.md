@@ -62,10 +62,12 @@ The M0 deliverable is the **presentation-agnostic core + renderer seam**:
   `WorkspaceStatus`. The single source of truth.
 - `Sources/Renderer` — `PaneKind`, the `WorkspaceAdapter` protocol, and
   `AdapterRegistry`. An adapter renders the store for a pane kind; the registry
-  swaps the active adapter at runtime.
-- `Sources/UI` — the SwiftUI views, including the production list and the throwaway
+  resolves the active adapter at runtime.
+- `Sources/UI` — the SwiftUI views, including the production list and the
   `DebugDumpView`.
 
-Two adapters drive the **same unmodified store**: `NativeWorkspaceAdapter` (the V1
-2D list) and `DebugListAdapter` (a throwaway text dump). The bottom ornament flips
-between them at runtime with zero domain change — this proves the seam (PRD §17, M0).
+The seam drives the **same unmodified store** through `AdapterRegistry` rather than
+rendering it directly: `NativeWorkspaceAdapter` renders the list pane today, and a
+future spatial renderer (V2) is an adapter swap with zero domain change — that's
+what the seam proves (PRD §17, M0). The Debug surface (`DebugDumpView`) is its own
+window rendering the same store directly, for raw-state inspection.
