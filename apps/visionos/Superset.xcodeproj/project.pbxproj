@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		03572042072CD60937FE9971 /* HostSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */; };
+		03CDCB5D9C0BD6BB8CDC4300 /* PollBackoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6948512DB31CFF05DB669960 /* PollBackoff.swift */; };
 		03DFBA6E8565D8DA5752F27A /* AdapterRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = C535EAF837D94137217D69C1 /* AdapterRegistry.swift */; };
 		04C0E1E65158014FCA476D8E /* RelayTokenProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604ABE83D09304DF36E0C629 /* RelayTokenProvider.swift */; };
 		08ACC86E0A4FC0C48F71A05B /* UITestContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */; };
@@ -47,6 +48,7 @@
 		723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DB07131AB224ABB387A03E /* SignInView.swift */; };
 		764B824AD74E5E6BAFCFE5F1 /* PostHogTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A52EA499D48D24C71C06E1B /* PostHogTransport.swift */; };
 		774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */; };
+		7CBA75A7F5079A9677BDA7B9 /* TelemetryBoundsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98F88DDFFA6BF36095CF7FE /* TelemetryBoundsTests.swift */; };
 		7DF5684B45A4332F4AE85E49 /* WorkspaceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */; };
 		804DA999D250E633859F9B71 /* AuthHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */; };
 		8235B7201A86FBFA09F8DABB /* Project.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3C48D92A24056C34E69447 /* Project.swift */; };
@@ -85,6 +87,7 @@
 		CCC7846256E8342DEC897A07 /* ScenePollingMembership.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0AC80B796B7F2CEEED7BA6 /* ScenePollingMembership.swift */; };
 		CDFEEEDF0A6F3BFB3D6363C9 /* WorkspaceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D6AD53749C403E3FD124AE /* WorkspaceRowView.swift */; };
 		CE25151ABA3BE952C39ADC89 /* TelemetryConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74BC6EDC2AAC583751A65F5 /* TelemetryConfiguration.swift */; };
+		D351888F88396D38902271EC /* PollBackoffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C5D057607CD34AEEA55B811 /* PollBackoffTests.swift */; };
 		E906389B2A6C2821BC8A2790 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B6DFB06B2453339BC98E39 /* UITestSupport.swift */; };
 		E9FF1F83E22847605B58B3B6 /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AD9E9A3D6E963D12413832 /* OnboardingStore.swift */; };
 		EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */; };
@@ -157,6 +160,7 @@
 		6082965EE16AC8180EE852AB /* ChatSending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSending.swift; sourceTree = "<group>"; };
 		64FD4BDCD99524147416F507 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
 		66E12DC999DAD3D512CB63A0 /* PaneKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneKind.swift; sourceTree = "<group>"; };
+		6948512DB31CFF05DB669960 /* PollBackoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollBackoff.swift; sourceTree = "<group>"; };
 		6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWorkspaceListCache.swift; sourceTree = "<group>"; };
 		6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenTestDoubles.swift; sourceTree = "<group>"; };
 		701B2DA6403630C0415730ED /* SupersetTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupersetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,6 +170,7 @@
 		7A32857A7A4CE341816F161F /* TelemetryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryValue.swift; sourceTree = "<group>"; };
 		7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEvent.swift; sourceTree = "<group>"; };
 		7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
+		7C5D057607CD34AEEA55B811 /* PollBackoffTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollBackoffTests.swift; sourceTree = "<group>"; };
 		7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentPreset.swift; sourceTree = "<group>"; };
 		84E52950F51D244AFDD15CE1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8B0AC80B796B7F2CEEED7BA6 /* ScenePollingMembership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePollingMembership.swift; sourceTree = "<group>"; };
@@ -199,6 +204,7 @@
 		E09F26E5C4DD588C2E00894D /* PendingStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingStateStore.swift; sourceTree = "<group>"; };
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIDStore.swift; sourceTree = "<group>"; };
+		E98F88DDFFA6BF36095CF7FE /* TelemetryBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryBoundsTests.swift; sourceTree = "<group>"; };
 		EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValueRenderTests.swift; sourceTree = "<group>"; };
 		EF721B84B64BBFA6A277F655 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		F0F959F6CC86D853AE500BE5 /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
@@ -230,6 +236,7 @@
 				6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */,
 				B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */,
 				3D12A1AE63700A219133875E /* LoadState.swift */,
+				6948512DB31CFF05DB669960 /* PollBackoff.swift */,
 				9D3C48D92A24056C34E69447 /* Project.swift */,
 				951C8B061117E946C12C674B /* Workspace.swift */,
 				130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */,
@@ -272,7 +279,9 @@
 			children = (
 				2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */,
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
+				7C5D057607CD34AEEA55B811 /* PollBackoffTests.swift */,
 				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
+				E98F88DDFFA6BF36095CF7FE /* TelemetryBoundsTests.swift */,
 				197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */,
 				C69E5837111CD3CA0EF38BEB /* WindowRosterAndPollMembershipTests.swift */,
 				601C4AF0F9ECFC92D83AA9F1 /* WorkspaceCreateSelectionTests.swift */,
@@ -581,6 +590,7 @@
 				48D6739261B886DC0ADEB607 /* OpenWindowsModel.swift in Sources */,
 				9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */,
 				8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */,
+				03CDCB5D9C0BD6BB8CDC4300 /* PollBackoff.swift in Sources */,
 				764B824AD74E5E6BAFCFE5F1 /* PostHogTransport.swift in Sources */,
 				8235B7201A86FBFA09F8DABB /* Project.swift in Sources */,
 				BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */,
@@ -637,8 +647,10 @@
 			files = (
 				2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */,
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
+				D351888F88396D38902271EC /* PollBackoffTests.swift in Sources */,
 				6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */,
 				265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */,
+				7CBA75A7F5079A9677BDA7B9 /* TelemetryBoundsTests.swift in Sources */,
 				8DD58AC0F4341C00664EB56A /* WebAuthenticationContinuationTests.swift in Sources */,
 				94510D35F675F5FE8ABB2D2E /* WindowRosterAndPollMembershipTests.swift in Sources */,
 				36D6664EBE8F4504F6E1E2CD /* WorkspaceCreateSelectionTests.swift in Sources */,

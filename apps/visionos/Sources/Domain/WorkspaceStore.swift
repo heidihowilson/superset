@@ -37,6 +37,9 @@ final class WorkspaceStore {
     private let lifecycle: WorkspaceLifecycleProviding?
     private let cache: WorkspaceListCaching?
     private let pollInterval: Duration
+    /// Ceiling the poll backoff climbs to while the list keeps failing (host asleep is the
+    /// common case). Healthy polls stay at `pollInterval`; see `PollBackoff`.
+    private let maxPollInterval: Duration
     private var pollingTask: Task<Void, Never>?
     private let logger = Logger(subsystem: Logging.subsystem, category: "polling")
     /// Tokens of the visible windows holding the poll open. Multi-window scenes share this
@@ -64,12 +67,14 @@ final class WorkspaceStore {
         provider: WorkspaceListProviding? = nil,
         lifecycle: WorkspaceLifecycleProviding? = nil,
         cache: WorkspaceListCaching? = nil,
-        pollInterval: Duration = .seconds(7)
+        pollInterval: Duration = .seconds(7),
+        maxPollInterval: Duration = .seconds(60)
     ) {
         self.provider = provider
         self.lifecycle = lifecycle
         self.cache = cache
         self.pollInterval = pollInterval
+        self.maxPollInterval = maxPollInterval
         let cached = cache?.load() ?? .empty
         self.projects = cached.projects
         self.workspaces = cached.workspaces
@@ -226,22 +231,29 @@ final class WorkspaceStore {
 
     /// Pull one fresh snapshot. Cache-first: a populated list stays on screen while the
     /// poll runs and even if it fails; `loadState` reflects errors for the empty case.
-    func refresh() async {
-        guard let provider else { return }
+    /// Returns whether the poll reached the provider, so the loop can back off on a run of
+    /// failures and recover at the fast interval on the next success. A cancelled or
+    /// superseded poll is not a failure (the loop is stopping or a newer poll owns the state).
+    @discardableResult
+    func refresh() async -> Bool {
+        guard let provider else { return true }
         refreshGeneration &+= 1
         let generation = refreshGeneration
         if workspaces.isEmpty { loadState = .loading }
         do {
             let snapshot = try await provider.fetchSnapshot()
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             apply(snapshot)
             cache?.save(snapshot)
             loadState = .loaded
+            return true
         } catch is CancellationError {
             // Polling was cancelled (hidden/backgrounded) — keep the last good data.
+            return true
         } catch {
-            guard generation == refreshGeneration else { return }
+            guard generation == refreshGeneration else { return true }
             loadState = workspaces.isEmpty ? .failed(Self.message(for: error)) : .loaded
+            return false
         }
     }
 
@@ -308,12 +320,13 @@ final class WorkspaceStore {
     /// a second call while a loop is running is a no-op.
     private func ensurePolling() {
         guard provider != nil, pollingTask == nil, !pollingWindowTokens.isEmpty, isForeground else { return }
-        let interval = pollInterval
+        var backoff = PollBackoff(base: pollInterval, maxInterval: maxPollInterval)
         pollingTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.refresh()
+                let succeeded = await self?.refresh() ?? false
                 if Task.isCancelled { break }
-                try? await Task.sleep(for: interval)
+                backoff.record(success: succeeded)
+                try? await Task.sleep(for: backoff.currentInterval)
             }
         }
     }
