@@ -53,9 +53,11 @@ while [ $(date +%s) -lt $deadline ]; do
     fi
   fi
   if [ -n "$arv" ]; then
-    [ "$arv" != "$rev_issue" ] && { rev_issue=$arv; rev_since=$now; rev_redisp=0; }
+    [ "$arv" != "$rev_issue" ] && { rev_issue=$arv; rev_since=$now; }
     el=$(( now - rev_since ))
-    if [ "$el" -gt 720 ]; then
+    # NO reviewer re-dispatch — the worker already dispatched it once at handoff; a 2nd
+    # session contends on the single reviewer workspace and slows BOTH (the "stall" cause).
+    if [ "$el" -gt 420 ]; then
       # SECURITY issues never fallback-merge — they require a real adversarial review.
       sec=$(gh issue view "$arv" --repo $REPO --json labels -q '[.labels[].name]|index("security")' 2>/dev/null)
       if [ "$sec" != "null" ] && [ -n "$sec" ]; then
@@ -65,12 +67,10 @@ while [ $(date +%s) -lt $deadline ]; do
       p=$(gh pr list --repo $REPO --head "agent/issue-$arv" --state open --json number,mergeable -q '.[0]|"\(.number) \(.mergeable)"' 2>/dev/null); pn=${p%% *}; mg=${p##* }
       cr=$(gh pr view "$pn" --repo $REPO --json reviews -q '[.reviews[]|select(.author.login=="coderabbitai")]|length' 2>/dev/null)
       if [ -n "$pn" ] && [ "$mg" = "MERGEABLE" ] && [ "${cr:-0}" -gt 0 ]; then
-        gh pr merge "$pn" --repo $REPO --squash --delete-branch >/dev/null 2>&1 && log "FALLBACK-MERGED #$arv (PR #$pn; reviewer stalled, CodeRabbit+CI gate)"
+        gh pr merge "$pn" --repo $REPO --squash --delete-branch >/dev/null 2>&1 && log "FALLBACK-MERGED #$arv (PR #$pn; reviewer slow, CodeRabbit+CI gate)"
       elif [ "$el" -gt 1080 ]; then echo "RESULT: REVIEW-STALL on #$arv"; break; fi
-    elif [ "$el" -gt 480 ] && [ "$rev_redisp" -eq 0 ]; then
-      superset organization switch $ORG >/dev/null 2>&1; superset automations run $REVIEWER >/dev/null 2>&1; rev_redisp=1; log "re-dispatched reviewer for #$arv (once)"
     fi
-  else rev_issue=""; rev_since=0; rev_redisp=0; fi
+  else rev_issue=""; rev_since=0; fi
   wc=$(superset workspaces list --json 2>/dev/null | q "print(sum(1 for w in json.load(sys.stdin) if (w.get('projectName') or '').find('Vision Pro')>=0))")
   [ -n "$wc" ] && [ "$wc" -gt "$maxws" ] && { maxws=$wc; log "vision-pro workspaces: $wc"; }
   [ -n "$wc" ] && [ "$wc" -gt 8 ] && { echo "RESULT: LEAK-GUARD — $wc workspaces (>8)"; break; }
