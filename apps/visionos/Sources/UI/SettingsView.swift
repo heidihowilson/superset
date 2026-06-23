@@ -22,10 +22,8 @@ struct SettingsView: View {
     @Environment(OnboardingStore.self) private var onboarding
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.scenePhase) private var scenePhase
 
     @State private var model: SettingsModel
-    @State private var sceneActive = false
     @State private var category: SettingsCategory? = .account
 
     init(auth: AuthController, store: WorkspaceStore) {
@@ -46,17 +44,7 @@ struct SettingsView: View {
         }
         .frame(minWidth: 720, minHeight: 600)
         .task { await model.load() }
-        .onAppear {
-            store.beginPolling()
-            syncForeground(scenePhase)
-        }
-        .onDisappear {
-            syncForeground(.background)
-            store.endPolling()
-        }
-        .onChange(of: scenePhase) { _, phase in
-            syncForeground(phase)
-        }
+        .scenePollingMembership(store: store)
     }
 
     /// The detail column for the selected category. Each pane is a `Form` reusing the same
@@ -318,15 +306,6 @@ struct SettingsView: View {
         }
     }
 
-    /// Report this scene's active-ness to the shared store so the host-online indicator
-    /// polls while Settings is visible — the same balanced register/unregister `RootView`
-    /// uses so one inactive window can't pause the shared poll for others.
-    private func syncForeground(_ phase: ScenePhase) {
-        let active = phase == .active
-        guard active != sceneActive else { return }
-        sceneActive = active
-        if active { store.sceneBecameActive() } else { store.sceneResignedActive() }
-    }
 }
 
 /// The Settings sidebar categories, mirroring the desktop's master/detail layout
