@@ -19,7 +19,6 @@
 		15CD9DC3E3A2A38948445F26 /* InlineToolResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1C321FA276AC80B909B18A /* InlineToolResultView.swift */; };
 		17AAEA8D7E8B45F77C91E382 /* WorkspaceLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */; };
 		1FA3CA7DD882280F06E2659F /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E32D705561C5BE2FAC96F /* ChatModel.swift */; };
-		21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */; };
 		2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */; };
 		23C3FECF03827D3E4B7072EF /* TelemetryEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */; };
 		2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */; };
@@ -160,7 +159,6 @@
 		72768452C20DF59EFB5A2111 /* RootRailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRailView.swift; sourceTree = "<group>"; };
 		7A32857A7A4CE341816F161F /* TelemetryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryValue.swift; sourceTree = "<group>"; };
 		7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryEvent.swift; sourceTree = "<group>"; };
-		7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPaneView.swift; sourceTree = "<group>"; };
 		7B1A33BCCB729966E3BE20D4 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
 		7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentPreset.swift; sourceTree = "<group>"; };
 		84E52950F51D244AFDD15CE1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -388,7 +386,6 @@
 				A714C9E7340031FA6EF71C5A /* LockGate.swift */,
 				48383CE2E272082F5B861F2C /* LockView.swift */,
 				A6E033B8837C310A1ACC8BF8 /* OpenWindowsModel.swift */,
-				7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */,
 				CE6CCDB4EFC03649FB80847A /* ProjectWindowView.swift */,
 				72768452C20DF59EFB5A2111 /* RootRailView.swift */,
 				9F36DC5B2A7314017753C666 /* RootView.swift */,
@@ -574,7 +571,6 @@
 				48D6739261B886DC0ADEB607 /* OpenWindowsModel.swift in Sources */,
 				9743B1C58095655CFC9A7881 /* PaneKind.swift in Sources */,
 				8E18E653B5615FA8B6F89ED1 /* PendingStateStore.swift in Sources */,
-				21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */,
 				764B824AD74E5E6BAFCFE5F1 /* PostHogTransport.swift in Sources */,
 				8235B7201A86FBFA09F8DABB /* Project.swift in Sources */,
 				BE8DF51B347AACA7B1CEECD8 /* ProjectWindowView.swift in Sources */,
