@@ -13,15 +13,6 @@ import os
 @MainActor
 @Observable
 final class WorkspaceStore {
-    /// Drives only the empty-state UI. Cached/loaded rows are always shown — a poll
-    /// that is in flight or has failed never blanks an existing list.
-    enum LoadState: Equatable {
-        case idle
-        case loading
-        case loaded
-        case failed(String)
-    }
-
     private(set) var projects: [Project]
     private(set) var workspaces: [Workspace]
     /// The org's Hosts, the targets a create can be dialed at — surfaced from the same
@@ -358,34 +349,19 @@ final class WorkspaceStore {
     private static let embeddedKeyPrefix = "__embedded:"
 
     private static func message(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case let AuthError.badServerResponse(status):
-            return "Server returned HTTP \(status)."
-        default:
-            return "Couldn't load workspaces. Retrying…"
-        }
+        AuthError.userFacingMessage(for: error, default: "Couldn't load workspaces. Retrying…")
     }
 
     /// User-facing copy for a failed lifecycle op. A relay 403 means the Host is offline or
     /// the org's plan doesn't allow host access (`checkHostAccess`), the dominant failure for
     /// the Host-gated create/delete — surfaced plainly rather than as a raw status.
     private static func lifecycleMessage(for error: Error) -> String {
-        switch error {
-        case AuthError.notAuthenticated:
-            return "Not signed in."
-        case AuthError.noActiveOrganization:
-            return "No organization available."
-        case AuthError.badServerResponse(status: 403):
-            return "Host unavailable. The Host must be online and the organization on an active plan."
-        case let AuthError.badServerResponse(status):
-            return "The operation failed (HTTP \(status)). Please try again."
-        default:
-            return "The operation failed. Please try again."
-        }
+        AuthError.userFacingMessage(
+            for: error,
+            hostGated403: "Host unavailable. The Host must be online and the organization on an active plan.",
+            serverStatus: { "The operation failed (HTTP \($0)). Please try again." },
+            default: "The operation failed. Please try again."
+        )
     }
 }
 
