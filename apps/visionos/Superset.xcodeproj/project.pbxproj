@@ -20,6 +20,7 @@
 		17AAEA8D7E8B45F77C91E382 /* WorkspaceLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */; };
 		1FA3CA7DD882280F06E2659F /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E32D705561C5BE2FAC96F /* ChatModel.swift */; };
 		21D6110DFD881AE4455AA3D5 /* PlaceholderPaneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB6AF6E7DC086463573FA31 /* PlaceholderPaneView.swift */; };
+		2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */; };
 		23C3FECF03827D3E4B7072EF /* TelemetryEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */; };
 		2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */; };
 		253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */; };
@@ -131,6 +132,7 @@
 		2978A7F458C82111FBB5B731 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		29CE8CA664D6E1EB4998B113 /* AuthHandoff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHandoff.swift; sourceTree = "<group>"; };
 		2A354115CC73B8D78D623386 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
+		2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudWorkspaceClientDecodeTests.swift; sourceTree = "<group>"; };
 		31C300406588D9244173B6DA /* SessionMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMetrics.swift; sourceTree = "<group>"; };
 		360BA75FD53E0FEA0FCCE2F7 /* HostCallOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostCallOutcome.swift; sourceTree = "<group>"; };
 		36B6DFB06B2453339BC98E39 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
@@ -263,6 +265,7 @@
 		4F2837046E487098645555F9 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */,
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
 				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
 				197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */,
@@ -624,6 +627,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */,
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
 				6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */,
 				265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */,
