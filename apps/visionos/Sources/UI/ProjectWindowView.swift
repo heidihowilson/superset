@@ -85,21 +85,7 @@ struct ProjectWindowView: View {
                             openWindow: openWindow
                         )
                     } label: {
-                        HStack(spacing: 16) {
-                            Circle()
-                                .fill(workspace.status.tint)
-                                .frame(width: 14, height: 14)
-                                .accessibilityLabel(workspace.status.label)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(workspace.name).font(.headline)
-                                Text(workspace.status.label)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer(minLength: 0)
-                        }
-                        .frame(minHeight: 60)
-                        .contentShape(Rectangle())
+                        WorkspaceRowView(workspace: workspace)
                     }
                     .buttonBorderShape(.roundedRectangle)
                 }
