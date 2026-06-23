@@ -22,6 +22,11 @@ enum AuthError: Error, Equatable {
     case noActiveOrganization
     /// The server returned a non-2xx status or an undecodable body.
     case badServerResponse(status: Int)
+    /// A bearer-authed call proved the stored session token itself is dead — a relay-JWT
+    /// mint 401, or a host call that 401s even on a freshly minted JWT. Unlike a transient
+    /// `badServerResponse`, no retry recovers it: the only path back is re-running the
+    /// OAuth handoff, so it drives the app to signed-out (`AuthController.handleSessionExpired`).
+    case sessionExpired
     /// A Keychain operation failed with the given `OSStatus`.
     case keychain(status: Int32)
 }

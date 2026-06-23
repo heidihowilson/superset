@@ -1,5 +1,11 @@
 import Foundation
 
+/// Invoked when a bearer-authed call proves the stored session token itself is dead — a
+/// relay-JWT mint 401, or a host call that 401s even on a freshly minted JWT. Fired off
+/// the main actor from the transport; the handler hops to the main actor to drop the
+/// token and surface sign-in (`AuthController.handleSessionExpired`).
+typealias SessionExpiredHandler = @Sendable () -> Void
+
 /// Caches the short-lived relay/host JWT (`/api/auth/token`, RS256, ~1h TTL) so a
 /// poll loop doesn't re-mint on every tick. Mirrors the web's `auth-token.ts`: reuse
 /// until close to expiry, then re-mint.
@@ -27,9 +33,27 @@ final class RelayTokenProvider: @unchecked Sendable {
     /// than this so the gate's seal/release calls converge on the latest `LockState` intent
     /// even when they arrive out of call order.
     private var lockGeneration = 0
+    /// Fired when the session token is rejected (a mint 401, or — via
+    /// `notifySessionExpired()` — a host call that 401s on a freshly minted JWT). Set once
+    /// at wiring time; read under the lock since the poll loops mint off the main actor.
+    private var onSessionExpired: SessionExpiredHandler?
 
     init(api: AuthAPIClient) {
         self.api = api
+    }
+
+    /// Wire the forced-re-auth handler (`AuthController.handleSessionExpired`). Called once
+    /// when the controller builds the shared provider, before any poll loop starts.
+    func setSessionExpiredHandler(_ handler: @escaping SessionExpiredHandler) {
+        lock.withLock { onSessionExpired = handler }
+    }
+
+    /// Signal a definitive session-death 401 observed downstream (the host rejected a
+    /// freshly minted JWT), firing the handler exactly as a mint 401 does. Read under the
+    /// lock, then called outside it so a re-auth hop can't deadlock against the cache lock.
+    func notifySessionExpired() {
+        let handler = lock.withLock { onSessionExpired }
+        handler?()
     }
 
     func token() async throws -> String {
@@ -45,7 +69,15 @@ final class RelayTokenProvider: @unchecked Sendable {
             return reusable
         }
 
-        let minted = try await api.mintRelayJWT()
+        let minted: String
+        do {
+            minted = try await api.mintRelayJWT()
+        } catch AuthError.badServerResponse(status: 401) {
+            // The session token itself is revoked/expired — there is no refresh endpoint,
+            // so re-running the OAuth handoff is the only recovery (PRD §11).
+            notifySessionExpired()
+            throw AuthError.sessionExpired
+        }
 
         // A seal may have engaged during the mint: honor it and discard the fresh JWT
         // rather than caching or returning an RCE-grade token after the gate locked.

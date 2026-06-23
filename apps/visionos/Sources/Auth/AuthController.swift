@@ -60,6 +60,11 @@ final class AuthController: RelayCredentialGate {
         self.relayTokenProvider = RelayTokenProvider(
             api: AuthAPIClient(configuration: configuration, tokenProvider: { [tokenBox] in tokenBox.value })
         )
+        // A dead-session 401 from the shared relay/host path forces re-auth. The provider
+        // fires this off the main actor, so hop back on before mutating auth state.
+        relayTokenProvider.setSessionExpiredHandler { [weak self] in
+            Task { @MainActor in self?.handleSessionExpired() }
+        }
     }
 
     /// Keep the in-memory nonce and its durable copy in lockstep — assign through
@@ -255,6 +260,18 @@ final class AuthController: RelayCredentialGate {
         setToken(nil)
         setPendingState(nil)
         enterSignedOut()
+    }
+
+    /// Force the app back to signed-out when a bearer-authed call proves the stored session
+    /// token is dead (`AuthError.sessionExpired` — a relay-JWT mint 401, or a host call that
+    /// 401s even on a freshly minted JWT). There is no refresh endpoint, so re-running the
+    /// handoff is the only recovery: drop the token and surface the sign-in gate, making real
+    /// the claim at `AuthAPIClient.mintRelayJWT` that a 401 re-runs the handoff. Idempotent —
+    /// a no-op unless currently signed in, so the many poll loops that all hit the dead
+    /// session collapse to one transition and an in-flight re-auth is left undisturbed.
+    func handleSessionExpired() {
+        guard status == .signedIn else { return }
+        signOut()
     }
 
     private func complete(callbackURL: URL) throws {

@@ -96,12 +96,21 @@ struct HostServiceClient: Sendable {
 
     /// Perform one relay round-trip, re-minting the JWT once on a 401 (the token aged out
     /// or was dropped on background). Returns the raw body so void mutations skip decoding.
+    /// A *second* consecutive 401 — the host rejecting a freshly minted JWT — means the
+    /// session itself is dead, not just the cached JWT: surface `sessionExpired` so the
+    /// app forces re-auth instead of polling stale data forever (issue #67). (A mint 401
+    /// short-circuits here too: `send` rethrows `sessionExpired` from `RelayTokenProvider`.)
     private func requestData(_ procedure: String, method: HTTPMethod, input: Any?) async throws -> Data {
         do {
             return try await send(procedure, method: method, input: input)
         } catch AuthError.badServerResponse(status: 401) {
             tokenProvider.invalidate()
-            return try await send(procedure, method: method, input: input)
+            do {
+                return try await send(procedure, method: method, input: input)
+            } catch AuthError.badServerResponse(status: 401) {
+                tokenProvider.notifySessionExpired()
+                throw AuthError.sessionExpired
+            }
         }
     }
 
