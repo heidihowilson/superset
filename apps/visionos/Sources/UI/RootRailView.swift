@@ -1,9 +1,9 @@
 import SwiftUI
 
 /// The content surfaces the icon rail switches between in the root window. Each maps to a
-/// rail item; the selected one fills the content pane. `workspaces` is the default (and
-/// becomes the collapsible project tree in a later slice); `automations` and `tasks` are
-/// placeholder panes until wired.
+/// rail item; the selected one fills the content pane. `workspaces` is the default and
+/// renders the collapsible project tree; `automations` and `tasks` are placeholder panes
+/// until wired.
 enum RailDestination: String, CaseIterable, Identifiable {
     case workspaces
     case automations
@@ -212,7 +212,7 @@ private struct RailItemLabel: View {
             .font(.system(size: 24, weight: .medium))
             .frame(width: 60, height: 60)
             .background(
-                isSelected ? AnyShapeStyle(.tint.opacity(0.22)) : AnyShapeStyle(.clear),
+                .tint.opacity(isSelected ? 0.22 : 0),
                 in: RoundedRectangle(cornerRadius: 14)
             )
             .contentShape(RoundedRectangle(cornerRadius: 14))

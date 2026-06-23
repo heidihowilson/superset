@@ -76,8 +76,8 @@ struct RootView: View {
     }
 
     /// The content pane for the selected rail item. Workspaces renders the active
-    /// adapter's list (the collapsible project tree lands in a later slice); Automations
-    /// and Tasks & PRs are placeholders until wired.
+    /// adapter's list (the collapsible project tree); Automations and Tasks & PRs are
+    /// placeholders until wired.
     @ViewBuilder
     private var railContent: some View {
         switch railSelection {

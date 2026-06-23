@@ -125,7 +125,7 @@ struct WorkspaceListView: View {
                 openWindow: openWindow
             )
         } label: {
-            WorkspaceRow(
+            WorkspaceRowView(
                 workspace: workspace,
                 isSelected: workspace.id == store.selectedWorkspaceID,
                 isPending: store.pendingWorkspaceIDs.contains(workspace.id)
@@ -240,36 +240,5 @@ private struct ProjectHeader: View {
             }
         }
         .frame(minHeight: 44)
-    }
-}
-
-private struct WorkspaceRow: View {
-    let workspace: Workspace
-    let isSelected: Bool
-    let isPending: Bool
-
-    var body: some View {
-        HStack(spacing: 16) {
-            Circle()
-                .fill(workspace.status.tint)
-                .frame(width: 14, height: 14)
-                .accessibilityLabel(workspace.status.label)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(workspace.name).font(.headline)
-                Text(workspace.status.label)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 0)
-            if isPending {
-                ProgressView()
-            } else if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.tint)
-            }
-        }
-        .frame(minHeight: 60)
-        .opacity(isPending ? 0.6 : 1)
-        .contentShape(Rectangle())
     }
 }
