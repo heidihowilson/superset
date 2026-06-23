@@ -23,6 +23,7 @@
 		23C3FECF03827D3E4B7072EF /* TelemetryEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */; };
 		2492DD4BCA904F2217426005 /* WorkspaceWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */; };
 		253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */; };
+		265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */; };
 		26D182223694CF2CD5296B36 /* WorkspaceRenameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */; };
 		2708DC24F7DDD9F6C4BC9BF3 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48499C408B1F829A6FBF864B /* Telemetry.swift */; };
 		28F345036BA3A958F0734DBA /* ChatSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */; };
@@ -41,6 +42,7 @@
 		6315F9471E6591AB2B5FA504 /* AgentPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FDD53DEB3DACA052DE15581 /* AgentPreset.swift */; };
 		6C09EBBD3266BE28C3928D8B /* AppSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FD4BDCD99524147416F507 /* AppSettingsStore.swift */; };
 		6E06D08A9D826B141B1F7E95 /* CrashReporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6775F5C959687D1450A458C /* CrashReporter.swift */; };
+		6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */; };
 		723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92DB07131AB224ABB387A03E /* SignInView.swift */; };
 		764B824AD74E5E6BAFCFE5F1 /* PostHogTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A52EA499D48D24C71C06E1B /* PostHogTransport.swift */; };
 		774C55011298370736F154C1 /* NativeWorkspaceAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4728D29F2601E977824C02 /* NativeWorkspaceAdapter.swift */; };
@@ -95,6 +97,13 @@
 			remoteGlobalIDString = 9A81E7F139DC661E9C0CC326;
 			remoteInfo = Superset;
 		};
+		B62CCCDEBBC15B71522C050C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E10E0D0C6F0C1782993BD658 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9A81E7F139DC661E9C0CC326;
+			remoteInfo = Superset;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -103,6 +112,7 @@
 		0A89302CCDC57D318AACE341 /* ChatTranscriptProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscriptProviding.swift; sourceTree = "<group>"; };
 		0E54C463B7C9F6B1808C8587 /* LocalAuthenticating.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuthenticating.swift; sourceTree = "<group>"; };
 		10D3EF11E67F134FB9961295 /* TranscriptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptView.swift; sourceTree = "<group>"; };
+		11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenProviderTests.swift; sourceTree = "<group>"; };
 		130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceLifecycle.swift; sourceTree = "<group>"; };
 		16D3DBDE2668834DDADB7C18 /* DeepLinkRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkRoute.swift; sourceTree = "<group>"; };
 		194E32D705561C5BE2FAC96F /* ChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModel.swift; sourceTree = "<group>"; };
@@ -135,6 +145,8 @@
 		64FD4BDCD99524147416F507 /* AppSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsStore.swift; sourceTree = "<group>"; };
 		66E12DC999DAD3D512CB63A0 /* PaneKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaneKind.swift; sourceTree = "<group>"; };
 		6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWorkspaceListCache.swift; sourceTree = "<group>"; };
+		6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayTokenTestDoubles.swift; sourceTree = "<group>"; };
+		701B2DA6403630C0415730ED /* SupersetTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SupersetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7070DBB6BC8C26868EE3DB1E /* DeviceContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceContext.swift; sourceTree = "<group>"; };
 		72768452C20DF59EFB5A2111 /* RootRailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootRailView.swift; sourceTree = "<group>"; };
 		7A32857A7A4CE341816F161F /* TelemetryValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryValue.swift; sourceTree = "<group>"; };
@@ -238,6 +250,15 @@
 			path = UITests;
 			sourceTree = "<group>";
 		};
+		4F2837046E487098645555F9 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
+				B2955D84D9651633A564D752 /* Support */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		50BF9B3E16D929C1B06B6FAE /* Cloud */ = {
 			isa = PBXGroup;
 			children = (
@@ -317,6 +338,7 @@
 			isa = PBXGroup;
 			children = (
 				A7EC74FA3E1D90B3BD0C7CAD /* Superset.app */,
+				701B2DA6403630C0415730ED /* SupersetTests.xctest */,
 				24F7DEC826B777B61107FCC7 /* SupersetUITests.xctest */,
 			);
 			name = Products;
@@ -326,9 +348,18 @@
 			isa = PBXGroup;
 			children = (
 				9C20B8EEA8FE80F0403919FE /* Sources */,
+				4F2837046E487098645555F9 /* Tests */,
 				44E29695F37E77FE1E0BED9F /* UITests */,
 				AC24651113BCD4BCB2A66130 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		B2955D84D9651633A564D752 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */,
+			);
+			path = Support;
 			sourceTree = "<group>";
 		};
 		B55B99E04A5AB3A18722103B /* UI */ = {
@@ -388,6 +419,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5501ED0E381AB64F0E00EEC2 /* SupersetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3602C8C22D16135A640A39D /* Build configuration list for PBXNativeTarget "SupersetTests" */;
+			buildPhases = (
+				93A4CF25994E227A460360A1 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				108F9A8D9B80D81DB0CA2FAB /* PBXTargetDependency */,
+			);
+			name = SupersetTests;
+			packageProductDependencies = (
+			);
+			productName = SupersetTests;
+			productReference = 701B2DA6403630C0415730ED /* SupersetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		5E5B60C5AFE0EE57E48BB4C0 /* SupersetUITests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 94D427AF1979CD3820BB8CFB /* Build configuration list for PBXNativeTarget "SupersetUITests" */;
@@ -456,6 +505,7 @@
 			projectRoot = "";
 			targets = (
 				9A81E7F139DC661E9C0CC326 /* Superset */,
+				5501ED0E381AB64F0E00EEC2 /* SupersetTests */,
 				5E5B60C5AFE0EE57E48BB4C0 /* SupersetUITests */,
 			);
 		};
@@ -554,9 +604,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		93A4CF25994E227A460360A1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */,
+				265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		108F9A8D9B80D81DB0CA2FAB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9A81E7F139DC661E9C0CC326 /* Superset */;
+			targetProxy = B62CCCDEBBC15B71522C050C /* PBXContainerItemProxy */;
+		};
 		E84516B88488F5A979D39ACF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9A81E7F139DC661E9C0CC326 /* Superset */;
@@ -565,6 +629,25 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		40C9796F9770B1BDA7CF23F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sh.superset.visionos.tests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Superset.app/Superset";
+			};
+			name = Release;
+		};
 		60B70455F66F11958CA3A654 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -671,6 +754,7 @@
 				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Superset;
@@ -749,6 +833,25 @@
 			};
 			name = Debug;
 		};
+		EFC2B280C67DE4E463EA824F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGNING_ALLOWED[sdk=xrsimulator*]" = NO;
+				"CODE_SIGNING_REQUIRED[sdk=xrsimulator*]" = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = sh.superset.visionos.tests;
+				SDKROOT = xros;
+				TARGETED_DEVICE_FAMILY = 7;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Superset.app/Superset";
+			};
+			name = Debug;
+		};
 		F8DC6EC15FC72D1CD6100B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -785,6 +888,15 @@
 			buildConfigurations = (
 				F8DC6EC15FC72D1CD6100B45 /* Debug */,
 				9B8877A34546BA772D3EB6DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A3602C8C22D16135A640A39D /* Build configuration list for PBXNativeTarget "SupersetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EFC2B280C67DE4E463EA824F /* Debug */,
+				40C9796F9770B1BDA7CF23F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

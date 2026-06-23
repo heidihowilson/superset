@@ -44,6 +44,17 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5501ED0E381AB64F0E00EEC2"
+               BuildableName = "SupersetTests.xctest"
+               BlueprintName = "SupersetTests"
+               ReferencedContainer = "container:Superset.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "5E5B60C5AFE0EE57E48BB4C0"
                BuildableName = "SupersetUITests.xctest"
                BlueprintName = "SupersetUITests"
