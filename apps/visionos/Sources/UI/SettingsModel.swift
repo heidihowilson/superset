@@ -71,6 +71,12 @@ final class SettingsModel {
     /// Switch the session's active organization (cloud-persisted, no re-auth — ADR-0005),
     /// then reload the session so the active selection reflects the server's truth. A
     /// no-op when the target is already active.
+    ///
+    /// The switch and the follow-up session refresh are kept separate: once
+    /// `setActiveOrganization` succeeds the org has changed server-side, so only that call
+    /// determines `switchError`. The refresh is best-effort — a failed reload leaves the
+    /// switch reported as successful (the next `load`/poll reconciles the session) rather
+    /// than surfacing a false error and blocking the downstream workspace refresh.
     func switchOrganization(to id: String) async {
         guard id != activeOrganizationID else { return }
         switchError = nil
@@ -78,9 +84,12 @@ final class SettingsModel {
         defer { isSwitchingOrganization = false }
         do {
             try await api.setActiveOrganization(id: id)
-            session = try await api.fetchSession()
         } catch {
             switchError = Self.message(for: error)
+            return
+        }
+        if let refreshed = try? await api.fetchSession() {
+            session = refreshed
         }
     }
 
