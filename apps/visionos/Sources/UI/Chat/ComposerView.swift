@@ -232,6 +232,7 @@ struct ComposerView: View {
             Label(message, systemImage: "exclamationmark.triangle.fill")
                 .font(.footnote)
                 .foregroundStyle(.orange)
+                .accessibilityIdentifier(AccessibilityID.composerSendError)
         }
     }
 
