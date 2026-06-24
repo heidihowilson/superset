@@ -29,6 +29,7 @@
 		265176E18151041C815254B4 /* RelayTokenTestDoubles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D866690738585225E68A358 /* RelayTokenTestDoubles.swift */; };
 		26CBB384F966D74A83B921F1 /* ChatTranscriptIdentityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */; };
 		92AA001122334455667788AA /* ChatMessagePartDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92BB001122334455667788BB /* ChatMessagePartDecodeTests.swift */; };
+		93AA001122334455667788AA /* ChatDisplayStateDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93BB001122334455667788BB /* ChatDisplayStateDecodeTests.swift */; };
 		26D182223694CF2CD5296B36 /* WorkspaceRenameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */; };
 		2708DC24F7DDD9F6C4BC9BF3 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48499C408B1F829A6FBF864B /* Telemetry.swift */; };
 		28F345036BA3A958F0734DBA /* ChatSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */; };
@@ -198,6 +199,7 @@
 		AC176F69E2E01481F9EACFA5 /* WorkspaceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceListView.swift; sourceTree = "<group>"; };
 		AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTranscriptIdentityTests.swift; sourceTree = "<group>"; };
 		92BB001122334455667788BB /* ChatMessagePartDecodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagePartDecodeTests.swift; sourceTree = "<group>"; };
+		93BB001122334455667788BB /* ChatDisplayStateDecodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatDisplayStateDecodeTests.swift; sourceTree = "<group>"; };
 		B12FAB62826CA6420E3FC1BF /* WorkspaceAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceAdapter.swift; sourceTree = "<group>"; };
 		B2AC4C08EE6FBF693D8817C1 /* WorkspaceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStatus.swift; sourceTree = "<group>"; };
 		B36C6E14BB04EEC3C4ED5689 /* HostSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostSummary.swift; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 				940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */,
 				AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */,
 				92BB001122334455667788BB /* ChatMessagePartDecodeTests.swift */,
+				93BB001122334455667788BB /* ChatDisplayStateDecodeTests.swift */,
 				2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */,
 				AA5042528B49FFDD754AB484 /* DeepLinkRouterTests.swift */,
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
@@ -663,6 +666,7 @@
 				1656B096B125079A360F4E20 /* AuthHandoffTests.swift in Sources */,
 				26CBB384F966D74A83B921F1 /* ChatTranscriptIdentityTests.swift in Sources */,
 				92AA001122334455667788AA /* ChatMessagePartDecodeTests.swift in Sources */,
+				93AA001122334455667788AA /* ChatDisplayStateDecodeTests.swift in Sources */,
 				2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */,
 				ECFD6C6E2215E470CDC375BB /* DeepLinkRouterTests.swift in Sources */,
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
