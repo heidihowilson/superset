@@ -258,8 +258,14 @@ enum ChatMessagePart: Sendable, Equatable, Codable {
                 ?? (try? container.decode(String.self, forKey: .name))
             if let name {
                 let isResult = type.contains("result")
+                // Project the payload that matches the part kind: a result prefers its
+                // output, a call prefers its input. A stray output on a call part (or input
+                // on a result) must not win, or the inline card shows the wrong text.
+                let payloadKeys: [CodingKeys] = isResult
+                    ? [.output, .result, .input, .arguments, .args]
+                    : [.input, .arguments, .args, .output, .result]
                 var payload: JSONValue?
-                for key in [CodingKeys.output, .result, .input, .arguments, .args] {
+                for key in payloadKeys {
                     if let value = try? container.decode(JSONValue.self, forKey: key) {
                         payload = value
                         break
