@@ -52,7 +52,7 @@ struct AuthAPIClient: Sendable {
         let (data, response) = try await http.data(for: request)
         try Self.ensureOK(response)
         struct TokenResponse: Decodable { let token: String }
-        return try JSONDecoder().decode(TokenResponse.self, from: data).token
+        return try decodeSuccessBody(TokenResponse.self, from: data).token
     }
 
     /// Set the session's `activeOrganizationId` via the better-auth organization
@@ -85,7 +85,7 @@ struct AuthAPIClient: Sendable {
             let session: Session?
             let user: User?
         }
-        let payload = try JSONDecoder().decode(Payload.self, from: data)
+        let payload = try decodeSuccessBody(Payload.self, from: data)
         return SessionInfo(
             activeOrganizationID: payload.session?.activeOrganizationId,
             userEmail: payload.user?.email
@@ -100,7 +100,7 @@ struct AuthAPIClient: Sendable {
 
         let (data, response) = try await http.data(for: request)
         try Self.ensureOK(response)
-        return try JSONDecoder().decode([OrganizationSummary].self, from: data)
+        return try decodeSuccessBody([OrganizationSummary].self, from: data)
     }
 
     /// Register a client-minted chat session cloud-side (`chat.createSession`, a
@@ -158,7 +158,7 @@ struct AuthAPIClient: Sendable {
             }
             let result: ResultBox
         }
-        return try JSONDecoder().decode(Payload.self, from: data).result.data.json.models
+        return try decodeSuccessBody(Payload.self, from: data).result.data.json.models
     }
 
     private static func ensureOK(_ response: URLResponse) throws {

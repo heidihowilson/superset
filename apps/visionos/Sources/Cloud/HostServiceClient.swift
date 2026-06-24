@@ -91,7 +91,7 @@ struct HostServiceClient: Sendable {
         input: Any?
     ) async throws -> Payload {
         let data = try await requestData(procedure, method: method, input: input)
-        return try JSONDecoder().decode(RelayResult<Payload>.self, from: data).result.data.json
+        return try decodeSuccessBody(RelayResult<Payload>.self, from: data).result.data.json
     }
 
     /// Perform one relay round-trip, re-minting the JWT once on a 401 (the token aged out
