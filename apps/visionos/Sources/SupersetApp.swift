@@ -128,7 +128,8 @@ struct SupersetApp: App {
                 .lockGate(lock: lock, auth: auth)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }
-        .defaultSize(width: 560, height: 720)
+        .defaultSize(width: 720, height: 720)
+        .windowResizability(.contentSize)
         .restorationBehavior(.automatic)
 
         WindowGroup(id: DebugScene.windowID) {
