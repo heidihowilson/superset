@@ -8,9 +8,12 @@ enum HostCallOutcome: Sendable, Equatable {
     case poll(latency: Duration)
     /// The Host was unreachable. `planGated` distinguishes a plan/subscription 403 from
     /// an asleep Host (PRD §6.3 — host-offline is a first-class state, not an error).
-    case hostOffline(planGated: Bool)
-    /// Any other failed poll (transport/decoding/server error).
-    case drop(reason: String)
+    /// `latency` is the time spent before the poll failed — the slow failures are the
+    /// ones most worth measuring, so the host-call telemetry records them too.
+    case hostOffline(planGated: Bool, latency: Duration)
+    /// Any other failed poll (transport/decoding/server error). `latency` is the elapsed
+    /// time before the failure, recorded alongside the outcome like the success path.
+    case drop(reason: String, latency: Duration)
 }
 
 /// Sink for host-call/stream telemetry, injected into the watch poll loop so the Domain

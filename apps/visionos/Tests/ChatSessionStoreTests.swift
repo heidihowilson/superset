@@ -19,8 +19,30 @@ final class ChatSessionStoreTests: XCTestCase {
         await store.refresh()
 
         XCTAssertEqual(recorder.outcomes.count, 1, "a failed poll records exactly one outcome")
-        XCTAssertEqual(recorder.outcomes.first?.outcome, .hostOffline(planGated: true), "a 403 maps to plan-gated host-offline")
+        guard case let .hostOffline(planGated, latency) = recorder.outcomes.first?.outcome else {
+            return XCTFail("a 403 maps to plan-gated host-offline, got \(String(describing: recorder.outcomes.first?.outcome))")
+        }
+        XCTAssertTrue(planGated, "a 403 is the plan-gated host-offline state")
+        XCTAssertGreaterThan(latency, .zero, "a failed poll records the elapsed latency, not a dropped/zero duration")
         XCTAssertEqual(recorder.outcomes.first?.workspaceID, "w1", "the outcome is tagged with the bound Workspace")
+    }
+
+    /// The failure path threads the captured start instant through, so a failed poll records
+    /// a non-zero latency in the host-call recorder rather than silently dropping the elapsed
+    /// time of the (often slow) failed poll.
+    func testFailedRefreshRecordsNonZeroLatency() async {
+        let store = ChatSessionStore()
+        let recorder = RecorderSpy()
+        store.hostCallRecorder = recorder
+        let provider = StubTranscriptProvider(results: [.failure(StubError.boom)])
+        store.bind(provider: provider, workspaceID: "w1")
+
+        await store.refresh()
+
+        guard case let .drop(_, latency) = recorder.outcomes.first?.outcome else {
+            return XCTFail("a generic failure records a drop, got \(String(describing: recorder.outcomes.first?.outcome))")
+        }
+        XCTAssertGreaterThan(latency, .zero, "a failed poll records a non-zero latency")
     }
 
     /// Any non-403 failure (transport/decoding/other server error) is a drop, carrying the

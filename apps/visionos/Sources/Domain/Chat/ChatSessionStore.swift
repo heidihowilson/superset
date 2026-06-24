@@ -77,19 +77,21 @@ final class ChatSessionStore {
         } catch {
             guard generation == refreshGeneration else { return true }
             loadState = transcript.isEmpty ? .failed(Self.message(for: error)) : .loaded
-            recordFailure(error)
+            recordFailure(error, latency: ContinuousClock().now - start)
             return false
         }
     }
 
     /// Map a poll failure onto a host-call outcome: a 403 is the plan-gated host-offline
-    /// state (PRD §6.3), everything else is a drop.
-    private func recordFailure(_ error: Error) {
+    /// state (PRD §6.3), everything else is a drop. `latency` is the elapsed poll time,
+    /// recorded alongside the failure so slow/failed polls aren't dropped from the
+    /// host-call latency telemetry.
+    private func recordFailure(_ error: Error, latency: Duration) {
         let outcome: HostCallOutcome = switch error {
         case let AuthError.badServerResponse(status) where status == 403:
-            .hostOffline(planGated: true)
+            .hostOffline(planGated: true, latency: latency)
         default:
-            .drop(reason: String(describing: error))
+            .drop(reason: String(describing: error), latency: latency)
         }
         hostCallRecorder?.record(outcome, workspaceID: boundWorkspaceID ?? "")
     }

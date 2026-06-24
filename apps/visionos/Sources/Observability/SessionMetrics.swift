@@ -84,13 +84,13 @@ final class SessionMetrics: HostCallRecording {
             logger.info(
                 "host-call ok workspace=\(workspaceID, privacy: .public) latency_ms=\(Self.milliseconds(latency), privacy: .public)"
             )
-        case let .hostOffline(planGated):
+        case let .hostOffline(planGated, latency):
             logger.notice(
-                "host-offline workspace=\(workspaceID, privacy: .public) plan_gated=\(planGated, privacy: .public)"
+                "host-offline workspace=\(workspaceID, privacy: .public) plan_gated=\(planGated, privacy: .public) latency_ms=\(Self.milliseconds(latency), privacy: .public)"
             )
-        case let .drop(reason):
+        case let .drop(reason, latency):
             logger.error(
-                "host-call drop workspace=\(workspaceID, privacy: .public) reason=\(reason, privacy: .public)"
+                "host-call drop workspace=\(workspaceID, privacy: .public) reason=\(reason, privacy: .public) latency_ms=\(Self.milliseconds(latency), privacy: .public)"
             )
         }
     }
