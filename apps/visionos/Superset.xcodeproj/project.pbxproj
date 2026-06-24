@@ -24,6 +24,7 @@
 		17AAEA8D7E8B45F77C91E382 /* WorkspaceLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */; };
 		18B48A2B66AD0C51148C076B /* SettingsOrgSwitchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5298F11FAB767586845CE65 /* SettingsOrgSwitchTests.swift */; };
 		1CED7464022223FD06F3BFC9 /* HostServiceClientAuthRetryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E0BAF104B580D95A0503C /* HostServiceClientAuthRetryTests.swift */; };
+		8B74B0BE43A199B317C3EC5A /* HostServiceClientRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338B34D9875D6530687B5005 /* HostServiceClientRequestTests.swift */; };
 		1FA3CA7DD882280F06E2659F /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E32D705561C5BE2FAC96F /* ChatModel.swift */; };
 		201496E2BBF8DA0BC0C12DA8 /* ChatDisplayStateDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE08C896A891F1E9FE995A0C /* ChatDisplayStateDecodeTests.swift */; };
 		2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */; };
@@ -173,6 +174,7 @@
 		48499C408B1F829A6FBF864B /* Telemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
 		4C1A100609EC30AD426B9E98 /* WorkspaceWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWindowView.swift; sourceTree = "<group>"; };
 		4D1E0BAF104B580D95A0503C /* HostServiceClientAuthRetryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServiceClientAuthRetryTests.swift; sourceTree = "<group>"; };
+		338B34D9875D6530687B5005 /* HostServiceClientRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServiceClientRequestTests.swift; sourceTree = "<group>"; };
 		4E7A7A52F1D2A29BEBFFED82 /* UITestContract.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestContract.swift; sourceTree = "<group>"; };
 		551E9F7F296AC773E05175CD /* WorkspaceRenameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRenameView.swift; sourceTree = "<group>"; };
 		5792186C9F6E096C3C9C073D /* ComposerStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerStoreTests.swift; sourceTree = "<group>"; };
@@ -328,6 +330,7 @@
 				5792186C9F6E096C3C9C073D /* ComposerStoreTests.swift */,
 				AA5042528B49FFDD754AB484 /* DeepLinkRouterTests.swift */,
 				4D1E0BAF104B580D95A0503C /* HostServiceClientAuthRetryTests.swift */,
+				338B34D9875D6530687B5005 /* HostServiceClientRequestTests.swift */,
 				EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */,
 				7C5D057607CD34AEEA55B811 /* PollBackoffTests.swift */,
 				11A9C7152868F656335B5BA6 /* RelayTokenProviderTests.swift */,
@@ -717,6 +720,7 @@
 				0785A16952B5C70823FA66FA /* ComposerStoreTests.swift in Sources */,
 				ECFD6C6E2215E470CDC375BB /* DeepLinkRouterTests.swift in Sources */,
 				1CED7464022223FD06F3BFC9 /* HostServiceClientAuthRetryTests.swift in Sources */,
+				8B74B0BE43A199B317C3EC5A /* HostServiceClientRequestTests.swift in Sources */,
 				EA785A94A21315217D628CA1 /* JSONValueRenderTests.swift in Sources */,
 				D351888F88396D38902271EC /* PollBackoffTests.swift in Sources */,
 				6E54972C14CBCF813D99B6D2 /* RelayTokenProviderTests.swift in Sources */,
