@@ -137,5 +137,14 @@ struct SupersetApp: App {
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 560, height: 720)
+
+        // Phase-1 terminal spike (TerminalSurface + LoopbackTerminalIO). Opened from the
+        // Debug window, deliberately outside the production rail and the lock gate — it
+        // carries no relay credential and exists only to prove the surface renders.
+        WindowGroup(id: TerminalScene.windowID) {
+            TerminalWindow()
+                .preferredColorScheme(appSettings.appearance.colorScheme)
+        }
+        .defaultSize(width: 1100, height: 720)
     }
 }

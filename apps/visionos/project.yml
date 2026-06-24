@@ -11,12 +11,21 @@ settings:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
+packages:
+  # TerminalSurface — the reusable libghostty-backed visionOS terminal surface. Staged
+  # (xcframework + header prebuilt) at an absolute path for this spike branch; a real
+  # release would pin a checksummed .xcframework URL. See INTEGRATION.md.
+  TerminalSurface:
+    path: /Users/sethgho/ghv-spike/TerminalSurface
 targets:
   Superset:
     type: application
     platform: visionOS
     sources:
       - path: Sources
+    dependencies:
+      - package: TerminalSurface
+        product: TerminalSurface
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: sh.superset.visionos

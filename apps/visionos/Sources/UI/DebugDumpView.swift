@@ -11,12 +11,20 @@ enum DebugScene {
 /// glance, unconnected to the production UI.
 struct DebugDumpView: View {
     let store: WorkspaceStore
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8) {
                 Text("WorkspaceStore — \(store.workspaces.count) workspaces")
                     .font(.headline)
+
+                Button("Open Terminal Spike", systemImage: "terminal") {
+                    openWindow(id: TerminalScene.windowID)
+                }
+                .accessibilityIdentifier("open-terminal-spike")
+                .padding(.bottom, 4)
+
                 ForEach(store.workspaces) { workspace in
                     let marker = workspace.id == store.selectedWorkspaceID ? "  ← selected" : ""
                     Text("• [\(workspace.status.rawValue)] \(workspace.projectName)/\(workspace.name)\(marker)")
