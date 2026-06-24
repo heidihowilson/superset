@@ -35,16 +35,19 @@ enum AuthHandoff {
         provider: Provider,
         state: String
     ) -> URL {
-        var components = URLComponents(
-            url: configuration.apiBaseURL.appendingPathComponent("api/auth/desktop/connect"),
-            resolvingAgainstBaseURL: false
-        )!
+        let connectEndpoint = configuration.apiBaseURL.appendingPathComponent("api/auth/desktop/connect")
+        guard var components = URLComponents(url: connectEndpoint, resolvingAgainstBaseURL: false) else {
+            preconditionFailure("AuthHandoff.connectURL: \(connectEndpoint) does not parse into URLComponents")
+        }
         components.queryItems = [
             URLQueryItem(name: "provider", value: provider.rawValue),
             URLQueryItem(name: "state", value: state),
             URLQueryItem(name: "protocol", value: configuration.callbackScheme),
         ]
-        return components.url!
+        guard let url = components.url else {
+            preconditionFailure("AuthHandoff.connectURL: query components failed to re-serialize from \(connectEndpoint)")
+        }
+        return url
     }
 
     /// Validate the captured deep link against `configuration` and the `state` we
