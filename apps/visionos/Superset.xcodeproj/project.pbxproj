@@ -18,6 +18,7 @@
 		1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C300406588D9244173B6DA /* SessionMetrics.swift */; };
 		15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */; };
 		15CD9DC3E3A2A38948445F26 /* InlineToolResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1C321FA276AC80B909B18A /* InlineToolResultView.swift */; };
+		1656B096B125079A360F4E20 /* AuthHandoffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */; };
 		17AAEA8D7E8B45F77C91E382 /* WorkspaceLifecycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 130B252BCA4B8DDBBB1E42B6 /* WorkspaceLifecycle.swift */; };
 		18B48A2B66AD0C51148C076B /* SettingsOrgSwitchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5298F11FAB767586845CE65 /* SettingsOrgSwitchTests.swift */; };
 		1FA3CA7DD882280F06E2659F /* ChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194E32D705561C5BE2FAC96F /* ChatModel.swift */; };
@@ -178,6 +179,7 @@
 		84E52950F51D244AFDD15CE1 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8B0AC80B796B7F2CEEED7BA6 /* ScenePollingMembership.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenePollingMembership.swift; sourceTree = "<group>"; };
 		92DB07131AB224ABB387A03E /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHandoffTests.swift; sourceTree = "<group>"; };
 		951C8B061117E946C12C674B /* Workspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace.swift; sourceTree = "<group>"; };
 		999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStore.swift; sourceTree = "<group>"; };
 		9C4F66798274C0C2405DA556 /* HostServiceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServiceClient.swift; sourceTree = "<group>"; };
@@ -283,6 +285,7 @@
 		4F2837046E487098645555F9 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */,
 				AC8AA3CA4CB3F55FBB8B8D10 /* ChatTranscriptIdentityTests.swift */,
 				2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */,
 				AA5042528B49FFDD754AB484 /* DeepLinkRouterTests.swift */,
@@ -654,6 +657,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1656B096B125079A360F4E20 /* AuthHandoffTests.swift in Sources */,
 				26CBB384F966D74A83B921F1 /* ChatTranscriptIdentityTests.swift in Sources */,
 				2234F2A7956B11F28436704B /* CloudWorkspaceClientDecodeTests.swift in Sources */,
 				ECFD6C6E2215E470CDC375BB /* DeepLinkRouterTests.swift in Sources */,
