@@ -69,6 +69,26 @@ final class SupersetUITests: XCTestCase {
         XCTAssertTrue(mic.waitForExistence(timeout: 10), "App did not survive the dictation path")
         XCTAssertEqual(app.state, .runningForeground, "App is no longer running after mic tap")
         attachScreenshot(app, name: "03-after-dictation")
+
+        // Drive an explicit send. Under `-uiTestMode` the relay call has no reachable Host
+        // (dummy session token, no network), so the send fails and the composer surfaces its
+        // error notice — the one composer state the smoke flow can drive without a backend.
+        composer.tap()
+        composer.typeText("ship it")
+
+        let send = app.buttons["Send"]
+        XCTAssertTrue(send.waitForExistence(timeout: 10), "Send button missing")
+        send.tap()
+
+        // The failed-send notice must be locatable by its identifier (the proof the error
+        // state is wired into the UITest contract). The relay failure resolves on its own
+        // timeout, so wait generously rather than asserting immediately.
+        let sendError = app.descendants(matching: .any)[AccessibilityID.composerSendError]
+        XCTAssertTrue(
+            sendError.waitForExistence(timeout: 30),
+            "Composer send-error notice never appeared after a failed send"
+        )
+        attachScreenshot(app, name: "04-send-error")
     }
 
     /// Attach a screenshot to the result bundle for triage (free; no pixel-diffing yet).
