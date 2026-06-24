@@ -13,7 +13,6 @@ struct WorkspaceListView: View {
     @Bindable var store: WorkspaceStore
     @Environment(\.openWindow) private var openWindow
 
-    @State private var isCreating = false
     @State private var renameTarget: Workspace?
     @State private var deleteTarget: Workspace?
     @State private var searchText = ""
@@ -31,20 +30,6 @@ struct WorkspaceListView: View {
             }
         }
         .navigationTitle("Workspaces")
-        .toolbar {
-            if store.supportsLifecycle {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        isCreating = true
-                    } label: {
-                        Label("New Workspace", systemImage: "plus")
-                    }
-                }
-            }
-        }
-        .sheet(isPresented: $isCreating) {
-            WorkspaceCreateView(store: store)
-        }
         .sheet(item: $renameTarget) { workspace in
             WorkspaceRenameView(store: store, workspace: workspace)
         }
