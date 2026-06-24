@@ -49,6 +49,7 @@ struct SignInView: View {
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 320)
+                    .accessibilityIdentifier(AccessibilityID.signInError)
             }
         }
         .padding(48)
