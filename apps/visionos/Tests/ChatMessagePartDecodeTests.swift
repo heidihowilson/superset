@@ -73,6 +73,33 @@ final class ChatMessagePartDecodeTests: XCTestCase {
         XCTAssertEqual(toolPart.payload?.string("command"), "write")
     }
 
+    /// A `tool_call` carrying a stray `output` alongside its `input` still projects the `input` —
+    /// the key precedence branches on the part kind, so a call never surfaces a result payload in
+    /// the invocation slot of the inline card.
+    func testToolCallPrefersInputOverStrayOutput() throws {
+        let part = try decodePart(
+            #"{"type":"tool_call","name":"editor","input":{"command":"write"},"output":"stray result"}"#
+        )
+        guard case let .tool(toolPart) = part else {
+            return XCTFail("expected .tool, got \(part)")
+        }
+        XCTAssertFalse(toolPart.isResult)
+        XCTAssertEqual(toolPart.payload?.string("command"), "write")
+    }
+
+    /// A `tool_result` carrying both `output` and `input` still projects the `output` — results
+    /// keep output-first precedence, so a stray input field can't displace the result text.
+    func testToolResultPrefersOutputOverStrayInput() throws {
+        let part = try decodePart(
+            #"{"type":"tool_result","toolName":"bash","input":{"command":"ls"},"output":"command finished"}"#
+        )
+        guard case let .tool(toolPart) = part else {
+            return XCTFail("expected .tool, got \(part)")
+        }
+        XCTAssertTrue(toolPart.isResult)
+        XCTAssertEqual(toolPart.payload?.stringValue, "command finished")
+    }
+
     /// An unknown type with no tool name decodes to `.other`, preserving the type for the
     /// generic label rather than failing the poll.
     func testUnknownTypeDecodesToOther() throws {
