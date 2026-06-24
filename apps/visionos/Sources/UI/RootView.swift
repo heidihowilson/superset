@@ -4,20 +4,16 @@ import SwiftUI
 /// adapter's `workspaceList` pane over the shared, cloud-backed `WorkspaceStore`, which
 /// is polled while any window is visible and paused when the app backgrounds (ADR-0004).
 ///
-/// Two ornaments host the chrome (PRD §9, ADR-0011): a leading-edge icon rail
-/// (`RootRailView`) that switches the content pane, opens the create sheet, and opens
-/// Settings, and a bottom window-controls menu carrying the explicit "consolidate
-/// windows" action.
+/// A leading-edge icon rail ornament (`RootRailView`, PRD §9, ADR-0011) hosts the
+/// chrome: it switches the content pane, opens the create sheet, and opens Settings.
 struct RootView: View {
     @Bindable var store: WorkspaceStore
     let auth: AuthController
     @State private var registry = AdapterRegistry(adapters: [
         NativeWorkspaceAdapter(),
     ])
-    @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(SessionMetrics.self) private var metrics
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @State private var railSelection: RailDestination = .workspaces
     @State private var isCreating = false
     /// The org menu's cloud read model (session + memberships). Owned per-window like
@@ -49,9 +45,6 @@ struct RootView: View {
                 onOpenSettings: { openWindow(id: SettingsScene.windowID) },
                 onSignOut: { auth.signOut() }
             )
-        }
-        .ornament(attachmentAnchor: .scene(.bottom)) {
-            bottomControls
         }
         .sheet(isPresented: $isCreating) {
             WorkspaceCreateView(store: store)
@@ -110,26 +103,6 @@ struct RootView: View {
                 systemImage: railSelection.systemImage,
                 description: Text("Coming soon.")
             )
-        }
-    }
-
-    private var bottomControls: some View {
-        windowMenu
-            .padding()
-            .glassBackgroundEffect()
-    }
-
-    private var windowMenu: some View {
-        Menu {
-            if openWindows.openWindowCount > 0 {
-                Button("Consolidate Windows", systemImage: "rectangle.on.rectangle.slash") {
-                    WindowRouter.consolidate(openWindows: openWindows, dismissWindow: dismissWindow)
-                }
-            } else {
-                Text("No open windows")
-            }
-        } label: {
-            Label("Windows", systemImage: "macwindow.on.rectangle")
         }
     }
 }
