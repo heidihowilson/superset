@@ -36,7 +36,11 @@ struct AuthConfiguration: Sendable {
 
     /// `superset://auth/callback` — the value passed to
     /// `ASWebAuthenticationSession(callbackURLScheme:)` is the scheme alone.
-    var callbackURL: URL {
-        URL(string: "\(callbackScheme)://\(callbackHost)\(callbackPath)")!
+    ///
+    /// The components are mutable, so a non-default config with an empty or invalid
+    /// host yields a string `URL(string:)` cannot parse. Return `nil` in that case
+    /// rather than force-unwrapping, so a caller fails the flow instead of trapping.
+    var callbackURL: URL? {
+        URL(string: "\(callbackScheme)://\(callbackHost)\(callbackPath)")
     }
 }
