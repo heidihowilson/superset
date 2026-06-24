@@ -105,6 +105,31 @@ final class ComposerStoreTests: XCTestCase {
         await sendTask.value
         XCTAssertEqual(store.sendState, .idle, "the send returns to idle once it completes")
     }
+
+    /// A picker load from a superseded binding must be dropped (#114). An A->B->A rebind
+    /// returns `boundWorkspaceID` to "A", so the workspace guard alone would let a slow
+    /// fetch from the first "A" binding land its stale list. The generation guard catches
+    /// it because each distinct bind bumps the generation.
+    func testStaleLoadPickersFromRebindCycleIsDropped() async {
+        let store = ComposerStore()
+        let firstSender = GatedModelsSender(models: [ChatModel(id: "stale", name: "Stale", provider: "P")])
+        store.bind(sender: firstSender, workspaceID: "A") {}
+
+        // Start the first load; it parks inside `availableModels()`.
+        let loadTask = Task { await store.loadPickers() }
+        await firstSender.entered.wait()
+
+        // Rebind A->B->A while the first fetch is in flight: `boundWorkspaceID` is "A"
+        // again (matching the parked load) but the bind generation has moved on.
+        store.bind(sender: StubSender(), workspaceID: "B") {}
+        store.bind(sender: StubSender(), workspaceID: "A") {}
+
+        firstSender.release.signal()
+        await loadTask.value
+
+        XCTAssertTrue(store.models.isEmpty, "a picker list from a superseded binding must be dropped")
+        XCTAssertNil(store.selectedModelID, "a superseded load must not set the model selection")
+    }
 }
 
 /// A `ChatSending` stub that records delivered messages and optionally throws. `@unchecked
@@ -143,6 +168,29 @@ private final class GatedSender: ChatSending, @unchecked Sendable {
     }
 
     func availableModels() async throws -> [ChatModel] { [] }
+    func availableAgentPresets() async throws -> [AgentPreset] { [] }
+}
+
+/// A `ChatSending` stub whose `availableModels` parks until released and then returns a
+/// configured list, so a test can interleave a rebind cycle with an in-flight picker load.
+/// `entered` fires when the fetch begins; `release` lets it complete.
+private final class GatedModelsSender: ChatSending, @unchecked Sendable {
+    let entered = AsyncGate()
+    let release = AsyncGate()
+    private let models: [ChatModel]
+
+    init(models: [ChatModel]) {
+        self.models = models
+    }
+
+    func sendMessage(_ text: String, model: String?) async throws {}
+
+    func availableModels() async throws -> [ChatModel] {
+        entered.signal()
+        await release.wait()
+        return models
+    }
+
     func availableAgentPresets() async throws -> [AgentPreset] { [] }
 }
 

@@ -38,6 +38,10 @@ final class ComposerStore {
     /// The Workspace the bound sender serves, so re-binding the same Workspace keeps the
     /// in-progress draft while switching Workspaces clears it.
     private var boundWorkspaceID: String?
+    /// Bumped on every distinct bind so an in-flight `loadPickers` from a prior binding
+    /// can't land its picker list after an A->B->A rebind (where `boundWorkspaceID` alone
+    /// matches again). Mirrors ChatSessionStore's generation guard.
+    private var bindGeneration: UInt64 = 0
 
     /// Whether the draft is sendable: non-empty and not mid-flight. (Model/preset choices
     /// are optional — the Host has a default model and V1's agent is always the built-in.)
@@ -50,6 +54,7 @@ final class ComposerStore {
     /// sends another's draft.
     func bind(sender: ChatSending, workspaceID: String, onSent: @escaping @MainActor () -> Void) {
         if boundWorkspaceID == workspaceID { return }
+        bindGeneration &+= 1
         self.sender = sender
         self.onSent = onSent
         boundWorkspaceID = workspaceID
@@ -67,8 +72,9 @@ final class ComposerStore {
     func loadPickers(preferredModelID: String? = nil) async {
         guard let sender else { return }
         let loadWorkspaceID = boundWorkspaceID
+        let loadGeneration = bindGeneration
         if let fetched = try? await sender.availableModels() {
-            guard boundWorkspaceID == loadWorkspaceID else { return }
+            guard boundWorkspaceID == loadWorkspaceID, bindGeneration == loadGeneration else { return }
             models = fetched
             if selectedModelID == nil {
                 if let preferredModelID, fetched.contains(where: { $0.id == preferredModelID }) {
@@ -79,7 +85,7 @@ final class ComposerStore {
             }
         }
         let presets = (try? await sender.availableAgentPresets()) ?? []
-        guard boundWorkspaceID == loadWorkspaceID else { return }
+        guard boundWorkspaceID == loadWorkspaceID, bindGeneration == loadGeneration else { return }
         agentPresets = presets
     }
 
