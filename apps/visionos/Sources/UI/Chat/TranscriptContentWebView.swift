@@ -101,6 +101,33 @@ struct TranscriptContentWebView: UIViewRepresentable {
         }
     }
 
+    /// Pure markdown→inline-HTML helpers, deliberately free of any `window`/`document`/DOM
+    /// references so they can be exercised directly in a JSContext (see
+    /// `TranscriptRendererLinkTests`). `template` interpolates this block into its `<script>`;
+    /// the browser-only glue (`__render`, height posting, `ResizeObserver`) stays there.
+    ///
+    /// Links emit the captured destination (group 2) as the `href` rather than a dead `#`:
+    /// the URL is already entity-escaped by `esc`, attribute quotes are neutralised, and
+    /// `javascript:`/`data:`/`vbscript:` schemes are dropped to `#` so prose can't smuggle
+    /// script into the surface. `target`/`rel` are hardened on every anchor.
+    static let rendererCore = """
+      function esc(s) {
+        return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      }
+      function hrefAttr(u) {
+        if (/^\\s*(javascript|data|vbscript):/i.test(u)) { return "#"; }
+        return u.replace(/"/g, "&quot;");
+      }
+      function inline(s) {
+        s = esc(s);
+        s = s.replace(/`([^`]+)`/g, function(_, c){ return "<code>"+c+"</code>"; });
+        s = s.replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
+        s = s.replace(/(^|[^*])\\*([^*]+)\\*/g, "$1<em>$2</em>");
+        s = s.replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, function(_, t, u){ return "<a href=\\"" + hrefAttr(u) + "\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">" + t + "</a>"; });
+        return s;
+      }
+      """
+
     /// Self-contained document: glass-friendly CSS + a small markdown→HTML renderer.
     /// `__render` escapes input before formatting (no raw HTML injection), and a
     /// `ResizeObserver` posts the content height back so the native frame tracks it.
@@ -145,17 +172,7 @@ struct TranscriptContentWebView: UIViewRepresentable {
     </head>
     <body><div id="root"></div>
     <script>
-      function esc(s) {
-        return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-      }
-      function inline(s) {
-        s = esc(s);
-        s = s.replace(/`([^`]+)`/g, function(_, c){ return "<code>"+c+"</code>"; });
-        s = s.replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
-        s = s.replace(/(^|[^*])\\*([^*]+)\\*/g, "$1<em>$2</em>");
-        s = s.replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, function(_, t){ return "<a href=\\"#\\">"+t+"</a>"; });
-        return s;
-      }
+    \(Self.rendererCore)
       function toHtml(md) {
         var lines = md.split(/\\r?\\n/);
         var out = [], i = 0;
