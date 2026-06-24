@@ -192,11 +192,16 @@ final class WorkspaceStore {
             lifecycleError = "Host unavailable. The Host must be online and the organization on an active plan to create this workspace."
             return
         }
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, !projectID.isEmpty else {
+            lifecycleError = "Enter a name to create this workspace."
+            return
+        }
         lifecycleError = nil
         isCreatingWorkspace = true
         defer { isCreatingWorkspace = false }
         do {
-            try await lifecycle.create(projectID: projectID, name: name, branch: branch, hostID: hostID)
+            try await lifecycle.create(projectID: projectID, name: trimmedName, branch: branch, hostID: hostID)
             await refresh()
         } catch {
             lifecycleError = Self.lifecycleMessage(for: error)
