@@ -50,6 +50,29 @@ final class CloudWorkspaceClientDecodeTests: XCTestCase {
         }
     }
 
+    /// A malformed (non-JSON) body on a critical list read is surfaced as
+    /// `AuthError.badServerResponse` — the undecodable-body half of the documented contract
+    /// (AuthError.swift) — rather than leaking a raw `DecodingError` that falls through to a
+    /// generic message.
+    func testMalformedBodyThrowsBadServerResponse() async {
+        let http = RoutingTRPCHTTP(routes: [
+            "api/auth/get-session": .raw(#"{"session":{"activeOrganizationId":"org1"},"user":{"email":"a@b.c"}}"#),
+            "v2Project.list": .json("[]"),
+            "v2Workspace.list": .raw("not json at all <<<"),
+            "host.list": .json("[]"),
+        ])
+        let client = makeClient(http: http)
+
+        do {
+            _ = try await client.fetchSnapshot()
+            XCTFail("expected a malformed body to throw badServerResponse, not leak a DecodingError")
+        } catch let AuthError.badServerResponse(status) {
+            XCTAssertEqual(status, 200, "an undecodable 2xx body reports the 2xx-but-unusable-body status")
+        } catch {
+            XCTFail("unexpected error: \(error)")
+        }
+    }
+
     private func makeClient(http: HTTPPerforming) -> CloudWorkspaceClient {
         let token = AuthToken(value: "session-token", expiresAt: Date(timeIntervalSinceNow: 3600))
         let api = AuthAPIClient(configuration: .default, http: http) { token }

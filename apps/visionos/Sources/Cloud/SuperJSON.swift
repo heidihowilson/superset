@@ -19,3 +19,17 @@ func ensureSuccessStatus(_ response: URLResponse) throws {
         throw AuthError.badServerResponse(status: http.statusCode)
     }
 }
+
+/// Decodes a 2xx response body as `Payload`, honoring the undecodable-body half of the
+/// `badServerResponse` contract (AuthError.swift): a body the expected type can't decode is
+/// surfaced as `AuthError.badServerResponse` rather than leaking a raw `DecodingError` that
+/// falls through `AuthError.userFacingMessage` to a generic message. The companion decode
+/// gate to `ensureSuccessStatus` for the cloud-tRPC and relay/host transports; the status
+/// mirrors the existing 2xx-but-unusable-body convention (`status: 200`).
+func decodeSuccessBody<Payload: Decodable>(_ type: Payload.Type, from data: Data) throws -> Payload {
+    do {
+        return try JSONDecoder().decode(type, from: data)
+    } catch is DecodingError {
+        throw AuthError.badServerResponse(status: 200)
+    }
+}

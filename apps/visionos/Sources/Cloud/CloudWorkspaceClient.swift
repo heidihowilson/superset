@@ -162,7 +162,7 @@ struct CloudWorkspaceClient: WorkspaceListProviding {
     /// is: `error.json.message` surfaces as `AuthError.trpcError` rather than being mistaken
     /// for a successful decode, and a body that carries neither result nor error is rejected.
     private static func decodeEnvelope<Payload: Decodable>(_ data: Data) throws -> Payload {
-        let envelope = try JSONDecoder().decode(TRPCEnvelope<Payload>.self, from: data)
+        let envelope = try decodeSuccessBody(TRPCEnvelope<Payload>.self, from: data)
         if let error = envelope.error {
             throw AuthError.trpcError(message: error.json?.message ?? "tRPC error")
         }
