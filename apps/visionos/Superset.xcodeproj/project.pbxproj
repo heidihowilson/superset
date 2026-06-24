@@ -17,6 +17,8 @@
 		0D4FE4F83D6E73977CE7A2B5 /* TelemetryTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C605ADEC56AC4700CDA637C /* TelemetryTransport.swift */; };
 		0D6D0B2BFF7330504E7BDD23 /* FileWorkspaceListCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D54D6FB081CF27AF684D780 /* FileWorkspaceListCache.swift */; };
 		1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31C300406588D9244173B6DA /* SessionMetrics.swift */; };
+		A1F0C2B3D4E5061728394A5B /* WindowFocusTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F0C2B3D4E5061728394A5C /* WindowFocusTracker.swift */; };
+		A2F0C2B3D4E5061728394A5D /* WindowFocusTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2F0C2B3D4E5061728394A5E /* WindowFocusTrackerTests.swift */; };
 		15A86FDEF0682B968A6577F3 /* AuthConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBB23410BF69FFAD4754BCF /* AuthConfiguration.swift */; };
 		15CD9DC3E3A2A38948445F26 /* InlineToolResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1C321FA276AC80B909B18A /* InlineToolResultView.swift */; };
 		1656B096B125079A360F4E20 /* AuthHandoffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */; };
@@ -155,6 +157,7 @@
 		2A354115CC73B8D78D623386 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		2B4412E3AD713AF29FCF1108 /* CloudWorkspaceClientDecodeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudWorkspaceClientDecodeTests.swift; sourceTree = "<group>"; };
 		31C300406588D9244173B6DA /* SessionMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionMetrics.swift; sourceTree = "<group>"; };
+		B1F0C2B3D4E5061728394A5C /* WindowFocusTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowFocusTracker.swift; sourceTree = "<group>"; };
 		360BA75FD53E0FEA0FCCE2F7 /* HostCallOutcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostCallOutcome.swift; sourceTree = "<group>"; };
 		36B6DFB06B2453339BC98E39 /* UITestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestSupport.swift; sourceTree = "<group>"; };
 		38AB15580946313EA26FC000 /* AuthGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGateView.swift; sourceTree = "<group>"; };
@@ -232,6 +235,7 @@
 		E8A45041D84D7175E6E07224 /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		E8A727F8F09F5F410AF0DFAF /* SessionIDStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionIDStore.swift; sourceTree = "<group>"; };
 		E98F88DDFFA6BF36095CF7FE /* TelemetryBoundsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryBoundsTests.swift; sourceTree = "<group>"; };
+		B2F0C2B3D4E5061728394A5E /* WindowFocusTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowFocusTrackerTests.swift; sourceTree = "<group>"; };
 		EA3B266DA4A2028AFF420031 /* ChatSessionStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStoreTests.swift; sourceTree = "<group>"; };
 		EBC1116EAD31DE7070B3F67F /* JSONValueRenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValueRenderTests.swift; sourceTree = "<group>"; };
 		EF721B84B64BBFA6A277F655 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -322,6 +326,7 @@
 				E98F88DDFFA6BF36095CF7FE /* TelemetryBoundsTests.swift */,
 				197B9BBDCBEC522882E74466 /* WebAuthenticationContinuationTests.swift */,
 				C69E5837111CD3CA0EF38BEB /* WindowRosterAndPollMembershipTests.swift */,
+				B2F0C2B3D4E5061728394A5E /* WindowFocusTrackerTests.swift */,
 				233B761492CC6F03899F944B /* WorkspaceCreateBranchSlugTests.swift */,
 				601C4AF0F9ECFC92D83AA9F1 /* WorkspaceCreateSelectionTests.swift */,
 				C970CF7CB134DAB4AB53B486 /* WorkspaceGatingTests.swift */,
@@ -473,6 +478,7 @@
 				360BA75FD53E0FEA0FCCE2F7 /* HostCallOutcome.swift */,
 				5A52EA499D48D24C71C06E1B /* PostHogTransport.swift */,
 				31C300406588D9244173B6DA /* SessionMetrics.swift */,
+				B1F0C2B3D4E5061728394A5C /* WindowFocusTracker.swift */,
 				48499C408B1F829A6FBF864B /* Telemetry.swift */,
 				A74BC6EDC2AAC583751A65F5 /* TelemetryConfiguration.swift */,
 				7A4FAF6231201DB7C1CE794A /* TelemetryEvent.swift */,
@@ -642,6 +648,7 @@
 				CCC7846256E8342DEC897A07 /* ScenePollingMembership.swift in Sources */,
 				253DEB5B07FB3C0952A3B6C4 /* SessionIDStore.swift in Sources */,
 				1145EAAFB13955E516AE9305 /* SessionMetrics.swift in Sources */,
+				A1F0C2B3D4E5061728394A5B /* WindowFocusTracker.swift in Sources */,
 				46AA7C6E70547DD6FE471029 /* SettingsModel.swift in Sources */,
 				C75CA305DE3A3D4DE4BC7FDF /* SettingsView.swift in Sources */,
 				723FFB2208D3FE9EEA8FD4A2 /* SignInView.swift in Sources */,
@@ -703,6 +710,7 @@
 				E8C6BC2E618BF2DE973D2996 /* SessionIDStoreTests.swift in Sources */,
 				18B48A2B66AD0C51148C076B /* SettingsOrgSwitchTests.swift in Sources */,
 				7CBA75A7F5079A9677BDA7B9 /* TelemetryBoundsTests.swift in Sources */,
+				A2F0C2B3D4E5061728394A5D /* WindowFocusTrackerTests.swift in Sources */,
 				8DD58AC0F4341C00664EB56A /* WebAuthenticationContinuationTests.swift in Sources */,
 				94510D35F675F5FE8ABB2D2E /* WindowRosterAndPollMembershipTests.swift in Sources */,
 				6EB2FEF6C96006BE3E0124B9 /* WorkspaceCreateBranchSlugTests.swift in Sources */,
