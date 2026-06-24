@@ -120,10 +120,15 @@ struct TranscriptContentWebView: UIViewRepresentable {
       }
       function inline(s) {
         s = esc(s);
-        s = s.replace(/`([^`]+)`/g, function(_, c){ return "<code>"+c+"</code>"; });
+        // Pull code spans out before the emphasis/link passes so markdown metacharacters
+        // inside a `code` span (e.g. `**x**`) survive literally instead of being turned
+        // into <strong>/<em>; restore them after the other rules have run.
+        var codes = [];
+        s = s.replace(/`([^`]+)`/g, function(_, c){ codes.push(c); return "\\u0000" + (codes.length - 1) + "\\u0000"; });
         s = s.replace(/\\*\\*([^*]+)\\*\\*/g, "<strong>$1</strong>");
         s = s.replace(/(^|[^*])\\*([^*]+)\\*/g, "$1<em>$2</em>");
         s = s.replace(/\\[([^\\]]+)\\]\\(([^)]+)\\)/g, function(_, t, u){ return "<a href=\\"" + hrefAttr(u) + "\\" target=\\"_blank\\" rel=\\"noopener noreferrer\\">" + t + "</a>"; });
+        s = s.replace(/\\u0000(\\d+)\\u0000/g, function(_, n){ return "<code>" + codes[+n] + "</code>"; });
         return s;
       }
       """

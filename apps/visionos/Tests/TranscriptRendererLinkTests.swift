@@ -56,4 +56,31 @@ final class TranscriptRendererLinkTests: XCTestCase {
         XCTAssertTrue(html.contains("href=\"#\""), "javascript: scheme must be dropped to #, got: \(html)")
         XCTAssertFalse(html.lowercased().contains("href=\"javascript"), "javascript: must never reach href, got: \(html)")
     }
+
+    // Guards #144: markdown metacharacters inside a code span must render literally —
+    // the emphasis passes used to fire on the already-substituted <code> body.
+    func testCodeSpanPreservesAsterisksLiterally() throws {
+        let context = try makeContext()
+        let html = try inline("`a*b*`", in: context)
+
+        XCTAssertTrue(html.contains("<code>a*b*</code>"), "asterisks inside code must stay literal, got: \(html)")
+        XCTAssertFalse(html.contains("<em>"), "code span must not be emphasised, got: \(html)")
+    }
+
+    func testCodeSpanPreservesBoldMarkersLiterally() throws {
+        let context = try makeContext()
+        let html = try inline("`**x**`", in: context)
+
+        XCTAssertTrue(html.contains("<code>**x**</code>"), "bold markers inside code must stay literal, got: \(html)")
+        XCTAssertFalse(html.contains("<strong>"), "code span must not be bolded, got: \(html)")
+    }
+
+    func testEmphasisStillAppliesOutsideCodeSpans() throws {
+        let context = try makeContext()
+        let html = try inline("*em* and `code` and **bold**", in: context)
+
+        XCTAssertTrue(html.contains("<em>em</em>"), "emphasis outside code must still render, got: \(html)")
+        XCTAssertTrue(html.contains("<strong>bold</strong>"), "bold outside code must still render, got: \(html)")
+        XCTAssertTrue(html.contains("<code>code</code>"), "code span must still render, got: \(html)")
+    }
 }
