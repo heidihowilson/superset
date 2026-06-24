@@ -52,6 +52,7 @@ struct WorkspaceCreateView: View {
                         }
                         .pickerStyle(.menu)
                         .labelsHidden()
+                        .accessibilityLabel("Project")
                     }
                     Section("Host") {
                         if store.paidPlan == false {
@@ -68,6 +69,7 @@ struct WorkspaceCreateView: View {
                             }
                             .pickerStyle(.menu)
                             .labelsHidden()
+                            .accessibilityLabel("Host")
                         }
                     }
                 }
