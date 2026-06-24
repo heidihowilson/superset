@@ -11,6 +11,14 @@ struct PostHogTransport: TelemetryTransport {
     let host: URL
     var session: URLSession = .shared
 
+    /// Injection seam for failed sends — a thrown transport error or a non-2xx `/capture`
+    /// response. Defaults to the unified-log debug sink; tests substitute a recorder to
+    /// observe that a drop happened. Telemetry stays best-effort, so failures are only
+    /// logged here, never thrown.
+    var logFailure: @Sendable (String) -> Void = { message in
+        PostHogTransport.logger.debug("\(message, privacy: .public)")
+    }
+
     private static let logger = Logger(subsystem: Logging.subsystem, category: "telemetry")
 
     func send(_ event: TelemetryEvent, distinctID: String) async {
@@ -30,9 +38,12 @@ struct PostHogTransport: TelemetryTransport {
         request.httpBody = body
 
         do {
-            _ = try await session.data(for: request)
+            let (_, response) = try await session.data(for: request)
+            if let http = response as? HTTPURLResponse, !(200 ..< 300).contains(http.statusCode) {
+                logFailure("telemetry send rejected: HTTP \(http.statusCode)")
+            }
         } catch {
-            Self.logger.debug("telemetry send failed: \(error.localizedDescription, privacy: .public)")
+            logFailure("telemetry send failed: \(error.localizedDescription)")
         }
     }
 }
