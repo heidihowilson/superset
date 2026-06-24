@@ -38,6 +38,8 @@ enum AccessibilityID {
     static let composerMicToggle = "composer-mic-toggle"
     /// The composer's failed-send error notice (shown only when `sendState == .failed`).
     static let composerSendError = "composer-send-error"
+    /// The sign-in failure message (shown only when `AuthController.status == .failed`).
+    static let signInError = "sign-in-error"
 
     /// The full identifier for a workspace row, given its workspace id.
     static func workspaceRow(_ id: String) -> String { workspaceRowPrefix + id }
