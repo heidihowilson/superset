@@ -43,4 +43,82 @@ final class JSONValueRenderTests: XCTestCase {
         XCTAssertLessThanOrEqual(rendered.count, 4001) // limit + ellipsis
         XCTAssertTrue(rendered.hasSuffix("…"))
     }
+
+    // MARK: - Decode
+
+    /// A mixed object exercises every scalar branch of `init(from:)` plus the nested
+    /// array/object recursion; the integer field must land as `.number` (not `.bool`),
+    /// pinning the bool-before-number decode order.
+    func testMixedJSONDecodesEveryBranch() throws {
+        let json = """
+        {"name":"build","ok":true,"count":3,"ratio":1.5,"empty":null,\
+        "args":["a","b"],"meta":{"k":"v"}}
+        """
+        let value = try JSONDecoder().decode(JSONValue.self, from: Data(json.utf8))
+        XCTAssertEqual(value, .object([
+            "name": .string("build"),
+            "ok": .bool(true),
+            "count": .number(3),
+            "ratio": .number(1.5),
+            "empty": .null,
+            "args": .array([.string("a"), .string("b")]),
+            "meta": .object(["k": .string("v")]),
+        ]))
+    }
+
+    /// A top-level array decodes its scalar elements (and covers the array branch as root).
+    func testTopLevelArrayDecodes() throws {
+        let value = try JSONDecoder().decode(JSONValue.self, from: Data("[true,1,\"x\",null]".utf8))
+        XCTAssertEqual(value, .array([.bool(true), .number(1), .string("x"), .null]))
+    }
+
+    /// Encoding then decoding a nested mixed value yields an equal value (lossless round-trip).
+    func testNestedMixedJSONRoundTrips() throws {
+        let original = JSONValue.object([
+            "tool": .string("shell"),
+            "input": .object(["command": .string("ls"), "retry": .bool(false)]),
+            "outputs": .array([.number(0), .string("done")]),
+        ])
+        let reencoded = try JSONEncoder().encode(original)
+        let redecoded = try JSONDecoder().decode(JSONValue.self, from: reencoded)
+        XCTAssertEqual(redecoded, original)
+    }
+
+    // MARK: - stringValue
+
+    /// The direct payload of a string value (the plain-text tool result case).
+    func testStringValueReturnsPayloadForString() {
+        XCTAssertEqual(JSONValue.string("shell output").stringValue, "shell output")
+    }
+
+    /// Every non-string case yields nil rather than a stringified projection.
+    func testStringValueNilForNonString() {
+        XCTAssertNil(JSONValue.number(1).stringValue)
+        XCTAssertNil(JSONValue.bool(true).stringValue)
+        XCTAssertNil(JSONValue.null.stringValue)
+        XCTAssertNil(JSONValue.array([.string("x")]).stringValue)
+        XCTAssertNil(JSONValue.object(["k": .string("v")]).stringValue)
+    }
+
+    // MARK: - string(_:)
+
+    /// Looking up a string field on an object returns its payload (e.g. a tool input's `command`).
+    func testStringKeyReadsObjectStringField() {
+        let object = JSONValue.object(["command": .string("ls -la"), "code": .number(0)])
+        XCTAssertEqual(object.string("command"), "ls -la")
+    }
+
+    /// A missing key, or a present-but-non-string field, both yield nil.
+    func testStringKeyNilForMissingOrNonStringField() {
+        let object = JSONValue.object(["code": .number(0)])
+        XCTAssertNil(object.string("command")) // missing key
+        XCTAssertNil(object.string("code")) // present but not a string
+    }
+
+    /// A non-object receiver never resolves a key.
+    func testStringKeyNilForNonObject() {
+        XCTAssertNil(JSONValue.string("plain").string("anything"))
+        XCTAssertNil(JSONValue.array([.string("x")]).string("0"))
+        XCTAssertNil(JSONValue.null.string("k"))
+    }
 }
