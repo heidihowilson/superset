@@ -26,8 +26,7 @@ struct WorkspaceWindowView: View {
     @Environment(AppSettingsStore.self) private var appSettings
     @Environment(OpenWindowsModel.self) private var openWindows
     @Environment(SessionMetrics.self) private var metrics
-    private let clock = ContinuousClock()
-    @State private var focusStart: ContinuousClock.Instant?
+    @State private var focus = WindowFocusTracker(kind: "workspace")
 
     private var workspace: Workspace? {
         guard let workspaceID else { return nil }
@@ -63,19 +62,19 @@ struct WorkspaceWindowView: View {
         // the relay JWT on background, ADR-0006/0008) and M3 records foreground dwell.
         .scenePollingMembership(store: store) { active in
             if active {
-                focusStart = clock.now
+                focus.begin()
                 chat.startPolling()
             } else {
                 // M3: this window's foreground dwell (foreground time, never gaze — §13).
-                if let start = focusStart {
-                    metrics.recordWindowFocus(kind: "workspace", seconds: Self.seconds(clock.now - start))
-                    focusStart = nil
-                }
+                flushFocus()
                 chat.stopPolling()
                 auth.dropRelayToken()
             }
         }
         .onDisappear {
+            // Closing while active fires onDisappear with no inactive transition, so flush
+            // the open dwell here too — flush is idempotent, so it can't double-count.
+            flushFocus()
             chat.stopPolling()
             if let workspaceID { openWindows.unregisterWorkspace(workspaceID) }
         }
@@ -97,9 +96,8 @@ struct WorkspaceWindowView: View {
         }
     }
 
-    private static func seconds(_ duration: Duration) -> Double {
-        let components = duration.components
-        return Double(components.seconds) + Double(components.attoseconds) / 1e18
+    private func flushFocus() {
+        focus.flush { metrics.recordWindowFocus(kind: $0, seconds: $1) }
     }
 
     @ViewBuilder
