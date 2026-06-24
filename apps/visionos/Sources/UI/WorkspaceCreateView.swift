@@ -38,11 +38,13 @@ struct WorkspaceCreateView: View {
                             .onChange(of: name) { _, newValue in
                                 if !branchEdited { branch = Self.branchSlug(from: newValue) }
                             }
+                            .accessibilityIdentifier(AccessibilityID.workspaceNameField)
                     }
                     Section("Branch") {
                         TextField("Branch name", text: $branch)
                             .textInputAutocapitalization(.never)
                             .onChange(of: branch) { _, _ in branchEdited = true }
+                            .accessibilityIdentifier(AccessibilityID.workspaceBranchField)
                     }
                     Section("Project") {
                         Picker("Project", selection: $projectID) {
@@ -85,6 +87,7 @@ struct WorkspaceCreateView: View {
                     } else {
                         Button("Create") { submit() }
                             .disabled(!canSubmit)
+                            .accessibilityIdentifier(AccessibilityID.createButton)
                     }
                 }
             }

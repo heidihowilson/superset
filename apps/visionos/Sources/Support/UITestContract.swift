@@ -26,6 +26,12 @@ enum AccessibilityID {
     /// Identifiers go on leaf elements, never the window's container: a container-level
     /// identifier propagates to and clobbers every descendant's identifier in SwiftUI.
     static let workspaceWindowTitle = "workspace-window-title"
+    /// The workspace-create sheet's name field.
+    static let workspaceNameField = "workspace-name-field"
+    /// The workspace-create sheet's branch field.
+    static let workspaceBranchField = "workspace-branch-field"
+    /// The workspace-create sheet's Create (confirmation) button.
+    static let createButton = "create-button"
     /// The composer's prompt text field.
     static let composerInput = "composer-input"
     /// The composer's dictation mic toggle.
