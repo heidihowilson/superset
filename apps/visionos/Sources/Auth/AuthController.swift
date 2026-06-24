@@ -255,10 +255,10 @@ final class AuthController: RelayCredentialGate {
         else { return }
         do {
             try complete(callbackURL: url)
+            setPendingState(nil)
         } catch {
             status = .failed(Self.message(for: error))
         }
-        setPendingState(nil)
     }
 
     func signOut() {
