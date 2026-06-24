@@ -17,15 +17,10 @@ final class TerminalSpikeUITests: XCTestCase {
     }
 
     func testTerminalRendersEchoesAndCoexists() throws {
-        // BLOCKED upstream: opening the terminal crashes the app on the Simulator with
-        // EXC_BREAKPOINT. libghostty's HOST_MANAGED backend fires receive_buffer /
-        // receive_resize on its `termio` IO thread, but GhosttyTerminal.attach(to:) wraps
-        // those callbacks in MainActor.assumeIsolated, which hard-traps off-main. The fix
-        // is in the TerminalSurface package; this navigation is kept as the live repro and
-        // re-enables once the package marshals those callbacks safely.
-        // See apps/visionos/docs/terminal-spike-ghostty-isolation-issue.md.
-        try XCTSkipIf(true, "Blocked on TerminalSurface isolation crash (receive_* on termio thread)")
-
+        // libghostty's HOST_MANAGED backend fires receive_buffer / receive_resize on its
+        // `termio` IO thread. The TerminalSurface package now routes those callbacks to a
+        // lock-guarded Sendable TerminalOutputSink (no MainActor.assumeIsolated, no main
+        // hop), so bring-up no longer traps off-main.
         let app = XCUIApplication()
         app.launchArguments.append(UITestLaunch.argument)
         app.launch()
@@ -56,8 +51,9 @@ final class TerminalSpikeUITests: XCTestCase {
         openTerminal.tap()
 
         // The two-up toggle lives only in the terminal window — its presence proves the
-        // window opened and the SwiftUI host of the surface mounted.
-        let twoUp = app.buttons["terminal-two-up-toggle"]
+        // window opened and the SwiftUI host of the surface mounted. A button-styled
+        // SwiftUI Toggle surfaces as a `Switch` in the accessibility tree, not a button.
+        let twoUp = app.switches["terminal-two-up-toggle"]
         XCTAssertTrue(twoUp.waitForExistence(timeout: 20), "Terminal window did not open")
         XCTAssertGreaterThan(app.windows.count, windowsBefore, "Expected a new window for the terminal")
         attachScreenshot(app, name: "01-terminal-rendered")

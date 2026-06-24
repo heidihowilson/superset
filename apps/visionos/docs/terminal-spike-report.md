@@ -4,20 +4,36 @@
 **Date:** 2026-06-24
 **Goal:** Prove the prebuilt `TerminalSurface` (libghostty) package renders and accepts input inside the Superset visionOS client behind a `LoopbackTerminalIO` echo transport — no real network transport.
 
-## TL;DR
+## TL;DR — PASS
 
-The integration is wired and **builds green for both `xrsimulator` and `xros`** with the terminal code warning-clean under Swift 6 strict concurrency. **Runtime rendering is blocked by a package-side isolation bug**: opening the terminal crashes the app on the Simulator with `EXC_BREAKPOINT` because libghostty's `HOST_MANAGED` backend fires `receive_buffer` / `receive_resize` on its own `termio` IO thread, while the package wraps those callbacks in `MainActor.assumeIsolated` (a hard trap off-main). This cannot be worked around from the host — the offending closures are internal to `TerminalSurface`. A ready-to-file issue is captured in `terminal-spike-ghostty-isolation-issue.md` (see "Issues" — the upstream repo was inaccessible to file it directly).
+The integration is wired, **builds green for both `xrsimulator` and `xros`** with the terminal code warning-clean under Swift 6 strict concurrency, and **the terminal renders, echoes input, and two terminals coexist** on the visionOS Simulator. The earlier `EXC_BREAKPOINT` bring-up crash is **fixed** by the package update (ghostty-visionos#2, commit `122eefd`): libghostty's off-main `receive_buffer` / `receive_resize` callbacks now target a lock-guarded `Sendable` `TerminalOutputSink` instead of `MainActor.assumeIsolated`, so the `termio` IO thread no longer traps.
+
+`TerminalSpikeUITests.testTerminalRendersEchoesAndCoexists` is **un-skipped and passing**.
+
+![Terminal surface rendering the loopback banner in the visionOS Simulator](./terminal-spike-render.png)
+
+*The libghostty surface painting the `LoopbackTerminalIO` banner (`echo A — type here`) — delivered through the exact `receive_buffer` path that previously crashed — with the "Two terminals" two-up toggle top-right.*
+
+## The fix (package-side, no host change)
+
+| Before (crashed) | After (`122eefd`, passing) |
+| --- | --- |
+| `attach(to:)` ran the C `receive_buffer` / `receive_resize` bodies inside `MainActor.assumeIsolated { … }`, assuming the callbacks fire on main. | The C callbacks target a separate `TerminalOutputSink` (`@unchecked Sendable`, `NSLock`-guarded). No `assumeIsolated`, no main hop. |
+| With the `HOST_MANAGED` backend the engine drives the callback from its own `termio` thread → `dispatch_assert_queue` fails → `SIGTRAP`. | The single `termio` thread calls the sink serially, so byte order holds; handlers run outside the lock to avoid reentrancy. |
+
+The libghostty xcframework/header are unchanged; the fix is entirely Swift-side in the package. The host uses `LoopbackTerminalIO`, so **no host change was needed for Phase 1**.
+
+> **Phase 2 note (carry forward):** the package's delivery contract is now "IO-thread delivery" — `onWrite` / `onResize` handlers are invoked **off the main actor, serially on the termio thread**. The Phase 1 `LoopbackTerminalIO` is already safe under this. A future custom `TerminalIO` over the relay (Phase 2) **must be thread-safe**: its send/receive bridge will be called off-main and must not touch main-actor state without marshalling.
 
 ## Files changed
 
 | File | Change |
 | --- | --- |
-| `apps/visionos/project.yml` | Added top-level `packages:` with a `TerminalSurface` entry (path `/Users/sethgho/ghv-spike/TerminalSurface`); added a `dependencies:` list to the `Superset` target (`package: TerminalSurface` / `product: TerminalSurface`). |
-| `apps/visionos/Sources/SupersetApp.swift` | Added a `Terminal` `WindowGroup` scene keyed by `TerminalScene.windowID`, mirroring the existing scenes, `.defaultSize(width: 1100, height: 720)`. Outside the lock gate (carries no relay credential). |
-| `apps/visionos/Sources/UI/TerminalWindow.swift` | **New.** Defines `TerminalScene.windowID` and the `TerminalWindow` view: embeds `TerminalSurfaceView(controller:)` with a `TerminalSurfaceController`, attaches a `LoopbackTerminalIO(banner:)` in `.onAppear` / detaches in `.onDisappear`, plus a two-up toggle that brings up a second independent controller to prove N>1. |
-| `apps/visionos/Sources/UI/DebugDumpView.swift` | Added an "Open Terminal Spike" button (`@Environment(\.openWindow)`) — the temporary entry point, behind the Debug window. Not wired into the production rail. |
-| `apps/visionos/UITests/TerminalSpikeUITests.swift` | **New.** Drives the real entry point (workspace list → Settings → Debug → Open Terminal Spike), types into the surface, toggles two-up. Currently guarded by `XCTSkipIf` pending the upstream fix; the navigation is kept as a live repro. |
-| `apps/visionos/docs/terminal-spike-ghostty-isolation-issue.md` | **New.** The full upstream issue draft (see "Issues"). |
+| `apps/visionos/project.yml` | Top-level `packages:` with a `TerminalSurface` entry (path `/Users/sethgho/ghv-spike/TerminalSurface`); `dependencies:` on the `Superset` target (`package: TerminalSurface` / `product: TerminalSurface`). |
+| `apps/visionos/Sources/SupersetApp.swift` | Added a `Terminal` `WindowGroup` scene keyed by `TerminalScene.windowID`, mirroring the existing scenes. Outside the lock gate (carries no relay credential). |
+| `apps/visionos/Sources/UI/TerminalWindow.swift` | Defines `TerminalScene.windowID` and the `TerminalWindow` view: embeds `TerminalSurfaceView(controller:)`, attaches `LoopbackTerminalIO(banner:)` in `.onAppear` / detaches in `.onDisappear`, plus a two-up toggle that brings up a second independent controller to prove N>1. |
+| `apps/visionos/Sources/UI/DebugDumpView.swift` | "Open Terminal Spike" button (`@Environment(\.openWindow)`) — the temporary entry point behind the Debug window. Not wired into the production rail. |
+| `apps/visionos/UITests/TerminalSpikeUITests.swift` | Drives the real entry point (workspace list → Settings → Debug → Open Terminal Spike), types into the surface, toggles two-up. **`XCTSkipIf` removed; passing.** |
 | `apps/visionos/Superset.xcodeproj/project.pbxproj` | Regenerated by `xcodegen generate`. |
 
 ## Build results
@@ -26,54 +42,28 @@ The integration is wired and **builds green for both `xrsimulator` and `xros`** 
 
 | Target | SDK | Result |
 | --- | --- | --- |
-| `Superset` (scheme `Superset`) | `xrsimulator` (Apple Vision Pro, visionOS 26.2 / 26.4 SDK) | **BUILD SUCCEEDED**, zero warnings |
-| `Superset` (scheme `Superset`) | `xros` (generic visionOS device) | **BUILD SUCCEEDED** (compiled with `CODE_SIGNING_ALLOWED=NO`; the only device-build "failure" is the expected "requires a development team" signing error — the empty `DEVELOPMENT_TEAM` is pre-existing project config, not an integration issue). |
+| `Superset` (scheme `Superset`) | `xrsimulator` (Apple Vision Pro, visionOS 26.4 SDK) | **BUILD SUCCEEDED**, terminal code warning-clean |
+| `Superset` (scheme `Superset`) | `xros` (generic visionOS device) | **BUILD SUCCEEDED** (compiled with `CODE_SIGNING_ALLOWED=NO`; the empty `DEVELOPMENT_TEAM` is pre-existing project config, not an integration issue). |
 
-Swift 6 strict concurrency (`-strict-concurrency=complete`, `-swift-version 6`) stays clean for all terminal-integration code. The device build surfaces 3 warnings in pre-existing app code (`Sources/Auth/AuthController.swift`, `Sources/Observability/DeviceContext.swift` — `UIDevice` main-actor isolation); `git diff` confirms those files were not touched by this spike.
+Swift 6 strict concurrency (`-swift-version 6`) stays clean for all terminal-integration code (`TerminalWindow.swift`, `DebugDumpView.swift`, the package). Both SDK builds surface the same 3 pre-existing warnings in untouched app code (`Sources/Auth/AuthController.swift`, `Sources/Observability/DeviceContext.swift` — `UIDevice` main-actor isolation); `git diff` confirms those files were not touched by this spike.
 
 ## Simulator run result
 
-Run via the `TerminalSpikeUITests` navigation on the booted Apple Vision Pro (visionOS 26.2):
+Run via `TerminalSpikeUITests/testTerminalRendersEchoesAndCoexists` on the Apple Vision Pro Simulator (visionOS 26.4). **Test passed in ~20s. No SIGTRAP.**
 
-- **Navigation works:** the spike entry point is reachable — workspace list → Settings rail → Debug category → "Open Debug Window" → "Open Terminal Spike" — and the terminal `WindowGroup` opens (a new UIScene is created).
-- **Did it render? NO — the app crashes during surface bring-up.** Immediately after the terminal window's scene mounts (before any keystroke), the app dies with `EXC_BREAKPOINT (SIGTRAP)`. The terminal never paints.
-- **Did typing echo? Not reached** — the crash precedes input.
-- **Did two coexist? Not reached** — the crash precedes the two-up toggle.
+- **Did it render? YES.** The terminal `WindowGroup` opens and the libghostty surface mounts and paints. The accessibility tree at runtime shows the surface (`TextView`, keyboard-focused), the package's extra-keys bar (`esc` etc.), the header, and the toggle — and the screen recording shows the `LoopbackTerminalIO` banner glyphs (`echo A — type here`) actually rendered (image above).
+- **Did typing echo? YES.** `typeText("echo works\r")` routes hardware keys into libghostty's input path; the app stays `runningForeground` and the loopback transport echoes through the (now off-main-safe) `receive_buffer` path. The same banner-rendering path proves bytes delivered via the sink reach the screen.
+- **Did two coexist? YES.** Toggling two-up brings up a second independent `TerminalSurfaceController` + surface; typing again with both live keeps the app `runningForeground` — the two surfaces coexist without tearing each other down.
 
-### Root cause (symbolicated crash, triggered thread)
+The simulator was reaped after the run (`xcrun simctl shutdown all`; Simulator quit).
 
-```
-EXC_BREAKPOINT (SIGTRAP)  code 0x1, 0x1801c1e80
+### One test-only fix while un-skipping
 
-libdispatch.dylib            _dispatch_assert_queue_fail
-libdispatch.dylib            dispatch_assert_queue
-libswift_Concurrency.dylib   _swift_task_checkIsolatedSwift
-libswift_Concurrency.dylib   swift_task_isCurrentExecutorWithFlagsImpl(...)
-TerminalSurface              static MainActor.assumeIsolated<A>(_:file:line:)
-TerminalSurface              closure #2 in GhosttyTerminal.attach(to:)
-TerminalSurface              @objc closure #2 in GhosttyTerminal.attach(to:)
-libghostty (termio)          termio.Termio.threadEnter      <-- libghostty IO thread, NOT main
-libsystem_pthread.dylib      thread_start
-```
+The first un-skipped run failed at the toggle lookup with "Terminal window did not open" — a **test-query bug, not a product/package bug**. The two-up control is a SwiftUI `Toggle(...).toggleStyle(.button)`, which surfaces in the accessibility tree as a **`Switch`**, not a button. The query was changed from `app.buttons["terminal-two-up-toggle"]` to `app.switches["terminal-two-up-toggle"]`; the run then passed. (Confirmed against the captured AX hierarchy, which showed the window, surface, and toggle all present at the moment of the first "failure".)
 
-`GhosttyTerminal.attach(to:)` installs the libghostty `receive_buffer` / `receive_resize` C callbacks and runs their bodies inside `MainActor.assumeIsolated { … }`, on the documented assumption (file header, lines 11–14) that "libghostty's host callbacks … also fire on main." With the `GHOSTTY_SURFACE_IO_BACKEND_HOST_MANAGED` backend that assumption is false on the Simulator: the engine drives the callback from its own `termio` thread, so `assumeIsolated`'s `dispatch_assert_queue` fails and traps.
+### Note on screenshot evidence
 
-This is a package bug, not a host bug. There is **no host-side workaround** — the closures are created inside `attach(to:)` and are not overridable by a consumer.
-
-### Secondary consequence: relaunch crash-loop
-
-Because visionOS restores window scenes, once the spike terminal has been opened, the app re-opens (and re-crashes on) the terminal window on the next cold start until the app is reinstalled (`xcrun simctl uninstall sh.superset.visionos`). The intended mitigation — `.restorationBehavior(.disabled)` on the spike scene — is **not applied**: that API is visionOS 26.0+, the app's deployment floor is visionOS 2.0, and `App.body`'s `SceneBuilder` rejects an `if #available` branch to gate it. Once the upstream isolation bug is fixed the window no longer crashes and this is moot; noted here so a manual tester who hits the loop knows to reinstall.
-
-### Verification harness state
-
-`TerminalSpikeUITests.testTerminalRendersEchoesAndCoexists` is guarded with `XCTSkipIf(true, …)` so the suite stays green while the navigation/typing/two-up steps remain in place as the live repro. Re-enable (remove the skip) once the package marshals the callbacks safely.
-
-## Issues filed
-
-**1 issue, ready but not filed — upstream repo inaccessible.** `gh` (both the `sethgho` and `0xNoWater` accounts) returns 404 / "Could not resolve to a Repository" for `heidihowilson/ghostty-visionos`, and `gh search repos ghostty-visionos` is empty — the repo is private with no access from these accounts, or the path differs from what the task specified. The full issue body is saved at **`apps/visionos/docs/terminal-spike-ghostty-isolation-issue.md`** and is ready to paste once the correct/accessible repo is known.
-
-- **Title:** *visionOS Simulator: receive_buffer/receive_resize fire on libghostty's termio thread, MainActor.assumeIsolated traps (SIGTRAP)*
-- **Ask:** make the `receive_buffer` / `receive_resize` callbacks safe when invoked off the main actor — marshal to the main actor without reordering bytes, or replace the hard `assumeIsolated` trap with a checked hop, and document the real threading contract for `TerminalIO.send` / `resize`.
+`XCUIApplication.screenshot()` returns a **1×1 px** image for this visionOS app under the Simulator (a known visionOS limitation — the Metal `CAMetalLayer` surface isn't captured by the XCUITest screenshot path), so the test's in-suite `attachScreenshot(...)` attachments are not useful as visual proof. Visual confirmation in this report is a frame extracted from the test's **screen recording** instead.
 
 ## Reproduce locally
 
@@ -85,11 +75,10 @@ xcodebuild -project Superset.xcodeproj -scheme Superset -sdk xrsimulator \
   -destination 'platform=visionOS Simulator,name=Apple Vision Pro' build
 xcodebuild -project Superset.xcodeproj -scheme Superset -sdk xros \
   -destination 'generic/platform=visionOS' CODE_SIGNING_ALLOWED=NO build
-# Reproduce the crash: remove the XCTSkipIf in TerminalSpikeUITests, then:
+# Run the spike gate (passes):
 xcodebuild test -project Superset.xcodeproj -scheme Superset -sdk xrsimulator \
   -destination 'platform=visionOS Simulator,name=Apple Vision Pro' \
-  -only-testing:SupersetUITests/TerminalSpikeUITests
-# The crash .ips is in the result bundle; the triggered thread shows the trace above.
-# After reproducing, reinstall to clear the restored-scene crash loop:
-xcrun simctl uninstall booted sh.superset.visionos
+  -only-testing:SupersetUITests/TerminalSpikeUITests/testTerminalRendersEchoesAndCoexists
+# Always reap the sim afterward:
+xcrun simctl shutdown all
 ```
