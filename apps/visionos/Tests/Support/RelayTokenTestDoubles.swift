@@ -146,6 +146,37 @@ final class RelayUnauthorizedHTTP: HTTPPerforming, @unchecked Sendable {
     }
 }
 
+/// A fake `HTTPPerforming` that mints relay JWTs successfully and 401s only the *first*
+/// host-service relay call, answering 200 (empty body) thereafter — the "token aged out
+/// mid-poll" shape (#67): the host call 401s once, the transport drops the cached JWT and
+/// re-mints, and the retried call succeeds. Counts mint and host calls so a test can assert
+/// the single re-mint (the proxy for `invalidate()` having dropped the cache before retry).
+final class RelayRetryOnceHTTP: HTTPPerforming, @unchecked Sendable {
+    private let lock = NSLock()
+    private var mintCount = 0
+    private var hostCount = 0
+
+    var mintCalls: Int { lock.withLock { mintCount } }
+    var hostCalls: Int { lock.withLock { hostCount } }
+
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+        let path = request.url?.path ?? ""
+        if path.hasSuffix("/api/auth/token") {
+            lock.withLock { mintCount += 1 }
+            return try MintGateHTTP.tokenResponse("relay-jwt", for: request)
+        }
+        let attempt: Int = lock.withLock {
+            let current = hostCount
+            hostCount += 1
+            return current
+        }
+        let response = HTTPURLResponse(
+            url: request.url!, statusCode: attempt == 0 ? 401 : 200, httpVersion: nil, headerFields: nil
+        )!
+        return (Data(), response)
+    }
+}
+
 /// No-op `WebAuthenticating` so an `AuthController` can be built without a live browser —
 /// the session-expiry paths never open the handoff, they only drop the token.
 @MainActor
