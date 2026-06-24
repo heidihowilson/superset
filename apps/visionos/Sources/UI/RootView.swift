@@ -56,6 +56,15 @@ struct RootView: View {
         .sheet(isPresented: $isCreating) {
             WorkspaceCreateView(store: store)
         }
+        .alert(
+            "Couldn't complete that",
+            isPresented: lifecycleErrorBinding,
+            presenting: store.lifecycleError
+        ) { _ in
+            Button("OK") { store.clearLifecycleError() }
+        } message: { message in
+            Text(message)
+        }
         .task { await settings.load() }
         .scenePollingMembership(store: store)
         .onAppear {
@@ -63,6 +72,18 @@ struct RootView: View {
             // (PRD §17). Once-only — guarded inside `SessionMetrics`.
             metrics.markFirstMeaningfulView()
         }
+    }
+
+    /// Presentation binding for the shared store's lifecycle-error alert. A failed create from
+    /// the rail '+' surfaces here — `WorkspaceCreateView` keeps its sheet open on failure
+    /// (it dismisses only when `lifecycleError == nil`), and the list's own alert lives outside
+    /// this window's tree, so without this the failure is a silent no-op. Dismissing clears the
+    /// error, which lets the sheet's success guard dismiss on the next attempt.
+    private var lifecycleErrorBinding: Binding<Bool> {
+        Binding(
+            get: { store.lifecycleError != nil },
+            set: { if !$0 { store.clearLifecycleError() } }
+        )
     }
 
     /// Switch the session's active org from the rail menu, then refresh the shared list so
