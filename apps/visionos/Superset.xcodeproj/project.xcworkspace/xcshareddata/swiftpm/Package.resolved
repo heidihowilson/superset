@@ -1,0 +1,15 @@
+{
+  "originHash" : "ef08d5a90d2f5b20c477564ac4b7059e99c59195439eb1f45b9677e1a6abd217",
+  "pins" : [
+    {
+      "identity" : "ghostty-visionos",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/heidihowilson/ghostty-visionos.git",
+      "state" : {
+        "revision" : "b0dc0378388a116d914d2608221e96dcba1b8e96",
+        "version" : "0.1.1"
+      }
+    }
+  ],
+  "version" : 3
+}

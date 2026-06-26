@@ -214,7 +214,6 @@
 		92DB07131AB224ABB387A03E /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		940BA8DA781A35C61F2A578B /* AuthHandoffTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthHandoffTests.swift; sourceTree = "<group>"; };
 		951C8B061117E946C12C674B /* Workspace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Workspace.swift; sourceTree = "<group>"; };
-		958B594B4A67182B336C9381 /* TerminalSurface */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TerminalSurface; path = "../../../../../../../ghv-spike/TerminalSurface"; sourceTree = SOURCE_ROOT; };
 		9606CCAFA50892AEF07E04E8 /* HostServiceClientRequestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServiceClientRequestTests.swift; sourceTree = "<group>"; };
 		999F02D5BC64AC0EDBEE01EA /* ChatSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatSessionStore.swift; sourceTree = "<group>"; };
 		9C4F66798274C0C2405DA556 /* HostServiceClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostServiceClient.swift; sourceTree = "<group>"; };
@@ -465,7 +464,6 @@
 		B0623653AD41013004E74968 = {
 			isa = PBXGroup;
 			children = (
-				BB2023A988E5C691374943AC /* Packages */,
 				9C20B8EEA8FE80F0403919FE /* Sources */,
 				4F2837046E487098645555F9 /* Tests */,
 				44E29695F37E77FE1E0BED9F /* UITests */,
@@ -509,14 +507,6 @@
 				3189518095884CDA2ADDE4AC /* Onboarding */,
 			);
 			path = UI;
-			sourceTree = "<group>";
-		};
-		BB2023A988E5C691374943AC /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				958B594B4A67182B336C9381 /* TerminalSurface */,
-			);
-			name = Packages;
 			sourceTree = "<group>";
 		};
 		C6861F93373C82B978E891B2 /* Observability */ = {
@@ -633,7 +623,7 @@
 			mainGroup = B0623653AD41013004E74968;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				B57F3909D0D359211DE96E28 /* XCLocalSwiftPackageReference "/Users/sethgho/ghv-spike/TerminalSurface" */,
+				2B0D7F1DC08511C9D392C9BC /* XCRemoteSwiftPackageReference "ghostty-visionos" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -1083,16 +1073,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		B57F3909D0D359211DE96E28 /* XCLocalSwiftPackageReference "/Users/sethgho/ghv-spike/TerminalSurface" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "/Users/sethgho/ghv-spike/TerminalSurface";
+/* Begin XCRemoteSwiftPackageReference section */
+		2B0D7F1DC08511C9D392C9BC /* XCRemoteSwiftPackageReference "ghostty-visionos" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/heidihowilson/ghostty-visionos.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		CA4617EDE7A23AE175EA9C51 /* TerminalSurface */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 2B0D7F1DC08511C9D392C9BC /* XCRemoteSwiftPackageReference "ghostty-visionos" */;
 			productName = TerminalSurface;
 		};
 /* End XCSwiftPackageProductDependency section */
