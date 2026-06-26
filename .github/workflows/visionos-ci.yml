@@ -33,6 +33,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
+      - name: Authenticate private SwiftPM package (ghostty-visionos)
+        # The app depends on the private `heidihowilson/ghostty-visionos` SwiftPM package,
+        # whose Libghostty.xcframework ships in-repo via Git LFS. The runner's built-in
+        # GITHUB_TOKEN is scoped to this repo only, so SwiftPM can't clone it. Rewrite the
+        # package URL to carry a read-scoped PAT (secret GHOSTTY_VISIONOS_TOKEN); the same
+        # credential authenticates the LFS smudge during resolution. git-lfs is preinstalled
+        # on macos-latest runners.
+        env:
+          GHOSTTY_VISIONOS_TOKEN: ${{ secrets.GHOSTTY_VISIONOS_TOKEN }}
+        run: |
+          git config --global \
+            url."https://x-access-token:${GHOSTTY_VISIONOS_TOKEN}@github.com/heidihowilson/ghostty-visionos".insteadOf \
+            "https://github.com/heidihowilson/ghostty-visionos"
+          git lfs install
+
       - name: Select newest installed Xcode
         # The local gate builds with the latest Xcode/visionOS SDK; the runner's
         # default Xcode lags (e.g. 16.4 / visionOS 2.5 SDK), which enforces UIKit
