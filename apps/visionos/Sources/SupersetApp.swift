@@ -138,11 +138,12 @@ struct SupersetApp: App {
         }
         .defaultSize(width: 560, height: 720)
 
-        // Phase-1 terminal spike (TerminalSurface + LoopbackTerminalIO). Opened from the
-        // Debug window, deliberately outside the production rail and the lock gate — it
-        // carries no relay credential and exists only to prove the surface renders.
+        // Terminal spike (TerminalSurface). Opened from the Debug window, deliberately outside
+        // the production rail. The loopback mode carries no relay credential; the live (relay)
+        // mode provisions a real host PTY for a chosen Workspace over the shared relay seam —
+        // a Debug-only manual-test surface, not a production terminal.
         WindowGroup(id: TerminalScene.windowID) {
-            TerminalWindow()
+            TerminalWindow(auth: auth, store: store)
                 .preferredColorScheme(appSettings.appearance.colorScheme)
         }
         .defaultSize(width: 1100, height: 720)

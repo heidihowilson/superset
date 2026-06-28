@@ -147,6 +147,31 @@ final class AuthController: RelayCredentialGate {
         )
     }
 
+    /// Relay terminal-session provider for a Workspace (Phase-2 transport, Debug only).
+    /// Provisions a host-side PTY (`terminal.createSession`) and opens the relay WebSocket,
+    /// built over the same bearer seam and shared relay JWT cache as the watch/send paths so
+    /// the terminal rides the same minted credential. Returns nil when the Workspace has no
+    /// Host (nothing to attach to). The `URLSessionWebSocketTask` is built off `URLSession`
+    /// by default; tests inject a stub factory.
+    func makeTerminalSessionProvider(
+        for workspace: Workspace,
+        http: HTTPPerforming = URLSession.shared,
+        makeWebSocketTask: @escaping @Sendable (URL) -> TerminalWebSocketTask = { url in
+            URLSession.shared.webSocketTask(with: url)
+        }
+    ) -> RelayTerminalSessionProvider? {
+        guard let hostID = workspace.hostID else { return nil }
+        return RelayTerminalSessionProvider(
+            api: makeAPIClient(http: http),
+            configuration: configuration,
+            http: http,
+            tokenProvider: relayTokenProvider,
+            workspaceID: workspace.id,
+            hostID: hostID,
+            makeWebSocketTask: makeWebSocketTask
+        )
+    }
+
     /// Drop the cached relay JWT — called on background to shrink the RCE-grade token's
     /// live window ahead of the ~1h revocation lag (PRD §13, ADR-0008). Runs synchronously
     /// (no `Task`) so the JWT is cleared before the scene-phase handler returns and the OS
