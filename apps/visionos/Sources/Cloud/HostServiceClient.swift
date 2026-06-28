@@ -80,6 +80,33 @@ struct HostServiceClient: Sendable {
         try await query("settings.agentConfigs.list", method: .get, input: nil)
     }
 
+    /// Provision a terminal PTY on the Host for a Workspace (`terminal.createSession`), the
+    /// same mutation the web's `createHostTerminal` posts (`apps/web/src/trpc/host-client.ts`).
+    /// Host-gated by construction (relay). The Host keys the session by the returned
+    /// `terminalId`; the WS attach (`RelayTerminalIO`) dials `…/terminal/<terminalId>` to
+    /// adopt that PTY. Only the id is threaded out — `status` is informational.
+    func createTerminalSession(workspaceID: String) async throws -> String {
+        let result: CreateTerminalSessionResult = try await query(
+            "terminal.createSession",
+            method: .post,
+            input: ["workspaceId": workspaceID]
+        )
+        return result.terminalId
+    }
+
+    /// The Workspace's live terminal sessions on the Host (`terminal.listSessions`), the read
+    /// the web's `listHostTerminals` does to offer reattach. Host-gated by construction
+    /// (relay). Tolerant decode (`HostTerminalSession`): a partial row from a newer Host can't
+    /// fail the list.
+    func listTerminalSessions(workspaceID: String) async throws -> [HostTerminalSession] {
+        let result: ListTerminalSessionsResult = try await query(
+            "terminal.listSessions",
+            method: .get,
+            input: ["workspaceId": workspaceID]
+        )
+        return result.sessions
+    }
+
     private enum HTTPMethod: String {
         case get = "GET"
         case post = "POST"
@@ -155,4 +182,47 @@ struct HostServiceClient: Sendable {
 /// watch models read the few fields they need from `json` directly.
 private struct RelayResult<Payload: Decodable>: Decodable {
     let result: SuperJSONResult<Payload>
+}
+
+/// `terminal.createSession` payload (`{ "terminalId": …, "status": … }`). Mirrors the web's
+/// `createHostTerminal` return; only `terminalId` is required to dial the WS.
+private struct CreateTerminalSessionResult: Decodable {
+    let terminalId: String
+    let status: String?
+}
+
+/// `terminal.listSessions` payload (`{ "sessions": [...] }`), mirroring the web's
+/// `listHostTerminals`.
+private struct ListTerminalSessionsResult: Decodable {
+    let sessions: [HostTerminalSession]
+}
+
+/// One live terminal session on the Host, mirroring the web's `HostTerminalSession`
+/// (`apps/web/src/trpc/host-client.ts`). Tolerant decode: only `terminalId` is required;
+/// `workspaceId`/`exited`/`title` default so a partial row from a newer Host can't fail the
+/// list (PRD §12 hand-typed boundary).
+struct HostTerminalSession: Decodable, Sendable, Equatable {
+    let terminalId: String
+    let workspaceId: String?
+    let exited: Bool
+    let title: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case terminalId, workspaceId, exited, title
+    }
+
+    init(terminalId: String, workspaceId: String? = nil, exited: Bool = false, title: String? = nil) {
+        self.terminalId = terminalId
+        self.workspaceId = workspaceId
+        self.exited = exited
+        self.title = title
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        terminalId = try container.decode(String.self, forKey: .terminalId)
+        workspaceId = try container.decodeIfPresent(String.self, forKey: .workspaceId)
+        exited = (try? container.decodeIfPresent(Bool.self, forKey: .exited)) ?? false
+        title = try? container.decodeIfPresent(String.self, forKey: .title)
+    }
 }
