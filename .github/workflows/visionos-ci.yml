@@ -70,5 +70,8 @@ jobs:
       - name: Build
         working-directory: apps/visionos
         run: |
-          xcodebuild -project Superset.xcodeproj -target Superset \
+          # Use -scheme (not -target): under Xcode 26.4's explicit-module build, -target
+          # fails the dependency scan on the TerminalSurface SwiftPM product ("unable to
+          # resolve module dependency"). -scheme builds the package product correctly.
+          xcodebuild -project Superset.xcodeproj -scheme Superset \
             -sdk xrsimulator -configuration Debug -arch arm64 build
