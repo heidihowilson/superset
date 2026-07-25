@@ -1,9 +1,20 @@
 import { readFileSync } from "node:fs";
+import {
+	buildAgentEffortArgs,
+	buildAgentModelArgs,
+	buildAgentModelEnv,
+} from "@superset/shared/agent-models";
+import {
+	buildArgvCommand,
+	buildPromptCommandString,
+	envOverlayPrefix,
+	sanitizePromptForPty,
+} from "@superset/shared/agent-prompt-launch";
 import { TRPCError } from "@trpc/server";
 import { asc, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { HostDb } from "../../../db";
-import { hostAgentConfigs } from "../../../db/schema";
+import { hostAgentConfigs, workspaces } from "../../../db/schema";
 import { createTerminalSessionInternal } from "../../../terminal/terminal";
 import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
@@ -94,52 +105,42 @@ export function resolveHostAgentConfig(
 	return null;
 }
 
-function quoteSingleShell(value: string): string {
-	return `'${value.replaceAll("'", "'\\''")}'`;
-}
-
-function buildArgvCommand(argv: string[]): string {
-	return argv.map(quoteSingleShell).join(" ");
-}
-
 /**
  * Build a shell command string that runs the resolved agent config with the
- * given prompt. argv transport appends the prompt as the final positional;
- * stdin transport pipes the prompt via a heredoc so the agent can read from
- * fd 0.
+ * given prompt. argv transport appends the prompt as a quoted positional;
+ * stdin transport delegates heredoc assembly and delimiter collision handling
+ * to the shared prompt-launch pipeline.
  *
- * Empty prompts drop `promptArgs` so codex/opencode/copilot don't get stray
- * prompt-mode flags during promptless launches.
+ * Prompts that sanitize to empty drop `promptArgs` and the prompt payload so
+ * codex/opencode/copilot don't get stray prompt-mode flags during promptless
+ * launches — emptiness is only knowable after sanitization, so the check
+ * lives here rather than in the router's zod schema.
  */
 export function buildAgentCommandString(
 	config: ResolvedHostAgentConfig,
-	prompt: string,
+	rawPrompt: string,
+	modelArgs: string[] = [],
+	randomId: string = crypto.randomUUID(),
 ): string {
-	const baseArgv = [config.command, ...config.args, ...config.promptArgs];
+	const prompt = sanitizePromptForPty(rawPrompt);
+	const baseArgv = [config.command, ...config.args, ...modelArgs];
+
+	if (prompt === "") {
+		return buildArgvCommand(baseArgv);
+	}
 
 	if (config.promptTransport === "argv") {
-		return buildArgvCommand([...baseArgv, prompt]);
+		// Plain quoted positional, not the shared "$(cat <<…)" form: the command
+		// is typed into the user's configured shell, and fish has no heredocs.
+		return buildArgvCommand([...baseArgv, ...config.promptArgs, prompt]);
 	}
 
-	// stdin: pipe the prompt to the spawned process via heredoc. Delimiter is
-	// constructed to avoid collision with any line in the prompt content.
-	const baseDelimiter = "SUPERSET_PROMPT";
-	let delimiter = baseDelimiter;
-	let counter = 0;
-	while (prompt.split("\n").some((line) => line === delimiter)) {
-		counter += 1;
-		delimiter = `${baseDelimiter}_${counter}`;
-	}
-	return `${buildArgvCommand(baseArgv)} <<'${delimiter}'\n${prompt}\n${delimiter}`;
-}
-
-function envOverlayPrefix(env: Record<string, string>): string {
-	const entries = Object.entries(env);
-	if (entries.length === 0) return "";
-	const assignments = entries
-		.map(([key, value]) => `${key}=${quoteSingleShell(value)}`)
-		.join(" ");
-	return `${assignments} `;
+	return buildPromptCommandString({
+		command: buildArgvCommand([...baseArgv, ...config.promptArgs]),
+		transport: "stdin",
+		prompt,
+		randomId,
+	});
 }
 
 function buildAttachmentBlock(
@@ -157,6 +158,8 @@ export interface AgentRunInput {
 	agent: string;
 	prompt: string;
 	attachmentIds?: string[];
+	model?: string;
+	effort?: string;
 }
 
 export type AgentRunResult =
@@ -212,6 +215,7 @@ async function runChatAgent(
 				content: input.prompt,
 				...(files.length > 0 ? { files } : {}),
 			},
+			...(input.model ? { metadata: { model: input.model } } : {}),
 		})
 		.catch((error) => {
 			console.error(
@@ -229,9 +233,12 @@ async function runTerminalAgent(
 ): Promise<AgentRunResult> {
 	const config = resolveHostAgentConfig(ctx.db, input.agent);
 	if (!config) {
+		// Worded for end users (automation run errors show this verbatim), but
+		// keep "No host agent config matching" — the desktop matches on it to
+		// attach re-select guidance.
 		throw new TRPCError({
 			code: "NOT_FOUND",
-			message: `No host agent config matching '${input.agent}' (tried instance id then preset id).`,
+			message: `No host agent config matching '${input.agent}' — the agent may have been removed or this host's agents were reset. Re-select an agent (or use a preset id like "claude").`,
 		});
 	}
 
@@ -248,8 +255,14 @@ async function runTerminalAgent(
 	}
 
 	const prompt = buildAttachmentBlock(input.prompt, resolvedAttachments);
-	const command = buildAgentCommandString(config, prompt);
-	const fullCommand = `${envOverlayPrefix(config.env)}${command}`;
+	const modelArgs = buildAgentModelArgs(config.presetId, input.model);
+	const effortArgs = buildAgentEffortArgs(config.presetId, input.effort);
+	const command = buildAgentCommandString(config, prompt, [
+		...modelArgs,
+		...effortArgs,
+	]);
+	const modelEnv = buildAgentModelEnv(config.presetId, input.model);
+	const fullCommand = `${envOverlayPrefix({ ...config.env, ...modelEnv })}${command}`;
 
 	const terminalId = crypto.randomUUID();
 	const result = await createTerminalSessionInternal({
@@ -278,6 +291,17 @@ export async function runAgentInWorkspace(
 	ctx: HostServiceContext,
 	input: AgentRunInput,
 ): Promise<AgentRunResult> {
+	const workspace = ctx.db.query.workspaces
+		.findFirst({ where: eq(workspaces.id, input.workspaceId) })
+		.sync();
+	if (!workspace) {
+		// NOT_FOUND (not a 500) so callers like automation dispatch can tell a
+		// dead workspace pin apart from a host-side failure.
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: `Workspace ${input.workspaceId} not found on this host — it may have been deleted.`,
+		});
+	}
 	if (input.agent === SUPERSET_AGENT_ID) {
 		return runChatAgent(ctx, input, SUPERSET_AGENT_LABEL);
 	}
@@ -292,6 +316,8 @@ export const agentsRouter = router({
 				agent: z.string().min(1),
 				prompt: z.string().min(1),
 				attachmentIds: z.array(z.string().uuid()).optional(),
+				model: z.string().min(1).optional(),
+				effort: z.string().min(1).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => runAgentInWorkspace(ctx, input)),

@@ -13,9 +13,11 @@ import {
 	LuGitBranch,
 	LuLayoutTemplate,
 } from "react-icons/lu";
+import { UpdatesPill } from "renderer/components/UpdatesPill";
 import { useOpenProject } from "renderer/react-query/projects";
 import { useOpenMainRepoWorkspace } from "renderer/react-query/workspaces";
 import {
+	useOpenEmptyProjectModal,
 	useOpenNewProjectModal,
 	useOpenTemplateGalleryModal,
 } from "renderer/stores/add-repository-modal";
@@ -30,6 +32,7 @@ export function WorkspaceSidebarFooter({
 }: WorkspaceSidebarFooterProps) {
 	const { openNew, isPending: isOpenPending } = useOpenProject();
 	const openMainRepoWorkspace = useOpenMainRepoWorkspace();
+	const openEmptyProject = useOpenEmptyProjectModal();
 	const openNewProject = useOpenNewProjectModal();
 	const openTemplateGallery = useOpenTemplateGalleryModal();
 
@@ -73,6 +76,11 @@ export function WorkspaceSidebarFooter({
 		if (result) await openMainWorkspaceForProject(result.projectId);
 	};
 
+	const handleCreateProject = async () => {
+		const result = await openEmptyProject();
+		if (result) await openMainWorkspaceForProject(result.projectId);
+	};
+
 	const handleTemplateProject = async () => {
 		const result = await openTemplateGallery();
 		if (result) await openMainWorkspaceForProject(result.projectId);
@@ -83,6 +91,7 @@ export function WorkspaceSidebarFooter({
 	if (isCollapsed) {
 		return (
 			<div className="border-t border-border p-2 flex flex-col items-center gap-1">
+				<UpdatesPill isCollapsed />
 				<DropdownMenu>
 					<Tooltip delayDuration={300}>
 						<TooltipTrigger asChild>
@@ -100,6 +109,10 @@ export function WorkspaceSidebarFooter({
 						<TooltipContent side="right">Add repository</TooltipContent>
 					</Tooltip>
 					<DropdownMenuContent side="top" align="start">
+						<DropdownMenuItem onClick={handleCreateProject}>
+							<LuFolderPlus className="size-4" strokeWidth={STROKE_WIDTH} />
+							Create new project
+						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handleOpenProject} disabled={isLoading}>
 							<LuFolderOpen className="size-4" strokeWidth={STROKE_WIDTH} />
 							Open project
@@ -133,6 +146,10 @@ export function WorkspaceSidebarFooter({
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent side="top" align="start">
+					<DropdownMenuItem onClick={handleCreateProject}>
+						<LuFolderPlus className="size-4" strokeWidth={STROKE_WIDTH} />
+						Create new project
+					</DropdownMenuItem>
 					<DropdownMenuItem onClick={handleOpenProject} disabled={isLoading}>
 						<LuFolderOpen className="size-4" strokeWidth={STROKE_WIDTH} />
 						Open project
@@ -147,6 +164,7 @@ export function WorkspaceSidebarFooter({
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+			<UpdatesPill />
 		</div>
 	);
 }

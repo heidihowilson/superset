@@ -30,38 +30,24 @@ export class Agents extends APIResource {
 	}
 
 	/**
-	 * Create (launch) an agent session inside an existing workspace. Looks up
-	 * the host that owns the workspace (cloud index) and starts the named
-	 * preset (or HostAgentConfig instance) in a fresh terminal session on that
-	 * host. Pass an explicit `hostId` to skip the lookup.
+	 * Create (launch) an agent session inside an existing workspace on its
+	 * host: starts the named preset (or HostAgentConfig instance) in a fresh
+	 * terminal session there.
 	 *
-	 * Mirrors `superset agents create`.
+	 * Mirrors `superset agents create --host <id>`.
 	 */
-	async create(
-		params: AgentCreateParams,
-		options?: { hostId?: string },
-	): Promise<AgentCreateResult> {
+	async create(params: AgentCreateParams): Promise<AgentCreateResult> {
 		this._requireOrgId();
-		let hostId = options?.hostId;
-		if (!hostId) {
-			const cloud = await this._client.query<HostLookup | null>(
-				"v2Workspace.getFromHost",
-				{
-					organizationId: this._client.organizationId,
-					id: params.workspaceId,
-				},
-			);
-			if (!cloud) {
-				throw new SupersetError(`Workspace not found: ${params.workspaceId}`);
-			}
-			hostId = cloud.hostId;
-		}
-		return this._client.hostMutation<AgentCreateResult>(hostId, "agents.run", {
-			workspaceId: params.workspaceId,
-			agent: params.agent,
-			prompt: params.prompt,
-			attachmentIds: params.attachmentIds,
-		});
+		return this._client.hostMutation<AgentCreateResult>(
+			params.hostId,
+			"agents.run",
+			{
+				workspaceId: params.workspaceId,
+				agent: params.agent,
+				prompt: params.prompt,
+				attachmentIds: params.attachmentIds,
+			},
+		);
 	}
 
 	private _requireOrgId(): string {
@@ -97,6 +83,8 @@ export interface AgentListParams {
 }
 
 export interface AgentCreateParams {
+	/** The host machineId the workspace lives on (see `hosts.list()`). */
+	hostId: string;
 	/** Workspace UUID to launch the agent session in. */
 	workspaceId: string;
 	/** Agent preset id (e.g. `"claude"`, `"superset"`) or HostAgentConfig instance UUID. */
@@ -105,10 +93,6 @@ export interface AgentCreateParams {
 	prompt: string;
 	/** Host-scoped attachment ids; host resolves to absolute paths in the prompt. */
 	attachmentIds?: string[];
-}
-
-interface HostLookup {
-	hostId: string;
 }
 
 export type AgentCreateResult =

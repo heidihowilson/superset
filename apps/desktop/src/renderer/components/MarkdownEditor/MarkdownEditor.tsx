@@ -141,8 +141,15 @@ interface MarkdownEditorProps {
 	className?: string;
 	editorClassName?: string;
 	onModEnter?: () => void;
+	/**
+	 * If provided, plain Enter fires this instead of inserting a newline
+	 * (Shift+Enter still breaks the line). Composer-style editors only.
+	 */
+	onEnterSubmit?: () => void;
 	/** If provided, enables @-mention file search for the editor. */
 	searchFiles?: FileMentionSearchFn;
+	/** If provided, pasted file items (e.g. clipboard images) are forwarded here. */
+	onPasteFiles?: (files: File[]) => void;
 	/** Toggle optional affordances. Each defaults to enabled. */
 	features?: {
 		slashCommand?: boolean;
@@ -173,6 +180,25 @@ function isMarkdownTable(text: string): boolean {
 	return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(lines[1]);
 }
 
+function getClipboardFiles(data: DataTransfer | null): File[] {
+	if (!data) return [];
+
+	const files = Array.from(data.files ?? []);
+	const fileKeys = new Set(files.map((file) => `${file.name}:${file.size}`));
+
+	for (const item of Array.from(data.items ?? [])) {
+		if (item.kind !== "file") continue;
+		const file = item.getAsFile();
+		if (!file) continue;
+		const key = `${file.name}:${file.size}`;
+		if (fileKeys.has(key)) continue;
+		fileKeys.add(key);
+		files.push(file);
+	}
+
+	return files;
+}
+
 export function MarkdownEditor({
 	content,
 	onSave,
@@ -182,7 +208,9 @@ export function MarkdownEditor({
 	className,
 	editorClassName,
 	onModEnter,
+	onEnterSubmit,
 	searchFiles,
+	onPasteFiles,
 	features,
 }: MarkdownEditorProps) {
 	const showSlashCommand = features?.slashCommand ?? true;
@@ -194,6 +222,10 @@ export function MarkdownEditor({
 	// Thread through a ref so the extension reads the live callback each fire.
 	const searchFilesRef = useRef(searchFiles);
 	searchFilesRef.current = searchFiles;
+	const onPasteFilesRef = useRef(onPasteFiles);
+	onPasteFilesRef.current = onPasteFiles;
+	const onEnterSubmitRef = useRef(onEnterSubmit);
+	onEnterSubmitRef.current = onEnterSubmit;
 	const editorRef = useRef<Editor | null>(null);
 
 	const urlPolicy = useInlineUrlPolicy();
@@ -329,9 +361,27 @@ export function MarkdownEditor({
 					onModEnter?.();
 					return true;
 				}
+				if (
+					onEnterSubmitRef.current &&
+					event.key === "Enter" &&
+					!event.shiftKey &&
+					!event.altKey
+				) {
+					onEnterSubmitRef.current();
+					return true;
+				}
 				return false;
 			},
 			handlePaste: (_, event) => {
+				const onPasteFiles = onPasteFilesRef.current;
+				if (onPasteFiles) {
+					const files = getClipboardFiles(event.clipboardData);
+					if (files.length > 0) {
+						event.preventDefault();
+						onPasteFiles(files);
+						return true;
+					}
+				}
 				const text = event.clipboardData?.getData("text/plain") ?? "";
 				const currentEditor = editorRef.current;
 				if (!currentEditor || !isMarkdownTable(text)) {

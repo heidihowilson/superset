@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
 import {
 	getDefaultSeedPresets,
+	getPresetById,
 	type HostAgentPreset,
 } from "@superset/shared/host-agent-presets";
 import { TRPCError } from "@trpc/server";
@@ -19,6 +20,8 @@ const envSchema = z.record(z.string(), z.string());
 export interface HostAgentConfig {
 	id: string;
 	presetId: string;
+	/** Built-in icon key to render, or null to fall back to `presetId`. */
+	iconId: string | null;
 	label: string;
 	command: string;
 	args: string[];
@@ -31,6 +34,7 @@ export interface HostAgentConfig {
 interface HostAgentConfigRow {
 	id: string;
 	presetId: string;
+	iconId: string | null;
 	label: string;
 	command: string;
 	argsJson: string;
@@ -78,6 +82,7 @@ function toOutput(row: HostAgentConfigRow): HostAgentConfig {
 	return {
 		id: row.id,
 		presetId: row.presetId,
+		iconId: row.iconId ?? null,
 		label: row.label,
 		command: row.command,
 		args: parseArgv(row.argsJson),
@@ -95,6 +100,7 @@ function rowFromPreset(
 	return {
 		id: randomUUID(),
 		presetId: preset.presetId,
+		iconId: null,
 		label: preset.label,
 		command: preset.command,
 		argsJson: JSON.stringify(preset.args),
@@ -124,6 +130,14 @@ function seedDefaultsIfEmpty(db: HostDb): HostAgentConfigRow[] {
 	return listOrdered(db);
 }
 
+// An icon override is either a built-in icon key ("claude") or an uploaded
+// `data:` image URI. Capped so an oversized upload can't bloat the per-machine
+// SQLite DB — the client downscales images before sending.
+const MAX_ICON_ID_LENGTH = 256 * 1024;
+const iconIdSchema = z.string().trim().min(1).max(MAX_ICON_ID_LENGTH);
+// `null` clears the icon override (fall back to `presetId`); a string sets it.
+const iconIdPatchSchema = iconIdSchema.nullable();
+
 const updatePatchSchema = z
 	.object({
 		label: z.string().trim().min(1).optional(),
@@ -132,6 +146,7 @@ const updatePatchSchema = z
 		promptTransport: promptTransportSchema.optional(),
 		promptArgs: argvSchema.optional(),
 		env: envSchema.optional(),
+		iconId: iconIdPatchSchema.optional(),
 	})
 	.refine(
 		(patch) =>
@@ -140,7 +155,8 @@ const updatePatchSchema = z
 			patch.args !== undefined ||
 			patch.promptTransport !== undefined ||
 			patch.promptArgs !== undefined ||
-			patch.env !== undefined,
+			patch.env !== undefined ||
+			patch.iconId !== undefined,
 		{ message: "Patch must update at least one field" },
 	);
 
@@ -152,6 +168,7 @@ const addInputSchema = z.object({
 	promptArgs: argvSchema,
 	env: envSchema,
 	presetId: z.string().trim().min(1).optional(),
+	iconId: iconIdSchema.optional(),
 });
 
 export const agentConfigsRouter = router({
@@ -166,8 +183,10 @@ export const agentConfigsRouter = router({
 
 	/**
 	 * Insert a configured host-agent row. Callers pass the full launch shape;
-	 * `presetId` is a free-form metadata tag the client uses for icon and
-	 * description lookup, defaulting to `"custom"` when omitted. Duplicate
+	 * `presetId` is a free-form metadata tag the client uses for description
+	 * lookup (and as the icon fallback), defaulting to `"custom"` when omitted.
+	 * `iconId` optionally overrides the rendered icon with a built-in icon key
+	 * (used by user-authored agents, whose `presetId` is `"custom"`). Duplicate
 	 * `presetId` values are allowed — each row gets a fresh `id`.
 	 */
 	add: protectedProcedure.input(addInputSchema).mutation(({ ctx, input }) => {
@@ -182,6 +201,7 @@ export const agentConfigsRouter = router({
 			.values({
 				id,
 				presetId: input.presetId ?? "custom",
+				iconId: input.iconId ?? null,
 				label: input.label,
 				command: input.command,
 				argsJson: JSON.stringify(input.args),
@@ -242,6 +262,7 @@ export const agentConfigsRouter = router({
 				update.promptArgsJson = JSON.stringify(input.patch.promptArgs);
 			if (input.patch.env !== undefined)
 				update.envJson = JSON.stringify(input.patch.env);
+			if (input.patch.iconId !== undefined) update.iconId = input.patch.iconId;
 			ctx.db
 				.update(hostAgentConfigs)
 				.set(update)
@@ -259,6 +280,63 @@ export const agentConfigsRouter = router({
 				});
 			}
 			return toOutput(updated);
+		}),
+
+	/**
+	 * Restore one configured built-in agent to the bundled definition while
+	 * preserving its stable id and display order. This repairs stale defaults
+	 * without replacing unrelated custom agents or breaking linked presets.
+	 */
+	restoreDefault: protectedProcedure
+		.input(z.object({ id: z.string().min(1) }))
+		.mutation(({ ctx, input }) => {
+			const existing = ctx.db
+				.select()
+				.from(hostAgentConfigs)
+				.where(eq(hostAgentConfigs.id, input.id))
+				.get();
+			if (!existing) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `Host agent config not found: ${input.id}`,
+				});
+			}
+
+			const preset = getPresetById(existing.presetId);
+			if (!preset) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: `Agent config '${input.id}' has no bundled default`,
+				});
+			}
+
+			ctx.db
+				.update(hostAgentConfigs)
+				.set({
+					iconId: null,
+					label: preset.label,
+					command: preset.command,
+					argsJson: JSON.stringify(preset.args),
+					promptTransport: preset.promptTransport,
+					promptArgsJson: JSON.stringify(preset.promptArgs),
+					envJson: JSON.stringify(preset.env),
+					updatedAt: Date.now(),
+				})
+				.where(eq(hostAgentConfigs.id, input.id))
+				.run();
+
+			const restored = ctx.db
+				.select()
+				.from(hostAgentConfigs)
+				.where(eq(hostAgentConfigs.id, input.id))
+				.get();
+			if (!restored) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to read back restored host agent config",
+				});
+			}
+			return toOutput(restored);
 		}),
 
 	/** Delete a single host agent config by id. Throws NOT_FOUND if missing. */

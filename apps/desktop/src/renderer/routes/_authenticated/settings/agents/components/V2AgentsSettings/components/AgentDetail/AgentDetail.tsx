@@ -1,17 +1,23 @@
 import type { HostAgentConfig } from "@superset/host-service/settings";
 import type { PromptTransport } from "@superset/shared/agent-prompt-launch";
+import { getPresetById } from "@superset/shared/host-agent-presets";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@superset/ui/alert-dialog";
 import { Button } from "@superset/ui/button";
 import { Input } from "@superset/ui/input";
-import { Label } from "@superset/ui/label";
 import { toast } from "@superset/ui/sonner";
-import { cn } from "@superset/ui/utils";
 import { useMutation } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	getPresetIcon,
-	useIsDarkTheme,
-} from "renderer/assets/app-icons/preset-icons";
 import {
 	getAgentCommandText,
 	isAgentCommandPatchChanged,
@@ -21,6 +27,12 @@ import { joinArgs, parseArgs } from "renderer/lib/argv";
 import { getHostServiceClientByUrl } from "renderer/lib/host-service-client";
 import { getHostServiceUnavailableMessage } from "renderer/lib/host-service-unavailable";
 import { useLocalHostService } from "renderer/routes/_authenticated/providers/LocalHostServiceProvider";
+import {
+	AgentDetailHeader,
+	AgentLaunchFields,
+	Section,
+} from "../AgentFormControls";
+import { AgentIconPicker } from "../AgentIconPicker";
 
 interface AgentDetailProps {
 	config: HostAgentConfig;
@@ -37,8 +49,8 @@ export function AgentDetail({
 }: AgentDetailProps) {
 	const hostService = useLocalHostService();
 	const { activeHostUrl } = hostService;
-	const isDark = useIsDarkTheme();
-	const icon = getPresetIcon(config.presetId, isDark);
+	const isCustom = config.presetId === "custom";
+	const hasBundledDefault = getPresetById(config.presetId) !== undefined;
 
 	const [label, setLabel] = useState(config.label);
 	const [commandText, setCommandText] = useState(getAgentCommandText(config));
@@ -111,6 +123,29 @@ export function AgentDetail({
 			toast.error(err instanceof Error ? err.message : "Failed to remove"),
 	});
 
+	const restoreDefaultMutation = useMutation({
+		mutationFn: () => {
+			if (!activeHostUrl) {
+				throw new Error(
+					getHostServiceUnavailableMessage(hostService, {
+						action: "restore the agent defaults",
+					}),
+				);
+			}
+			return getHostServiceClientByUrl(
+				activeHostUrl,
+			).settings.agentConfigs.restoreDefault.mutate({ id: config.id });
+		},
+		onSuccess: (updated) => {
+			onChanged(updated);
+			toast.success(`${updated.label} restored to defaults`);
+		},
+		onError: (err) =>
+			toast.error(
+				err instanceof Error ? err.message : "Failed to restore defaults",
+			),
+	});
+
 	const handleLabelBlur = () => {
 		if (label !== config.label && label.trim().length > 0) {
 			updateMutation.mutate({ label });
@@ -150,17 +185,12 @@ export function AgentDetail({
 
 	return (
 		<div className="p-6 max-w-3xl w-full mx-auto">
-			<div className="mb-8 flex items-center gap-3">
-				{icon ? (
-					<img src={icon} alt="" className="size-8 object-contain shrink-0" />
-				) : null}
-				<div className="min-w-0 flex-1">
-					<h2 className="text-xl font-semibold truncate">{config.label}</h2>
-					<p className="text-sm text-muted-foreground mt-0.5 truncate">
-						{description}
-					</p>
-				</div>
-			</div>
+			<AgentDetailHeader
+				iconId={config.iconId}
+				presetId={config.presetId}
+				title={config.label}
+				subtitle={description}
+			/>
 
 			<div className="space-y-6">
 				<Section title="Label">
@@ -172,76 +202,78 @@ export function AgentDetail({
 					/>
 				</Section>
 
-				<Section title="Launch">
-					<StackedField
-						label="Command"
-						hint="Argv used to launch the agent."
-						htmlFor={`command-${config.id}`}
-					>
-						<Input
-							id={`command-${config.id}`}
-							className="font-mono text-xs"
-							value={commandText}
-							onChange={(e) => setCommandText(e.target.value)}
-							onBlur={handleCommandBlur}
-							placeholder="claude --dangerously-skip-permissions"
+				{isCustom ? (
+					<Section title="Icon">
+						<AgentIconPicker
+							value={config.iconId}
+							onChange={(iconId) => updateMutation.mutate({ iconId })}
+							disabled={updateMutation.isPending}
 						/>
-					</StackedField>
+					</Section>
+				) : null}
 
-					<StackedField
-						label="Prompt-only args"
-						hint={
-							<>
-								Added only when launching with a prompt — e.g. <code>--</code>,{" "}
-								<code>--prompt</code>, <code>-i</code>.
-							</>
-						}
-						htmlFor={`prompt-args-${config.id}`}
-					>
-						<Input
-							id={`prompt-args-${config.id}`}
-							className="font-mono text-xs"
-							value={promptArgsText}
-							onChange={(e) => setPromptArgsText(e.target.value)}
-							onBlur={handlePromptArgsBlur}
-							placeholder="--prompt"
-						/>
-					</StackedField>
+				<AgentLaunchFields
+					idPrefix={config.id}
+					commandText={commandText}
+					onCommandTextChange={setCommandText}
+					onCommandBlur={handleCommandBlur}
+					promptArgsText={promptArgsText}
+					onPromptArgsTextChange={setPromptArgsText}
+					onPromptArgsBlur={handlePromptArgsBlur}
+					promptTransport={promptTransport}
+					onPromptTransportChange={handleTransportChange}
+				/>
 
-					<StackedField
-						label="Prompt transport"
-						hint="How the prompt is delivered to the process."
-					>
-						<div className="inline-flex rounded-md border border-border overflow-hidden">
-							<button
-								type="button"
-								onClick={() => handleTransportChange("argv")}
-								className={cn(
-									"px-3 py-1 text-xs font-medium transition-colors",
-									promptTransport === "argv"
-										? "bg-accent text-accent-foreground"
-										: "bg-transparent text-muted-foreground hover:bg-accent/50",
-								)}
-							>
-								argv
-							</button>
-							<button
-								type="button"
-								onClick={() => handleTransportChange("stdin")}
-								className={cn(
-									"px-3 py-1 text-xs font-medium transition-colors border-l border-border",
-									promptTransport === "stdin"
-										? "bg-accent text-accent-foreground"
-										: "bg-transparent text-muted-foreground hover:bg-accent/50",
-								)}
-							>
-								stdin
-							</button>
+				{hasBundledDefault ? (
+					<div className="pt-2 border-t border-border">
+						<div className="flex items-center justify-between gap-8">
+							<div className="min-w-0 flex-1">
+								<div className="text-sm font-medium">Restore default</div>
+								<p className="text-sm text-muted-foreground mt-0.5">
+									Replace this agent's launch settings with the current bundled
+									configuration.
+								</p>
+							</div>
+							<AlertDialog>
+								<AlertDialogTrigger asChild>
+									<Button
+										variant="outline"
+										size="sm"
+										disabled={restoreDefaultMutation.isPending}
+										className="shrink-0 gap-1.5"
+									>
+										<RotateCcw className="size-3.5" />
+										Restore
+									</Button>
+								</AlertDialogTrigger>
+								<AlertDialogContent>
+									<AlertDialogHeader>
+										<AlertDialogTitle>
+											Restore {config.label} to defaults?
+										</AlertDialogTitle>
+										<AlertDialogDescription>
+											This replaces its label, command, arguments, prompt
+											settings, environment variables, and icon with the current
+											bundled configuration.
+										</AlertDialogDescription>
+									</AlertDialogHeader>
+									<AlertDialogFooter>
+										<AlertDialogCancel>Cancel</AlertDialogCancel>
+										<AlertDialogAction
+											onClick={() => restoreDefaultMutation.mutate()}
+										>
+											Restore defaults
+										</AlertDialogAction>
+									</AlertDialogFooter>
+								</AlertDialogContent>
+							</AlertDialog>
 						</div>
-					</StackedField>
-				</Section>
+					</div>
+				) : null}
 
-				<div className="pt-2 border-t border-border">
+				<div
+					className={hasBundledDefault ? "pt-6" : "pt-2 border-t border-border"}
+				>
 					<div className="flex items-center justify-between gap-8">
 						<div className="min-w-0 flex-1">
 							<div className="text-sm font-medium">Delete agent</div>
@@ -262,54 +294,6 @@ export function AgentDetail({
 					</div>
 				</div>
 			</div>
-		</div>
-	);
-}
-
-function Section({
-	title,
-	description,
-	action,
-	children,
-}: {
-	title: string;
-	description?: string;
-	action?: React.ReactNode;
-	children?: React.ReactNode;
-}) {
-	return (
-		<section className="space-y-3">
-			<div className="flex items-start justify-between gap-6">
-				<div className="min-w-0 flex-1">
-					<h3 className="text-sm font-medium">{title}</h3>
-					{description && (
-						<p className="text-xs text-muted-foreground mt-0.5">
-							{description}
-						</p>
-					)}
-				</div>
-				{action ? <div className="shrink-0">{action}</div> : null}
-			</div>
-			{children ? <div className="space-y-5">{children}</div> : null}
-		</section>
-	);
-}
-
-interface StackedFieldProps {
-	label: string;
-	hint?: React.ReactNode;
-	htmlFor?: string;
-	children: React.ReactNode;
-}
-
-function StackedField({ label, hint, htmlFor, children }: StackedFieldProps) {
-	return (
-		<div className="space-y-1.5">
-			<Label htmlFor={htmlFor} className="text-sm font-medium">
-				{label}
-			</Label>
-			{hint && <p className="text-xs text-muted-foreground -mt-1">{hint}</p>}
-			{children}
 		</div>
 	);
 }

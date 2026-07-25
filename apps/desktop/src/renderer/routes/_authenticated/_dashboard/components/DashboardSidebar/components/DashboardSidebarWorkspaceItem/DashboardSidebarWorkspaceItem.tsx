@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDiffStats } from "renderer/hooks/host-service/useDiffStats";
+import { useV2WorkspaceNotificationStatus } from "renderer/hooks/host-service/useV2NotificationStatus";
 import { useOptimisticCollectionActions } from "renderer/routes/_authenticated/hooks/useOptimisticCollectionActions";
 import { useDeletingWorkspaces } from "renderer/routes/_authenticated/providers/DeletingWorkspacesProvider";
 import { RenameBranchDialog } from "renderer/screens/main/components/WorkspaceSidebar/WorkspaceListItem/components";
-import { useV2WorkspaceNotificationStatus } from "renderer/stores/v2-notifications";
 import { useDashboardSidebarHover } from "../../providers/DashboardSidebarHoverProvider";
 import type { DashboardSidebarWorkspace } from "../../types";
 import { DashboardSidebarDeleteDialog } from "../DashboardSidebarDeleteDialog";
@@ -43,6 +43,7 @@ export function DashboardSidebarWorkspaceItem({
 	const workspaceStatus = useV2WorkspaceNotificationStatus(id);
 	const {
 		cancelRename,
+		handleClearStatus,
 		handleClick,
 		handleCopyPath,
 		handleCopyBranchName,
@@ -121,12 +122,10 @@ export function DashboardSidebarWorkspaceItem({
 				onMouseLeave={handleMouseLeave}
 				className="relative flex w-full justify-center"
 			>
-				{(accentColor || isActive) && (
+				{accentColor && (
 					<div
 						className="absolute inset-y-0 left-0 w-0.5"
-						style={{
-							backgroundColor: accentColor ?? "var(--color-foreground)",
-						}}
+						style={{ backgroundColor: accentColor }}
 					/>
 				)}
 				<DashboardSidebarCollapsedWorkspaceButton
@@ -150,9 +149,11 @@ export function DashboardSidebarWorkspaceItem({
 						content
 					) : (
 						<DashboardSidebarWorkspaceContextMenu
+							workspaceId={id}
 							projectId={projectId}
 							isInSection={isInSection}
 							isUnread={isUnread}
+							hasStatus={!!workspaceStatus}
 							isLocalWorkspace={hostType === "local-device"}
 							isPinned={isMainWorkspace && hostType === "local-device"}
 							onCreateSection={handleCreateSection}
@@ -164,11 +165,12 @@ export function DashboardSidebarWorkspaceItem({
 							onCopyPath={handleCopyPath}
 							onCopyBranchName={handleCopyBranchName}
 							onRemoveFromSidebar={handleRemoveFromSidebar}
-							onRename={startRename}
+							onRename={isMainWorkspace ? undefined : startRename}
 							onDelete={
 								isMainWorkspace ? undefined : () => setIsDeleteDialogOpen(true)
 							}
 							onToggleUnread={handleToggleUnread}
+							onClearStatus={handleClearStatus}
 						>
 							{content}
 						</DashboardSidebarWorkspaceContextMenu>
@@ -216,7 +218,7 @@ export function DashboardSidebarWorkspaceItem({
 				workspaceStatus={workspaceStatus}
 				isInSection={isInSection}
 				onClick={handleClick}
-				onDoubleClick={isPending ? undefined : startRename}
+				onDoubleClick={isPending || isMainWorkspace ? undefined : startRename}
 				onRemoveFromSidebarClick={handleRemoveFromSidebar}
 				onCloseWorkspaceClick={() => setIsDeleteDialogOpen(true)}
 				onRenameValueChange={setRenameValue}
@@ -233,9 +235,11 @@ export function DashboardSidebarWorkspaceItem({
 					expandedContent
 				) : (
 					<DashboardSidebarWorkspaceContextMenu
+						workspaceId={id}
 						projectId={projectId}
 						isInSection={isInSection}
 						isUnread={isUnread}
+						hasStatus={!!workspaceStatus}
 						onCreateSection={handleCreateSection}
 						onMoveToSection={(targetSectionId) =>
 							moveWorkspaceToSection(id, projectId, targetSectionId)
@@ -247,11 +251,12 @@ export function DashboardSidebarWorkspaceItem({
 						onCopyPath={handleCopyPath}
 						onCopyBranchName={handleCopyBranchName}
 						onRemoveFromSidebar={handleRemoveFromSidebar}
-						onRename={startRename}
+						onRename={isMainWorkspace ? undefined : startRename}
 						onDelete={
 							isMainWorkspace ? undefined : () => setIsDeleteDialogOpen(true)
 						}
 						onToggleUnread={handleToggleUnread}
+						onClearStatus={handleClearStatus}
 					>
 						{expandedContent}
 					</DashboardSidebarWorkspaceContextMenu>

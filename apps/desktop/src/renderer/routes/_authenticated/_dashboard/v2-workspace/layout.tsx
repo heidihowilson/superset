@@ -1,10 +1,14 @@
 import { eq } from "@tanstack/db";
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Outlet, useMatchRoute } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useV2UserPreferences } from "renderer/hooks/useV2UserPreferences";
+import { electronTrpc } from "renderer/lib/electron-trpc";
 import { useDashboardSidebarState } from "renderer/routes/_authenticated/hooks/useDashboardSidebarState";
 import { useCollections } from "renderer/routes/_authenticated/providers/CollectionsProvider";
+import { useHostWorkspaces } from "renderer/routes/_authenticated/providers/HostWorkspacesProvider";
 import { useWorkspaceTransactionsStore } from "renderer/stores/workspace-creates";
+import { StateScreenShell } from "./components/StateScreenShell";
 import { WorkspaceCreateErrorState } from "./components/WorkspaceCreateErrorState";
 import { WorkspaceCreatingState } from "./components/WorkspaceCreatingState";
 import { WorkspaceHostIncompatibleState } from "./components/WorkspaceHostIncompatibleState";
@@ -30,17 +34,28 @@ function V2WorkspaceLayout() {
 	const pendingTransaction = useWorkspaceTransactionsStore((state) =>
 		workspaceId ? (state.byWorkspaceId[workspaceId] ?? null) : null,
 	);
-	const clearWorkspaceTransaction = useWorkspaceTransactionsStore(
-		(state) => state.clear,
-	);
+	// The create transaction clears when the workspaces.create mutation
+	// settles — not when the host-served row first arrives, which happens
+	// mid-create before agent/terminal panes are seeded.
 	const isCreatePending = pendingTransaction?.type === "insert";
 
-	const { data: workspaces, isReady } = useLiveQuery(
-		(q) =>
-			q
-				.from({ v2Workspaces: collections.v2Workspaces })
-				.where(({ v2Workspaces }) => eq(v2Workspaces.id, workspaceId ?? "")),
-		[collections, workspaceId],
+	const { toggleShowPresetsBar } = useV2UserPreferences();
+	electronTrpc.menu.subscribe.useSubscription(undefined, {
+		onData: (event) => {
+			if (event.type === "toggle-presets-bar") {
+				toggleShowPresetsBar();
+			}
+		},
+	});
+
+	const { workspaces: hostWorkspaces, isReady } = useHostWorkspaces();
+	const workspace = useMemo(
+		() =>
+			workspaceId != null
+				? (hostWorkspaces.find((candidate) => candidate.id === workspaceId) ??
+					null)
+				: null,
+		[hostWorkspaces, workspaceId],
 	);
 	const { data: failedEntries } = useLiveQuery(
 		(q) =>
@@ -49,14 +64,7 @@ function V2WorkspaceLayout() {
 				.where(({ failed }) => eq(failed.id, workspaceId ?? "")),
 		[collections, workspaceId],
 	);
-	const workspace = workspaces?.[0] ?? null;
 	const failedEntry = failedEntries?.[0] ?? null;
-
-	useEffect(() => {
-		if (workspace?.$synced === true && pendingTransaction?.type === "insert") {
-			clearWorkspaceTransaction(workspace.id);
-		}
-	}, [clearWorkspaceTransaction, pendingTransaction, workspace]);
 
 	const lastEnsuredWorkspaceIdRef = useRef<string | null>(null);
 	useEffect(() => {
@@ -68,38 +76,50 @@ function V2WorkspaceLayout() {
 
 	const hostStatus = useRemoteHostStatus(workspace);
 
-	if (!workspaceId || !workspaces || (!workspace && !isReady)) {
-		return <div className="flex h-full w-full" />;
+	if (!workspaceId || (!workspace && !isReady)) {
+		return <StateScreenShell>{null}</StateScreenShell>;
 	}
 
 	if (!workspace) {
 		if (failedEntry) {
-			return <WorkspaceCreateErrorState entry={failedEntry} />;
+			return (
+				<StateScreenShell>
+					<WorkspaceCreateErrorState entry={failedEntry} />
+				</StateScreenShell>
+			);
 		}
-		return <WorkspaceNotFoundState workspaceId={workspaceId} />;
+		return (
+			<StateScreenShell>
+				<WorkspaceNotFoundState workspaceId={workspaceId} />
+			</StateScreenShell>
+		);
 	}
 
 	if (isCreatePending) {
 		return (
-			<WorkspaceCreatingState
-				name={workspace.name}
-				branch={workspace.branch}
-				startedAt={new Date(workspace.createdAt).getTime()}
-			/>
+			<StateScreenShell>
+				<WorkspaceCreatingState
+					name={workspace.name}
+					branch={workspace.branch}
+					startedAt={new Date(workspace.createdAt).getTime()}
+				/>
+			</StateScreenShell>
 		);
 	}
 
 	if (hostStatus.status === "incompatible") {
 		return (
-			<WorkspaceHostIncompatibleState
-				hostName={hostStatus.hostName}
-				hostVersion={hostStatus.hostVersion}
-				minVersion={hostStatus.minVersion}
-			/>
+			<StateScreenShell>
+				<WorkspaceHostIncompatibleState
+					hostName={hostStatus.hostName}
+					hostVersion={hostStatus.hostVersion}
+					minVersion={hostStatus.minVersion}
+				/>
+			</StateScreenShell>
 		);
 	}
 	if (hostStatus.status === "loading") {
-		return <div className="flex h-full w-full" />;
+		return <StateScreenShell>{null}</StateScreenShell>;
 	}
 
 	return (

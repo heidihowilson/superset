@@ -1,5 +1,6 @@
-import { boolean, positional, string } from "@superset/cli-framework";
+import { boolean, CLIError, positional, string } from "@superset/cli-framework";
 import { command } from "../../../lib/command";
+import { resolveAutomationTarget } from "../resolveAutomationTarget";
 
 export default command({
 	description: "Update an automation's metadata (name, schedule, agent, host)",
@@ -36,6 +37,26 @@ export default command({
 						.filter(Boolean)
 				: undefined;
 
+		// Retargeting (--workspace or --project) re-derives targetHostId +
+		// v2ProjectId; the resource must exist on the target host.
+		let target: { targetHostId: string; v2ProjectId: string } | undefined;
+		if (options.workspace || options.project) {
+			const organizationId = ctx.config.organizationId;
+			if (!organizationId) {
+				throw new CLIError(
+					"No active organization",
+					"Run: superset auth login",
+				);
+			}
+			target = await resolveAutomationTarget({
+				organizationId,
+				userJwt: ctx.bearer,
+				hostId: options.host ?? undefined,
+				workspaceId: options.workspace ?? undefined,
+				projectId: options.project ?? undefined,
+			});
+		}
+
 		const result = await ctx.api.automation.update.mutate({
 			id,
 			name: options.name,
@@ -50,6 +71,7 @@ export default command({
 			...(options.workspace !== undefined
 				? { v2WorkspaceId: options.workspace }
 				: {}),
+			...target,
 			...(mcpScope !== undefined ? { mcpScope } : {}),
 		});
 
