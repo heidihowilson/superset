@@ -140,6 +140,9 @@ export const pullRequests = sqliteTable(
 		reviewDecision: text("review_decision"),
 		checksStatus: text("checks_status").notNull().default("none"),
 		checksJson: text("checks_json").notNull().default("[]"),
+		// Set when the PR is first observed merged; never cleared. Anchors
+		// "merged in the last N days" windows on the workspaces board.
+		mergedAt: integer("merged_at"),
 		lastFetchedAt: integer("last_fetched_at"),
 		error: text(),
 		createdAt: integer("created_at")
@@ -201,9 +204,11 @@ export const workspaces = sqliteTable(
 	"workspaces",
 	{
 		id: text().primaryKey(),
-		projectId: text("project_id")
-			.notNull()
-			.references(() => projects.id, { onDelete: "cascade" }),
+		// Null = a project-less "session" workspace (managed folder under
+		// ~/.superset/sessions, its own standalone git repo).
+		projectId: text("project_id").references(() => projects.id, {
+			onDelete: "cascade",
+		}),
 		worktreePath: text("worktree_path").notNull(),
 		branch: text().notNull(),
 		headSha: text("head_sha"),
@@ -222,7 +227,10 @@ export const workspaces = sqliteTable(
 		// Empty string means "not yet backfilled from cloud" — the startup
 		// backfill sweep targets these rows.
 		name: text().notNull().default(""),
-		type: text().$type<"main" | "worktree">().notNull().default("worktree"),
+		type: text()
+			.$type<"main" | "worktree" | "session">()
+			.notNull()
+			.default("worktree"),
 		taskId: text("task_id"),
 		createdByUserId: text("created_by_user_id"),
 		createdAt: integer("created_at")
@@ -233,9 +241,15 @@ export const workspaces = sqliteTable(
 		// Null = local changes not yet pushed to the cloud mirror (dual-write
 		// era only; the column and reconciler go away in R3).
 		cloudSyncedAt: integer("cloud_synced_at"),
+		// Tombstone: null = live. Set at the destroy commit point; rows are
+		// kept forever and surface on the board's Merged/Deleted columns.
+		archivedAt: integer("archived_at"),
+		// "merged" when the linked PR was merged at destroy time.
+		archiveReason: text("archive_reason").$type<"merged" | "deleted">(),
 	},
 	(table) => [
 		index("workspaces_project_id_idx").on(table.projectId),
+		index("workspaces_archived_at_idx").on(table.archivedAt),
 		index("workspaces_upstream_ref_idx").on(
 			table.upstreamOwner,
 			table.upstreamRepo,
