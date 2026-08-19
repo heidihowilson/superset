@@ -1,3 +1,5 @@
+import type { TriggerConfigInput } from "./automation-triggers";
+
 // Auth
 export const AUTH_PROVIDERS = ["github", "google"] as const;
 export type AuthProvider = (typeof AUTH_PROVIDERS)[number];
@@ -138,6 +140,14 @@ export const FEATURE_FLAGS = {
 	/** Shows the "Star Superset on GitHub" sidebar card once a user crosses the workspace-count threshold. Lets us kill the nag instantly without a release if it reads as annoying. */
 	STAR_NAG_CARD: "star-nag-card",
 	/**
+	 * Which trigger providers the Add Trigger menu offers. Payload is a JSON
+	 * array of provider kinds, e.g. `["github", "slack"]`; Scheduled is always
+	 * offered. Off, unloaded, offline, or a payload that isn't an array all
+	 * mean Scheduled only — the event providers exist on main ahead of their
+	 * credentials being provisioned, and each is exposed by adding its kind.
+	 */
+	AUTOMATION_EVENT_TRIGGERS: "automation-event-triggers",
+	/**
 	 * Experiment flag (control/test): renders the new-workspace surface as a
 	 * full-screen view with sample prompts instead of the dense modal.
 	 * Eligibility (new accounts only) is a release condition on the flag —
@@ -192,6 +202,25 @@ export const FEATURE_FLAGS = {
 	 */
 	CLOUD_WORKSPACES: "cloud-workspaces",
 } as const;
+
+/**
+ * The trigger kinds the server accepts on save. The AUTOMATION_EVENT_TRIGGERS
+ * flag payload gates which of these each user's Add Trigger menu offers;
+ * flipping a provider off for everyone is deleting its line here.
+ */
+export const LAUNCHED_TRIGGER_KINDS = [
+	"schedule",
+	"webhook",
+	"github",
+	"slack",
+	"linear",
+	"sentry",
+	"notion",
+	"circleback",
+	"microsoft_teams",
+	"google_calendar",
+	"gmail",
+] as const satisfies readonly TriggerConfigInput["kind"][];
 
 /**
  * What a cloud workspace sandbox holds in place of a real model API key. The

@@ -3,6 +3,7 @@ import {
 	describeTriggerProblems,
 	summarizeTriggerProblems,
 } from "@superset/shared/automation-triggers";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { Button } from "@superset/ui/button";
 import {
 	DropdownMenu,
@@ -12,9 +13,11 @@ import {
 } from "@superset/ui/dropdown-menu";
 import { Input } from "@superset/ui/input";
 import { Separator } from "@superset/ui/separator";
+import { useFeatureFlagPayload } from "posthog-js/react";
 import { type ReactNode, useMemo, useState } from "react";
 import { LuCirclePlus, LuTriangleAlert } from "react-icons/lu";
-import { type ProviderOptions, TRIGGER_PROVIDERS } from "../providers";
+import { TRIGGER_PROVIDERS } from "../providers";
+import { useProviderOptions } from "../providers/useProviderOptions";
 import { TriggerSentence } from "../TriggerSentence";
 import { TriggerMenuItems } from "./TriggerMenuItems";
 import { flattenTriggerMenu, matchesQuery } from "./triggerMenu";
@@ -23,8 +26,8 @@ interface TriggersEditorProps {
 	triggers: DraftTrigger[];
 	/** Resolves once the set is written; rejects if it was refused. */
 	onChange: (next: DraftTrigger[]) => undefined | Promise<unknown>;
-	/** Pickable values per provider, fetched by the card. */
-	options: ProviderOptions;
+	/** Whose integrations the pickable lists come from. */
+	organizationId: string;
 	/** Trailing "Next run ..." text for one schedule row, by trigger id. */
 	renderNextRun?: (triggerId?: string) => ReactNode;
 	readOnly?: boolean;
@@ -41,7 +44,7 @@ interface TriggersEditorProps {
 export function TriggersEditor({
 	triggers,
 	onChange,
-	options,
+	organizationId,
 	renderNextRun,
 	readOnly,
 }: TriggersEditorProps) {
@@ -53,6 +56,7 @@ export function TriggersEditor({
 	// silently once it happened to become valid is no better: nothing tells you
 	// which edit crossed the line, or that anything was written at all.
 	const [drafts, setDrafts] = useState(triggers);
+	const options = useProviderOptions(organizationId, drafts);
 	const [dirty, setDirty] = useState(false);
 	const savedKey = JSON.stringify(triggers);
 	const [prevSavedKey, setPrevSavedKey] = useState(savedKey);
@@ -74,8 +78,22 @@ export function TriggersEditor({
 	const shownProblems = submitted ? problems : [];
 	const banner = submitted ? summarizeTriggerProblems(problems) : null;
 
+	const enabledKinds = useFeatureFlagPayload(
+		FEATURE_FLAGS.AUTOMATION_EVENT_TRIGGERS,
+	);
+	const providers = useMemo(() => {
+		const kinds = new Set(
+			Array.isArray(enabledKinds)
+				? enabledKinds.filter((kind) => typeof kind === "string")
+				: [],
+		);
+		return TRIGGER_PROVIDERS.filter(
+			(provider) => provider.kind === "schedule" || kinds.has(provider.kind),
+		);
+	}, [enabledKinds]);
+
 	const [query, setQuery] = useState("");
-	const leaves = useMemo(() => flattenTriggerMenu(), []);
+	const leaves = useMemo(() => flattenTriggerMenu(providers), [providers]);
 	const results = query
 		? leaves.filter((leaf) => matchesQuery(leaf, query))
 		: [];
@@ -112,8 +130,7 @@ export function TriggersEditor({
 		setSubmitted(false);
 	};
 
-	const add = (config: DraftTrigger["config"]) =>
-		edit([...drafts, { enabled: true, config }]);
+	const add = (config: DraftTrigger["config"]) => edit([...drafts, { config }]);
 
 	return (
 		<div className="flex flex-col gap-1">
@@ -202,18 +219,20 @@ export function TriggersEditor({
 						{/* Radix runs a typeahead on printable keys and would swallow what
 					    is being typed here; Escape and the arrows still need to reach
 					    the menu, so only the characters are stopped. */}
-						<Input
-							autoFocus
-							value={query}
-							placeholder="Search triggers..."
-							onChange={(event) => setQuery(event.target.value)}
-							onKeyDown={(event) => {
-								if (event.key.length === 1 || event.key === "Backspace") {
-									event.stopPropagation();
-								}
-							}}
-							className="mb-1 h-8 border-none bg-transparent px-2 text-[13px] shadow-none focus-visible:ring-0 dark:bg-transparent"
-						/>
+						{leaves.length > 1 && (
+							<Input
+								autoFocus
+								value={query}
+								placeholder="Search triggers..."
+								onChange={(event) => setQuery(event.target.value)}
+								onKeyDown={(event) => {
+									if (event.key.length === 1 || event.key === "Backspace") {
+										event.stopPropagation();
+									}
+								}}
+								className="mb-1 h-8 border-none bg-transparent px-2 text-[13px] shadow-none focus-visible:ring-0 dark:bg-transparent"
+							/>
+						)}
 
 						{query ? (
 							<>
@@ -245,7 +264,7 @@ export function TriggersEditor({
 								)}
 							</>
 						) : (
-							<TriggerMenuItems providers={TRIGGER_PROVIDERS} onPick={add} />
+							<TriggerMenuItems providers={providers} onPick={add} />
 						)}
 					</DropdownMenuContent>
 				</DropdownMenu>

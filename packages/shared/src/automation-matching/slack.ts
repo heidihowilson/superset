@@ -1,14 +1,9 @@
-import type {
-	SlackTriggerEvent,
-	TriggerActor,
-	TriggerScope,
-} from "../automation-triggers";
+import type { SlackTriggerEvent, TriggerScope } from "../automation-triggers";
 import {
-	actorAllows,
 	type BaseMatchableEvent,
 	bodyMatches,
-	type MatchContext,
 	type MatchResult,
+	no,
 	scopeAllows,
 } from "./core";
 
@@ -29,7 +24,15 @@ export type SlackMatchableEvent = BaseMatchableEvent & {
 	names: SlackTriggerEvent[];
 };
 
-const no = (reason: string): MatchResult => ({ matches: false, reason });
+/**
+ * One spelling of an emoji name for both sides of an emoji filter: `bug`,
+ * `:bug:` and `bug::skin-tone-2` (how a skin-toned reaction arrives) all read
+ * as `bug`. Slack emoji names are case-insensitive.
+ */
+export function slackEmojiName(raw: string): string {
+	const bare = raw.trim().replace(/^:+|:+$/g, "");
+	return (bare.split("::")[0] ?? bare).toLowerCase();
+}
 
 /**
  * Maps a Slack event type to the event a trigger names. Only `message` differs
@@ -55,12 +58,11 @@ export function slackTriggerMatches(
 		event: string;
 		channels: TriggerScope;
 		emoji: TriggerScope;
-		actor: TriggerActor;
+		actor: TriggerScope;
 		messageFilter?: { pattern: string; isRegex: boolean } | null;
 		topLevelOnly?: boolean;
 	},
 	event: SlackMatchableEvent,
-	context: MatchContext,
 ): MatchResult {
 	if (!event.names.includes(config.event as SlackTriggerEvent)) {
 		return no("event");
@@ -72,9 +74,15 @@ export function slackTriggerMatches(
 	) {
 		return no("channel");
 	}
+	// Configs saved before the editor normalized names may still hold `:Bug:`.
 	if (
 		config.event === "reaction_added" &&
-		!scopeAllows(config.emoji, event.reaction)
+		!scopeAllows(
+			config.emoji.mode === "list"
+				? { ...config.emoji, ids: config.emoji.ids.map(slackEmojiName) }
+				: config.emoji,
+			event.reaction,
+		)
 	) {
 		return no("emoji");
 	}
@@ -86,7 +94,7 @@ export function slackTriggerMatches(
 	) {
 		return no("threadReply");
 	}
-	if (!actorAllows(config.actor, event.actorId, context.ownerIds)) {
+	if (!scopeAllows(config.actor, event.actorId)) {
 		return no("actor");
 	}
 	if (!bodyMatches(config.messageFilter ?? null, event.body)) {

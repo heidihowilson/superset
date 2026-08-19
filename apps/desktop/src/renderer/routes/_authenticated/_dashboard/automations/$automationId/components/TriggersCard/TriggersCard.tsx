@@ -11,7 +11,6 @@ import { useRecentProjects } from "renderer/hooks/host-projects/useRecentProject
 import type { apiTrpcClient } from "renderer/lib/api-trpc-client";
 import { DevicePicker } from "renderer/routes/_authenticated/components/DashboardNewWorkspaceModal/components/DashboardNewWorkspaceForm/components/DevicePicker";
 import { ProjectPicker } from "../../../components/ProjectPicker";
-import { useProviderOptions } from "../../../components/providers/useProviderOptions";
 import { RelayOfflineNotice } from "../../../components/RelayOfflineNotice";
 import { TriggersEditor } from "../../../components/TriggersEditor";
 import { WorkspacePicker } from "../../../components/WorkspacePicker";
@@ -43,7 +42,6 @@ export function TriggersCard({
 	onSaveTriggers,
 }: TriggersCardProps) {
 	const recentProjects = useRecentProjects();
-	const options = useProviderOptions(automation.organizationId);
 	const selectedProject = recentProjects.find(
 		(p) => p.id === automation.v2ProjectId,
 	);
@@ -61,15 +59,13 @@ export function TriggersCard({
 			const config = trigger.config as DraftTrigger["config"];
 			if (config.kind !== "schedule") continue;
 
-			// A paused automation keeps a stale nextRunAt, so compute what this
-			// schedule would fire next — the row is previewable before resuming.
-			if (automation.enabled) {
-				if (trigger.nextRunAt) {
-					entries.set(trigger.id, {
-						at: new Date(trigger.nextRunAt),
-						timezone: config.timezone,
-					});
-				}
+			// The saved nextRunAt is the dispatcher's truth; the computed one
+			// covers a paused automation, whose stored value is stale.
+			if (automation.enabled && trigger.nextRunAt) {
+				entries.set(trigger.id, {
+					at: new Date(trigger.nextRunAt),
+					timezone: config.timezone,
+				});
 				continue;
 			}
 			try {
@@ -123,11 +119,10 @@ export function TriggersCard({
 			<TriggersEditor
 				triggers={automation.triggers.map((t) => ({
 					id: t.id,
-					enabled: t.enabled,
 					config: t.config as DraftTrigger["config"],
 				}))}
 				onChange={onSaveTriggers}
-				options={options}
+				organizationId={automation.organizationId}
 				renderNextRun={renderNextRun}
 				readOnly={readOnly}
 			/>

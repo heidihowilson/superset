@@ -1,8 +1,8 @@
 import type { SentryTriggerEvent, TriggerScope } from "../automation-triggers";
 import {
 	type BaseMatchableEvent,
-	type MatchContext,
 	type MatchResult,
+	no,
 	scopeAllows,
 } from "./core";
 
@@ -17,8 +17,6 @@ export type SentryMatchableEvent = BaseMatchableEvent & {
 	names: SentryTriggerEvent[];
 };
 
-const no = (reason: string): MatchResult => ({ matches: false, reason });
-
 /**
  * Maps a Sentry issue webhook to the events a trigger can name. The wire event
  * is `issue.<action>`; every one of them also satisfies `issue.any`.
@@ -31,6 +29,9 @@ export function sentryEventNames(eventType: string): SentryTriggerEvent[] {
 		case "issue.archived":
 		case "issue.unresolved":
 			return [eventType, "issue.any"];
+		// Sentry's older wire name for Archive; both spellings still arrive.
+		case "issue.ignored":
+			return ["issue.archived", "issue.any"];
 		default:
 			return [];
 	}
@@ -44,7 +45,6 @@ export function sentryTriggerMatches(
 		level: TriggerScope;
 	},
 	event: SentryMatchableEvent,
-	_context: MatchContext,
 ): MatchResult {
 	if (!event.names.includes(config.event as SentryTriggerEvent)) {
 		return no("event");
@@ -52,9 +52,7 @@ export function sentryTriggerMatches(
 	if (!scopeAllows(config.projects, event.projectId)) {
 		return no("project");
 	}
-	// Level only narrows when configured; null means the trigger author did not
-	// choose to filter on it, which for this is "any".
-	if (config.level !== null && !scopeAllows(config.level, event.level)) {
+	if (!scopeAllows(config.level, event.level)) {
 		return no("level");
 	}
 	return { matches: true };
