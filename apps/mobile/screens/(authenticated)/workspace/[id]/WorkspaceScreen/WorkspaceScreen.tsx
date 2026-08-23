@@ -1,3 +1,4 @@
+import type { ComposerHandle } from "@superset/composer";
 import { useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -28,7 +29,6 @@ import {
 	getHostTerminalsQueryKey,
 	useHostTerminals,
 } from "@/screens/(authenticated)/(home)/home/hooks/useHostTerminals";
-import type { GlassComposerHandle } from "@/screens/(authenticated)/components/GlassComposer";
 import { PressableScale } from "@/screens/(authenticated)/components/PressableScale";
 import { useAppReviewPrompt } from "@/screens/(authenticated)/hooks/useAppReviewPrompt";
 import { useCreateTerminalWorkspace } from "@/screens/(authenticated)/hooks/useCreateTerminalWorkspace";
@@ -295,10 +295,14 @@ export function WorkspaceScreen() {
 	const terminalRef = useRef<TerminalWebViewHandle>(null);
 	const [connectionState, setConnectionState] =
 		useState<TerminalConnectionState>("connecting");
+	// Reported by the composer itself: it draws in an overlay and takes no
+	// layout space here, so `onLayout` on the wrapper below measures only the
+	// pull-requests button.
 	const [composerHeight, setComposerHeight] = useState(0);
+	const [aboveComposerHeight, setAboveComposerHeight] = useState(0);
 	const [keyboardHeight, setKeyboardHeight] = useState(0);
 	const [composerActive, setComposerActive] = useState(false);
-	const composerRef = useRef<GlassComposerHandle>(null);
+	const composerRef = useRef<ComposerHandle>(null);
 	const [select, setSelect] = useState<TerminalSelectState>({
 		active: false,
 		hasSelection: false,
@@ -396,7 +400,10 @@ export function WorkspaceScreen() {
 	// and none of the chrome that assumes a workspace exists (tab strip,
 	// composer, sheets). The native header stays so back keeps working.
 	if ((isCreating || createFailed) && pendingCreate) {
-		const subtitle = `${pendingCreate.input.target.projectName} · ${pendingCreate.input.branchLabel}`;
+		const { projectName } = pendingCreate.input.target;
+		const subtitle = pendingCreate.input.branchLabel
+			? `${projectName} · ${pendingCreate.input.branchLabel}`
+			: projectName;
 		return (
 			<View className="bg-background flex-1">
 				<Stack.Screen options={{ ...headerOptions, title: "New workspace" }} />
@@ -494,7 +501,11 @@ export function WorkspaceScreen() {
 			<View
 				className="flex-1"
 				style={{
-					marginBottom: showComposer ? composerHeight + composerBottom : 0,
+					// The terminal has to clear everything stacked at the bottom or its
+					// own prompt hides behind the composer.
+					marginBottom: showComposer
+						? composerHeight + aboveComposerHeight + composerBottom
+						: aboveComposerHeight + composerBottom,
 				}}
 			>
 				{hostCompatibility.incompatible ? (
@@ -566,9 +577,14 @@ export function WorkspaceScreen() {
 			{showComposer || pullRequests.length > 0 ? (
 				<View
 					className="absolute inset-x-0"
-					style={{ bottom: composerBottom }}
+					// Sits above the composer's overlay, which owns the space below it —
+					// but the reported height is stale once the composer is gone, and
+					// would leave this floating in the middle of the screen.
+					style={{
+						bottom: composerBottom + (showComposer ? composerHeight : 0),
+					}}
 					onLayout={(event) =>
-						setComposerHeight(event.nativeEvent.layout.height)
+						setAboveComposerHeight(event.nativeEvent.layout.height)
 					}
 				>
 					{pullRequests.length > 0 ? (
@@ -597,9 +613,11 @@ export function WorkspaceScreen() {
 					) : null}
 					{showComposer ? (
 						<TerminalComposer
+							workspaceId={id}
 							allowAttachments={activeRow?.agentId != null}
 							attachmentTarget={attachmentTarget}
 							onActiveChange={setComposerActive}
+							onHeightChange={setComposerHeight}
 							onCopySelection={() => terminalRef.current?.copySelection()}
 							onQuickKey={handleQuickKey}
 							onSubmit={handleSubmit}
