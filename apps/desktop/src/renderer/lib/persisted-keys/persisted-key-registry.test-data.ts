@@ -82,6 +82,10 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		"src/renderer/stores/sidebar-sections-collapse.ts",
 		["sidebar-workspaces-collapse"],
 	],
+	[
+		"src/renderer/stores/last-active-v2-workspace.ts",
+		["last-active-v2-workspace"],
+	],
 	["src/renderer/stores/v2-local-override.ts", ["v2-local-override-v2"]],
 	[
 		"src/renderer/stores/v2-workspace-create-defaults.ts",
@@ -139,12 +143,21 @@ export const PERSISTED_KEY_REGISTRY: ReadonlyArray<
 		["active_organization_id"],
 	],
 	[
+		"src/renderer/routes/_authenticated/components/LeaderboardAutoPublish/hooks/useLeaderboardAutoPublish/autoPublishState.ts",
+		["leaderboard-auto-publish-v1"],
+	],
+	["src/renderer/lib/leaderboard/askedState.ts", ["leaderboard-asked-v1"]],
+	[
 		"src/renderer/hooks/useAgentModelPreference/useAgentModelPreference.ts",
 		["lastSelectedV2WorkspaceCreateModelByPreset"],
 	],
 	[
 		"src/renderer/hooks/useAgentEffortPreference/useAgentEffortPreference.ts",
 		["lastSelectedV2WorkspaceCreateEffortByPreset"],
+	],
+	[
+		"src/renderer/hooks/useAgentModePreference/useAgentModePreference.ts",
+		["lastSelectedV2WorkspaceCreateModeByPreset"],
 	],
 	[
 		"src/renderer/hooks/useAgentLaunchPreferences/useAgentLaunchPreferences.ts",
