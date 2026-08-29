@@ -1,4 +1,6 @@
-import { Trans } from "@lingui/react/macro";
+import { msg } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import {
@@ -32,12 +34,15 @@ import type {
 } from "../../hooks/useHostUsageQuota";
 import { useHostUsageQuota } from "../../hooks/useHostUsageQuota";
 import { useRemoveUsageAccount } from "../../hooks/useRemoveUsageAccount";
+import { useRestartAgentSessions } from "../../hooks/useRestartAgentSessions";
 import { useSetDefaultUsageAccount } from "../../hooks/useSetDefaultUsageAccount";
 import { LeaderboardPrompt } from "../LeaderboardPrompt";
 import { UsageHistorySection } from "../UsageHistorySection";
 import type { SwitchSignInTarget } from "./components/AddAccountDialog";
 import { AddAccountDialog } from "./components/AddAccountDialog";
 import { RemoveAccountDialog } from "./components/RemoveAccountDialog";
+import type { RestartSessionsPrompt } from "./components/RestartSessionsDialog";
+import { RestartSessionsDialog } from "./components/RestartSessionsDialog";
 import { formatResetIn, formatResetLabel } from "./utils/formatResetIn";
 import { switchSignInCommand } from "./utils/switchSignInCommand";
 
@@ -85,16 +90,32 @@ function QuotaWindowRow({ window }: { window: UsageQuotaWindow }) {
 
 function creditsLine(account: UsageAccount): string | null {
 	if (account.creditsBalance !== null) {
-		return `$${account.creditsBalance.toFixed(2)} credits`;
+		const balance = account.creditsBalance.toFixed(2);
+		return i18n._(
+			msg({
+				id: "settings.usage.account.creditsBalance",
+				message: `$${balance} credits`,
+			}),
+		);
 	}
 	if (account.extraUsage) {
-		return `extra $${(account.extraUsage.usedCents / 100).toFixed(2)} of $${(account.extraUsage.limitCents / 100).toFixed(2)}`;
+		const used = (account.extraUsage.usedCents / 100).toFixed(2);
+		const limit = (account.extraUsage.limitCents / 100).toFixed(2);
+		return i18n._(
+			msg({
+				id: "settings.usage.account.extraUsage",
+				message: `extra $${used} of $${limit}`,
+			}),
+		);
 	}
 	return null;
 }
 
-const DEFAULT_TITLE =
-	"New agent launches use this account. Relaunch a running agent to switch it.";
+const DEFAULT_TITLE = msg({
+	id: "settings.usage.account.defaultTitle",
+	message:
+		"New agent launches use this account. Relaunch a running agent to switch it.",
+});
 
 function AccountCard({
 	account,
@@ -118,6 +139,7 @@ function AccountCard({
 	/** Replaces account emails so screenshots do not retain identifying pixels. */
 	hideEmails: boolean;
 }) {
+	const { t } = useLingui();
 	const credits = creditsLine(account);
 	const { copyToClipboard, copied } = useCopyToClipboard();
 	const expiredCommand =
@@ -134,7 +156,10 @@ function AccountCard({
 			<div className="flex items-baseline gap-1.5">
 				{selectable &&
 					(account.isDefault ? (
-						<span className="shrink-0 self-center" title={DEFAULT_TITLE}>
+						<span
+							className="shrink-0 self-center"
+							title={i18n._(DEFAULT_TITLE)}
+						>
 							<LuCircleCheck className="size-3.5 text-primary" />
 						</span>
 					) : (
@@ -142,7 +167,11 @@ function AccountCard({
 							type="button"
 							className="shrink-0 self-center text-muted-foreground/50 transition-colors hover:text-primary disabled:pointer-events-none"
 							disabled={isSwitching}
-							title="Make default — launch new terminals and agents on this account."
+							title={t({
+								id: "settings.usage.account.makeDefaultTitle",
+								message:
+									"Make default — launch new terminals and agents on this account.",
+							})}
 							onClick={onMakeDefault}
 						>
 							<LuCircle className="size-3.5" />
@@ -230,7 +259,13 @@ function AccountCard({
 						title={expiredCommand}
 						onClick={() =>
 							copyToClipboard(expiredCommand).catch(() =>
-								toast.error("Copy failed", { description: expiredCommand }),
+								toast.error(
+									t({
+										id: "settings.usage.account.copyFailed",
+										message: "Copy failed",
+									}),
+									{ description: expiredCommand },
+								),
 							)
 						}
 					>
@@ -264,7 +299,7 @@ function AccountCard({
 						!selectable && (
 							<span
 								className="inline-flex items-center gap-1 text-[10px] font-medium text-primary"
-								title={DEFAULT_TITLE}
+								title={i18n._(DEFAULT_TITLE)}
 							>
 								<LuCircleCheck className="size-3" />
 								<Trans id="settings.usage.account.defaultForNewAgents">
@@ -278,7 +313,7 @@ function AccountCard({
 							size="sm"
 							className="h-5 rounded px-1.5 text-[10px]"
 							disabled={isSwitching}
-							title={DEFAULT_TITLE}
+							title={i18n._(DEFAULT_TITLE)}
 							onClick={onMakeDefault}
 						>
 							<Trans id="settings.usage.account.makeDefault">
@@ -298,6 +333,7 @@ function AccountCard({
 }
 
 export function UsageView({ hostUrl }: { hostUrl: string | null }) {
+	const { t } = useLingui();
 	const quotaQuery = useHostUsageQuota(hostUrl);
 	const setDefault = useSetDefaultUsageAccount(hostUrl);
 	const removeAccount = useRemoveUsageAccount(hostUrl);
@@ -310,19 +346,98 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 		null,
 	);
 	const [removeTarget, setRemoveTarget] = useState<UsageAccount | null>(null);
+	const [restartPrompt, setRestartPrompt] =
+		useState<RestartSessionsPrompt | null>(null);
+	const { countRestartCandidates, restartMutation } =
+		useRestartAgentSessions(hostUrl);
 
 	const accounts = quotaQuery.data ?? [];
 	const isBusy = quotaQuery.isFetching || isRefreshing;
+
+	const showMadeDefaultToast = (
+		providerLabel: string,
+		accountLabel: string,
+	) => {
+		toast.success(
+			t({
+				id: "settings.usage.account.madeDefaultToast",
+				message: `New ${providerLabel} agents will use ${accountLabel}.`,
+			}),
+			{
+				description: t({
+					id: "settings.usage.account.madeDefaultDescription",
+					message: "Relaunch running agents to switch them.",
+				}),
+			},
+		);
+	};
+
+	// Running agents keep the previous account (their PTY env froze at
+	// spawn) — after a switch, offer to restart them onto the new one. When
+	// the host can't be asked, fall back to the plain toast.
+	const handleDefaultSwitched = async (
+		provider: Provider,
+		accountLabel: string,
+	) => {
+		const providerLabel = PROVIDER_LABELS[provider];
+		let candidateCount = 0;
+		try {
+			candidateCount = await countRestartCandidates(provider);
+		} catch {
+			// Fall through to the plain toast.
+		}
+		if (candidateCount > 0) {
+			setRestartPrompt({
+				provider,
+				providerLabel,
+				accountLabel,
+				count: candidateCount,
+			});
+			return;
+		}
+		showMadeDefaultToast(providerLabel, accountLabel);
+	};
 
 	const makeDefaultAccount = (account: UsageAccount) => {
 		setDefault.mutate(
 			{ provider: account.provider, selection: account.selection },
 			{
 				onSuccess: () => {
+					void handleDefaultSwitched(
+						account.provider,
+						account.email ?? account.sourceLabel,
+					);
+				},
+				onError: (error) => toast.error(errorMessage(error)),
+			},
+		);
+	};
+
+	const declineRestartSessions = () => {
+		if (!restartPrompt) return;
+		const { providerLabel, accountLabel } = restartPrompt;
+		setRestartPrompt(null);
+		showMadeDefaultToast(providerLabel, accountLabel);
+	};
+
+	const confirmRestartSessions = () => {
+		if (!restartPrompt) return;
+		const { provider, accountLabel } = restartPrompt;
+		setRestartPrompt(null);
+		restartMutation.mutate(
+			{ provider },
+			{
+				onSuccess: () => {
 					toast.success(
-						`New ${PROVIDER_LABELS[account.provider]} agents will use ${account.email ?? account.sourceLabel}.`,
+						t({
+							id: "settings.usage.restartAgents.startedToast",
+							message: `Restarting agents on ${accountLabel}.`,
+						}),
 						{
-							description: "Relaunch running agents to switch them.",
+							description: t({
+								id: "settings.usage.restartAgents.startedDescription",
+								message: "Each session resumes where it left off.",
+							}),
 						},
 					);
 				},
@@ -474,8 +589,13 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 						},
 						{
 							onSuccess: () => {
+								const removedLabel =
+									removeTarget.email ?? removeTarget.sourceLabel;
 								toast.success(
-									`Removed ${removeTarget.email ?? removeTarget.sourceLabel}.`,
+									t({
+										id: "settings.usage.account.removedToast",
+										message: `Removed ${removedLabel}.`,
+									}),
 								);
 								setRemoveTarget(null);
 							},
@@ -483,6 +603,12 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 						},
 					);
 				}}
+			/>
+
+			<RestartSessionsDialog
+				prompt={restartPrompt}
+				onDecline={declineRestartSessions}
+				onConfirm={confirmRestartSessions}
 			/>
 
 			<AddAccountDialog
@@ -494,6 +620,9 @@ export function UsageView({ hostUrl }: { hostUrl: string | null }) {
 				provider={dialogProvider}
 				switchTarget={switchTarget}
 				hostUrl={hostUrl}
+				onDefaultSwitched={(provider, accountLabel) => {
+					void handleDefaultSwitched(provider, accountLabel);
+				}}
 				onAccountAdded={() => {
 					setIsRefreshing(true);
 					void quotaQuery

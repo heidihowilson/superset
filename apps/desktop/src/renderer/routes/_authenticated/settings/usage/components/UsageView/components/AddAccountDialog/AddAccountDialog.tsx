@@ -1,4 +1,6 @@
+import { msg } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
+import { i18n } from "@superset/i18n";
 import { errorMessage } from "@superset/i18n/errors";
 import { Button } from "@superset/ui/button";
 import {
@@ -97,7 +99,16 @@ function findSignInChange(
 		baseline.codex.find((entry) => entry.home === home)?.fingerprint ?? null;
 	const after =
 		current.codex.find((entry) => entry.home === home)?.fingerprint ?? null;
-	return after && after !== before ? { label: "The Codex sign-in" } : null;
+	return after && after !== before
+		? {
+				label: i18n._(
+					msg({
+						id: "settings.usage.addAccount.codexSignInLabel",
+						message: "The Codex sign-in",
+					}),
+				),
+			}
+		: null;
 }
 
 interface AddAccountDialogProps {
@@ -108,6 +119,9 @@ interface AddAccountDialogProps {
 	provider: Provider;
 	/** Called once when the new sign-in is detected, to refresh quota. */
 	onAccountAdded: () => void;
+	/** Called after "Use for new agents" makes the added account the default;
+	 * the owner toasts, or offers to restart running agents onto it. */
+	onDefaultSwitched: (provider: Provider, accountLabel: string) => void;
 	/** When set, the dialog re-signs this existing login instead of adding a
 	 * separate profile. */
 	switchTarget?: SwitchSignInTarget | null;
@@ -126,6 +140,7 @@ export function AddAccountDialog({
 	hostUrl,
 	provider: addProvider,
 	onAccountAdded,
+	onDefaultSwitched,
 	switchTarget = null,
 }: AddAccountDialogProps) {
 	const { t } = useLingui();
@@ -275,10 +290,7 @@ export function AddAccountDialog({
 											{ provider, selection: found.selection },
 											{
 												onSuccess: () => {
-													toast.success(`New agents will use ${found.label}.`, {
-														description:
-															"Running sessions keep their current account — restart them to switch.",
-													});
+													onDefaultSwitched(provider, found.label);
 													onOpenChange(false);
 												},
 												onError: (error) => toast.error(errorMessage(error)),

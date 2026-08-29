@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import type { HostAgentConfig } from "@superset/host-service/settings";
 import { errorMessage } from "@superset/i18n/errors";
 import {
@@ -79,6 +79,7 @@ interface V2AgentsSettingsProps {
 export function V2AgentsSettings({
 	initialAgentId,
 }: V2AgentsSettingsProps = {}) {
+	const { t } = useLingui();
 	const hostService = useLocalHostService();
 	const { activeHostUrl } = hostService;
 	const queryClient = useQueryClient();
@@ -131,7 +132,7 @@ export function V2AgentsSettings({
 			if (!activeHostUrl) {
 				throw new Error(
 					getHostServiceUnavailableMessage(hostService, {
-						action: "add an agent",
+						action: "addAgent",
 					}),
 				);
 			}
@@ -162,7 +163,16 @@ export function V2AgentsSettings({
 				insertLinkedTerminalPreset(collections, added);
 			}
 		},
-		onError: (err) => toast.error(errorMessage(err, "Failed to add agent")),
+		onError: (err) =>
+			toast.error(
+				errorMessage(
+					err,
+					t({
+						id: "settings.agents.v2.addFailed",
+						message: "Failed to add agent",
+					}),
+				),
+			),
 	});
 
 	const addCustomMutation = useMutation({
@@ -170,7 +180,7 @@ export function V2AgentsSettings({
 			if (!activeHostUrl) {
 				throw new Error(
 					getHostServiceUnavailableMessage(hostService, {
-						action: "add an agent",
+						action: "addAgent",
 					}),
 				);
 			}
@@ -186,7 +196,16 @@ export function V2AgentsSettings({
 				insertLinkedTerminalPreset(collections, added);
 			}
 		},
-		onError: (err) => toast.error(errorMessage(err, "Failed to add agent")),
+		onError: (err) =>
+			toast.error(
+				errorMessage(
+					err,
+					t({
+						id: "settings.agents.v2.addFailed",
+						message: "Failed to add agent",
+					}),
+				),
+			),
 	});
 
 	const reorderMutation = useMutation({
@@ -194,7 +213,7 @@ export function V2AgentsSettings({
 			if (!activeHostUrl) {
 				throw new Error(
 					getHostServiceUnavailableMessage(hostService, {
-						action: "reorder agents",
+						action: "reorderAgents",
 					}),
 				);
 			}
@@ -223,7 +242,15 @@ export function V2AgentsSettings({
 			if (ctx?.previous) {
 				queryClient.setQueryData(queryKey, ctx.previous);
 			}
-			toast.error(errorMessage(err, "Failed to reorder"));
+			toast.error(
+				errorMessage(
+					err,
+					t({
+						id: "settings.agents.v2.reorderFailed",
+						message: "Failed to reorder",
+					}),
+				),
+			);
 		},
 		onSettled: () => invalidate(),
 	});
@@ -233,7 +260,7 @@ export function V2AgentsSettings({
 			if (!activeHostUrl) {
 				throw new Error(
 					getHostServiceUnavailableMessage(hostService, {
-						action: "reset agents",
+						action: "resetAgents",
 					}),
 				);
 			}
@@ -247,7 +274,16 @@ export function V2AgentsSettings({
 			void navigate({ to: "/settings/agents" });
 			invalidate();
 		},
-		onError: (err) => toast.error(errorMessage(err, "Failed to reset")),
+		onError: (err) =>
+			toast.error(
+				errorMessage(
+					err,
+					t({
+						id: "settings.agents.v2.resetFailed",
+						message: "Failed to reset",
+					}),
+				),
+			),
 	});
 
 	const configs = configsQuery.data ?? [];
@@ -257,7 +293,7 @@ export function V2AgentsSettings({
 	);
 	const hostServiceUnavailableMessage = getHostServiceUnavailableMessage(
 		hostService,
-		{ action: "load agent settings" },
+		{ action: "loadAgentSettings" },
 	);
 
 	const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -343,7 +379,10 @@ export function V2AgentsSettings({
 						config={selectedAgent}
 						description={
 							DESCRIPTION_BY_PRESET_ID.get(selectedAgent.presetId) ??
-							"Terminal agent launch configuration"
+							t({
+								id: "settings.agents.v2.defaultDescription",
+								message: "Terminal agent launch configuration",
+							})
 						}
 						onChanged={(updated) => {
 							updateCachedConfig(updated);

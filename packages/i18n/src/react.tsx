@@ -27,8 +27,19 @@ export function I18nProvider({
 	const [activeLocale, setActiveLocale] = useState(() => i18n.locale);
 	useEffect(() => i18n.on("change", () => setActiveLocale(i18n.locale)), []);
 	useEffect(() => {
-		if (locale && i18n.locale !== locale) {
-			initI18n(locale);
+		// No explicit locale means "Auto", which is a real choice and not an
+		// absence of one: fall back to inference so switching from a pinned
+		// language back to Auto re-activates instead of leaving the old locale
+		// active until the next restart.
+		const next = locale ?? inferLocale();
+		if (i18n.locale !== next) {
+			initI18n(next);
+		}
+		// Keep the document's language attribute truthful: CSS text-transform
+		// and screen readers key off it, and a stale "en" breaks locale-aware
+		// casing — Turkish uppercases i to İ, not I.
+		if (typeof document !== "undefined") {
+			document.documentElement.lang = next;
 		}
 	}, [locale]);
 	return (
