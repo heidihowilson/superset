@@ -1,5 +1,7 @@
 import { db } from "@superset/db/client";
 import {
+	attachments,
+	files,
 	members,
 	organizations,
 	pages,
@@ -8,9 +10,16 @@ import {
 	users,
 	workspacePages,
 } from "@superset/db/schema";
+import {
+	fileOriginalKey,
+	pageManifestKey,
+	pageThumbnailKey,
+	pageThumbnailUrl,
+	pageViewUrl,
+} from "@superset/shared/usercontent";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
-import { del, head } from "@vercel/blob";
-import { and, desc, eq, or, type SQL, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, or, type SQL, sql } from "drizzle-orm";
+import { deleteObjects, presignedGetUrl } from "../../lib/r2";
 import { protectedProcedure, userError } from "../../trpc";
 import { requireActiveOrgMembership } from "../utils/active-org";
 import { assertPageReadable, assertPageWritable } from "./access";
@@ -28,6 +37,13 @@ import {
 	setSharedVersionSchema,
 } from "./schema";
 import { resolveSharedVersion, servedVersion } from "./shared-version";
+import {
+	deletePageObjects,
+	mintPageTicket,
+	usercontentBaseUrl,
+	writePageManifest,
+} from "./storage";
+import { enqueuePageThumbnail } from "./thumbnail";
 import { watchState } from "./watch";
 import { assertWorkspaceAccess } from "./workspace-access";
 
@@ -202,7 +218,35 @@ export const pageRouter = {
 					);
 
 			const rows = await scoped.orderBy(desc(pages.updatedAt));
-			return rows.map((row) => ({ ...row, url: pageUrl(row.slug) }));
+			const baseUrl = usercontentBaseUrl();
+			return await Promise.all(
+				rows.map(async (row) => {
+					const served = servedVersion(row.sharedVersion, row.latestVersion);
+					const ticket = await mintPageTicket(row);
+					// Version-bound, so it turns daily instead of hourly — the capture
+					// is immutable and the stable URL is what lets it cache.
+					const thumbnailTicket =
+						served === null
+							? undefined
+							: await mintPageTicket(row, { version: served });
+					return {
+						...row,
+						url: pageUrl(row.slug),
+						viewUrl: pageViewUrl({ baseUrl, pageId: row.id, ticket }),
+						thumbnailUrl:
+							served === null
+								? null
+								: pageThumbnailUrl({
+										baseUrl,
+										pageId: row.id,
+										version: served,
+										ticket: thumbnailTicket,
+									}),
+						thumbnailStorageKey:
+							served === null ? null : pageThumbnailKey(row.id, served),
+					};
+				}),
+			);
 		}),
 
 	get: protectedProcedure.input(pageRefSchema).query(async ({ ctx, input }) => {
@@ -215,11 +259,21 @@ export const pageRouter = {
 		});
 
 		const latestVersion = await latestVersionNumber(page.id);
+		const served = servedVersion(page.sharedVersion, latestVersion);
 		return {
 			...page,
 			url: pageUrl(page.slug),
+			viewUrl: pageViewUrl({
+				baseUrl: usercontentBaseUrl(),
+				pageId: page.id,
+				version: served,
+				ticket: await mintPageTicket(
+					page,
+					served === null ? {} : { version: served },
+				),
+			}),
 			latestVersion,
-			servedVersion: servedVersion(page.sharedVersion, latestVersion),
+			servedVersion: served,
 			watch: watchState(page, Date.now()),
 		};
 	}),
@@ -245,6 +299,7 @@ export const pageRouter = {
 					i18nKey: "serverError.page.pageNotFound",
 				});
 			}
+			await writePageManifest(page.id);
 			return { id: updated.id, visibility: updated.visibility };
 		}),
 
@@ -324,10 +379,8 @@ export const pageRouter = {
 				}
 			}
 
-			const resolved = resolveSharedVersion(
-				input.version,
-				await latestVersionNumber(page.id),
-			);
+			const latestVersion = await latestVersionNumber(page.id);
+			const resolved = resolveSharedVersion(input.version, latestVersion);
 
 			const [updated] = await db
 				.update(pages)
@@ -342,6 +395,13 @@ export const pageRouter = {
 					i18nKey: "serverError.page.pageNotFound",
 				});
 			}
+			await writePageManifest(page.id);
+			// The pin may land on a version that was superseded before it was
+			// ever captured; one already captured is skipped by the job.
+			const served = servedVersion(resolved, latestVersion);
+			if (served !== null) {
+				void enqueuePageThumbnail({ pageId: page.id, version: served });
+			}
 			return { id: updated.id, sharedVersion: updated.sharedVersion };
 		}),
 
@@ -354,23 +414,63 @@ export const pageRouter = {
 			assertPageWritable(page, userId);
 
 			const rows = await db
-				.select({ blobPathname: pageVersions.blobPathname })
+				.select({
+					id: pageVersions.id,
+					version: pageVersions.version,
+					key: pageVersions.storageKey,
+				})
 				.from(pageVersions)
 				.where(eq(pageVersions.pageId, page.id));
 
+			// The manifest is the Worker's authorization source: removing it
+			// first makes deletion fail closed. If this throws, nothing has
+			// been deleted and the page still serves; once it is gone the
+			// origin 404s even if the cleanup below is interrupted.
+			await deleteObjects([pageManifestKey(page.id)]);
+
 			await db.delete(pages).where(eq(pages.id, page.id));
 
-			const pathnames = rows.map((row) => row.blobPathname);
-			if (pathnames.length > 0) {
-				try {
-					await del(pathnames);
-				} catch (error) {
-					console.error("[pages] blob cleanup failed after delete", {
-						pageId: page.id,
-						pathnames,
-						error,
-					});
+			try {
+				await deletePageObjects({
+					pageId: page.id,
+					versions: rows,
+				});
+				// `attachments.parentId` carries no foreign key (its parent kind
+				// varies), so the version cascade leaves attachment rows behind;
+				// files referenced by nothing else go with them, bytes included.
+				const versionIds = rows.map((row) => row.id);
+				if (versionIds.length > 0) {
+					const removed = await db
+						.delete(attachments)
+						.where(
+							and(
+								eq(attachments.parentKind, "page_version"),
+								inArray(attachments.parentId, versionIds),
+							),
+						)
+						.returning({ fileId: attachments.fileId });
+					const fileIds = [...new Set(removed.map((row) => row.fileId))];
+					if (fileIds.length > 0) {
+						const stillReferenced = new Set(
+							(
+								await db
+									.select({ fileId: attachments.fileId })
+									.from(attachments)
+									.where(inArray(attachments.fileId, fileIds))
+							).map((row) => row.fileId),
+						);
+						const orphans = fileIds.filter((id) => !stillReferenced.has(id));
+						if (orphans.length > 0) {
+							await deleteObjects(orphans.map(fileOriginalKey));
+							await db.delete(files).where(inArray(files.id, orphans));
+						}
+					}
 				}
+			} catch (error) {
+				console.error("[pages] storage cleanup failed after delete", {
+					pageId: page.id,
+					error,
+				});
 			}
 
 			return { id: page.id };
@@ -444,9 +544,9 @@ export const pageRouter = {
 
 			let downloadUrl: string;
 			try {
-				downloadUrl = (await head(row.blobPathname)).url;
+				downloadUrl = await presignedGetUrl(row.storageKey);
 			} catch (error) {
-				console.error("[pages] head failed", {
+				console.error("[pages] presign failed", {
 					pageId: page.id,
 					version,
 					error,
@@ -457,6 +557,13 @@ export const pageRouter = {
 					i18nKey: "serverError.page.pageContentIsNotAvailable",
 				});
 			}
+
+			const viewUrl = pageViewUrl({
+				baseUrl: usercontentBaseUrl(),
+				pageId: page.id,
+				version: row.version,
+				ticket: await mintPageTicket(page, { version: row.version }),
+			});
 
 			return {
 				id: page.id,
@@ -477,7 +584,9 @@ export const pageRouter = {
 				sizeBytes: row.sizeBytes,
 				sha256: row.sha256,
 				createdAt: row.createdAt,
+				storageKey: row.storageKey,
 				downloadUrl,
+				viewUrl,
 			};
 		}),
 } satisfies TRPCRouterRecord;
