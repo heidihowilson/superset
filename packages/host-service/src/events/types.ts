@@ -82,6 +82,12 @@ export interface WorkspaceSnapshot {
 	createdByUserId: string | null;
 	createdAt: number;
 	updatedAt: number;
+	/**
+	 * Epoch ms of the newest agent lifecycle event, or null for rows that
+	 * predate the column. Unlike `updatedAt` it never moves on metadata
+	 * writes (rename, tags, PR link).
+	 */
+	lastActivityAt: number | null;
 	/** Normalized, sorted tag set; sidebar folders derive from it. */
 	tags: string[];
 }
@@ -190,6 +196,10 @@ export interface WorkspaceCreateSettledMessage {
 export interface EventBusErrorMessage {
 	type: "error";
 	message: string;
+	/** Set on command rejections a client can act on. */
+	code?: "git-watch-cap";
+	/** The workspace whose command was rejected. */
+	workspaceId?: string;
 }
 
 export interface PageWatchChangedMessage {
@@ -225,6 +235,22 @@ export interface FsUnwatchCommand {
 }
 
 /**
+ * Register interest in a workspace's `git:changed` events, driving
+ * `GitWatcher`'s refcounted registration (see #6729) — a workspace with no
+ * `git:watch` interest from any client, and no internal host-service
+ * subscriber, is never watched.
+ */
+export interface GitWatchCommand {
+	type: "git:watch";
+	workspaceId: string;
+}
+
+export interface GitUnwatchCommand {
+	type: "git:unwatch";
+	workspaceId: string;
+}
+
+/**
  * Targeted watch on one file the recursive workspace watcher can't see
  * (inside a pruned subtree — gitignored build dir, node_modules, nested
  * repo). Sent by the renderer for every open document; the server installs a
@@ -247,4 +273,6 @@ export type ClientMessage =
 	| FsWatchCommand
 	| FsUnwatchCommand
 	| FsWatchFileCommand
-	| FsUnwatchFileCommand;
+	| FsUnwatchFileCommand
+	| GitWatchCommand
+	| GitUnwatchCommand;
