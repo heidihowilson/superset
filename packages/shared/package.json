@@ -56,6 +56,10 @@
 			"types": "./src/sentry.ts",
 			"default": "./src/sentry.ts"
 		},
+		"./sentry-throttle": {
+			"types": "./src/sentry-throttle.ts",
+			"default": "./src/sentry-throttle.ts"
+		},
 		"./slash-commands": {
 			"types": "./src/slash-commands.ts",
 			"default": "./src/slash-commands.ts"
@@ -67,6 +71,10 @@
 		"./dev-credentials": {
 			"types": "./src/dev-credentials.ts",
 			"default": "./src/dev-credentials.ts"
+		},
+		"./dev-app-profile": {
+			"types": "./src/dev-app-profile.ts",
+			"default": "./src/dev-app-profile.ts"
 		},
 		"./desktop-notices": {
 			"types": "./src/desktop-notices.ts",
