@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {非表示の#行} other {非表示の#行}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {非表示の#行を表示} other {非表示の#行を表示}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {#件の返信を表示} other {#件の返信を表示}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {さらに#件のフレームを表示} other {さらに#件のフレームを表示}}"
 
@@ -759,6 +762,9 @@ msgstr "{name} は組み込みのため置き換えられません"
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} は追加されていません"
+
+msgid "{needing, plural, one {# needs you} other {# need you}}"
+msgstr "{needing, plural, other {# 件が要対応}}"
 
 msgid "{nonBrandPct} of clicks"
 msgstr "クリックの {nonBrandPct}"
@@ -874,6 +880,12 @@ msgstr "{threshold, plural, other {#件のエージェントPRをマージ}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName}が中断されました"
 
+msgid "{total, plural, one {# agent working} other {# agents working}}"
+msgstr "{total, plural, other {エージェント # 件が実行中}}"
+
+msgid "{total, plural, one {# agent} other {# agents}}"
+msgstr "{total, plural, other {エージェント # 件}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#件のチェックにすべて成功しました} other {#件のチェックにすべて成功しました}}"
 
@@ -961,6 +973,9 @@ msgstr "⇧クリック"
 #. placeholder {2}: changeset.files.length
 msgid "+{0} −{1} · {2, plural, one {# file} other {# files}}"
 msgstr "+{0} −{1} · {2, plural, one {#ファイル} other {#ファイル}}"
+
+msgid "+{hidden} more"
+msgstr "他 {hidden} 件"
 
 msgid "+{hiddenCount} earlier"
 msgstr "以前の{hiddenCount}件"
@@ -1652,6 +1667,9 @@ msgstr "すべてのチェックが成功"
 msgid "All checks skipped or cancelled"
 msgstr "すべてのチェックがスキップまたはキャンセルされました"
 
+msgid "All comments"
+msgstr "すべてのコメント"
+
 msgid "All commits"
 msgstr "すべてのコミット"
 
@@ -2220,9 +2238,6 @@ msgstr "オートメーション({myFailedCount}件失敗中)"
 msgid "Automations & event triggers"
 msgstr "オートメーションとイベントトリガー"
 
-msgid "Automations docs"
-msgstr "オートメーションのドキュメント"
-
 msgid "Automations, {myFailedCount} failing"
 msgstr "オートメーション、{myFailedCount}件が失敗中"
 
@@ -2353,6 +2368,9 @@ msgstr "PR #{0} をベースに"
 #. placeholder {1}: preview.providers.join(" and ")
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "過去30日間の{0}トークンに基づく({1}を集計)。"
+
+msgid "Become a design partner"
+msgstr "共同開発パートナーになる"
 
 msgid "Before"
 msgstr "変更前"
@@ -2555,6 +2573,9 @@ msgstr "閲覧履歴"
 
 msgid "Bug"
 msgstr "バグ"
+
+msgid "Build the future of Superset in the cloud"
+msgstr "クラウドでSupersetの未来を築く"
 
 msgid "Building the last piece of software"
 msgstr "最後のソフトウェアを作る"
@@ -3154,6 +3175,9 @@ msgstr "チャットを閉じる"
 msgid "Close Comment"
 msgstr "コメントを閉じる"
 
+msgid "Close comments"
+msgstr "コメントを閉じる"
+
 msgid "Close Diff"
 msgstr "差分を閉じる"
 
@@ -3262,6 +3286,9 @@ msgstr "このターミナルを閉じると実行中のプロセスが終了し
 
 msgid "Cloud"
 msgstr "クラウド"
+
+msgid "Cloud is coming. Become a design partner"
+msgstr "クラウド版が近日登場。共同開発パートナーを募集中"
 
 msgid "Cloud sandboxes"
 msgstr "クラウドサンドボックス"
@@ -4000,6 +4027,9 @@ msgstr "このプルリクエストを読み込むためのホストに接続で
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "更新を開始するためにホストに接続できませんでした。オンラインであることを確認して、もう一度お試しください。"
 
+msgid "Could not reach the server."
+msgstr "サーバーに接続できませんでした。"
+
 msgid "Could not reach this workspace's machine"
 msgstr "このワークスペースのマシンに接続できませんでした"
 
@@ -4245,11 +4275,11 @@ msgstr "チームを作成"
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "MacBookに認証機能用のワークスペースを作って"
 
+msgid "Create again"
+msgstr "もう一度作成"
+
 msgid "Create an account"
 msgstr "アカウントを作成"
-
-msgid "Create an automation with an agent"
-msgstr "エージェントでオートメーションを作成"
 
 msgid "Create failed: {message}"
 msgstr "作成に失敗しました: {message}"
@@ -4870,6 +4900,9 @@ msgstr "音声入力"
 msgid "Dictation is not available on this device"
 msgstr "このデバイスでは音声入力を利用できません"
 
+msgid "Didn't hear back"
+msgstr "応答がありません"
+
 msgid "diff"
 msgstr "差分"
 
@@ -5467,9 +5500,6 @@ msgstr "各エージェントは専用のGitワークツリーで動くため、
 msgid "Every axis is carrying its weight for the next tier. Hold it and the tier follows."
 msgstr "すべての軸が次のティアのために働いています。これを維持すればティアは付いてきます。"
 
-msgid "Every Friday at 4pm, draft release notes from this week's merged PRs"
-msgstr "毎週金曜午後4時に、今週マージされたPRからリリースノートの下書きを作成する"
-
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "毎週金曜午後4時に、今週マージされたPRからリリースノートの下書きを作成する。"
 
@@ -5490,9 +5520,6 @@ msgstr "毎週水曜午前9時に、今週マージされたPRを確認し、古
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "平日午前9時に、新しいGitHub issueを読み、ラベルを付け、レビュー用の返信を下書きする。"
-
-msgid "Every weekday at 9am, triage new GitHub issues and draft replies for my review"
-msgstr "平日午前9時に新しいGitHub issueをトリアージし、レビュー用の返信を下書きする"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "これが一般化するかどうかで議論が起きます。その議論こそ、このレベルに到達した証拠です。"
@@ -5641,6 +5668,10 @@ msgstr "ファクトリーティア{tier}"
 msgid "failed"
 msgstr "失敗"
 
+msgid "Failed"
+msgstr "失敗"
+
+msgctxt "agent status"
 msgid "Failed"
 msgstr "失敗"
 
@@ -6806,6 +6837,9 @@ msgstr "プルリクエスト一覧を隠す"
 msgid "Hide pull request preview"
 msgstr "プルリクエストのプレビューを隠す"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "解決済みを非表示 ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "レビューコメントを隠す"
 
@@ -7907,6 +7941,9 @@ msgstr "読み込みと実行中の活動を示すインジケーター"
 msgid "Loading changes..."
 msgstr "変更を読み込み中..."
 
+msgid "Loading comments…"
+msgstr "コメントを読み込み中…"
+
 msgid "Loading contributors…"
 msgstr "コントリビューターを読み込み中…"
 
@@ -8455,6 +8492,9 @@ msgstr "他の{kindLower}テーマ"
 msgid "More actions"
 msgstr "その他の操作"
 
+msgid "More options"
+msgstr "その他のオプション"
+
 msgid "More pages"
 msgstr "その他のページ"
 
@@ -8577,6 +8617,10 @@ msgstr "要更新"
 msgid "Needs update"
 msgstr "要更新"
 
+msgctxt "agent status"
+msgid "Needs you"
+msgstr "要対応"
+
 msgid "Nerd Fonts"
 msgstr "Nerd Fonts"
 
@@ -8618,6 +8662,9 @@ msgstr "別の対戦相手"
 
 msgid "New chat"
 msgstr "新しいチャット"
+
+msgid "New cloud workspace"
+msgstr "新規クラウドワークスペース"
 
 msgid "New environment"
 msgstr "新しい環境"
@@ -8761,9 +8808,6 @@ msgstr "次: {nextLabel}"
 msgid "Nice, open a PR when ready."
 msgstr "いいですね。準備ができたらPRを作成してください。"
 
-msgid "Nightly at 2am, find one small bug, fix it, and open a PR"
-msgstr "毎晩午前2時に小さなバグを1つ見つけて修正し、PRを作成する"
-
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "No {0} logins on this host — sign in and usage appears here."
 msgstr "このホストに{0}のログインがありません — サインインすると使用量が表示されます。"
@@ -8880,6 +8924,9 @@ msgstr "コメント本文はありません"
 msgid "No comments yet."
 msgstr "コメントはまだありません。"
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "まだコメントはありません。コメントモードをオンにして、ページ上の要素をクリックすると開始できます。"
+
 msgid "No commits on this branch yet."
 msgstr "このブランチにはまだコミットがありません。"
 
@@ -8978,6 +9025,9 @@ msgstr "アイコンなし"
 
 msgid "No Internet Connection"
 msgstr "インターネット接続がありません"
+
+msgid "No internet connection."
+msgstr "インターネット接続がありません。"
 
 msgid "No issues found."
 msgstr "Issueが見つかりません。"
@@ -9343,6 +9393,9 @@ msgstr "あとで"
 msgid "Not on the leaderboard. Opt in first."
 msgstr "リーダーボードに参加していません。先に参加してください。"
 
+msgid "Not on this version"
+msgstr "このバージョンにはありません"
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "まだイベントを受信していません: Microsoft Graphが通知サブスクリプションを拒否しました。アプリの管理者同意と保護されたAPIの承認を確認してから、再接続してください。"
 
@@ -9360,6 +9413,10 @@ msgstr "このホストではセットアップされていません"
 
 msgid "not sorted"
 msgstr "並べ替えなし"
+
+msgctxt "agent status"
+msgid "Not updating"
+msgstr "更新なし"
 
 msgid "Notes"
 msgstr "ノート"
@@ -10883,9 +10940,6 @@ msgstr "パブリック"
 msgid "Public leaderboard"
 msgstr "公開リーダーボード"
 
-msgid "Publish a page from an agent or the CLI and it will show up here."
-msgstr "エージェントまたはCLIからページを公開すると、ここに表示されます。"
-
 msgid "Published"
 msgstr "公開日"
 
@@ -11747,6 +11801,10 @@ msgstr "自分のランクを表示"
 
 msgid "Review"
 msgstr "レビュー"
+
+msgctxt "agent status"
+msgid "Review"
+msgstr "要確認"
 
 msgid "Review and CI queues eat the gains agents create."
 msgstr "レビューとCIの待ち行列が、エージェントの生んだ余力を食い潰しています。"
@@ -12628,6 +12686,9 @@ msgstr "濃さはこの開発者の最も活動量が多い日を基準にして
 msgid "Share"
 msgstr "共有"
 
+msgid "Share designs and reports. Let your agent handle the feedback."
+msgstr "デザインやレポートを共有しましょう。フィードバックへの対応はエージェントに任せられます。"
+
 msgid "Share page"
 msgstr "ページを共有"
 
@@ -12675,6 +12736,9 @@ msgstr "{count}件すべて表示"
 
 msgid "Show all automations again"
 msgstr "すべてのオートメーションを再表示"
+
+msgid "Show all comments"
+msgstr "すべてのコメントを表示"
 
 msgid "Show all lines"
 msgstr "すべての行を表示"
@@ -12765,6 +12829,9 @@ msgstr "プルリクエスト一覧を表示"
 
 msgid "Show pull request preview"
 msgstr "プルリクエストのプレビューを表示"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "解決済みを表示 ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "レビューコメントを表示"
@@ -13330,6 +13397,9 @@ msgstr "ステップ {0} / 2"
 msgid "Step {step}: {name}"
 msgstr "ステップ{step}: {name}"
 
+msgid "Still can't reach the host."
+msgstr "ホストにまだ接続できません。"
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "処理を続けています — 大きなリポジトリでは数分かかることがあります。画面を離れても構いません。準備ができるとホームに表示されます。"
 
@@ -13440,9 +13510,6 @@ msgstr "スイート、そして共有アプリコンポーネントです。イ
 
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Supersetと監視対象のターミナルプロセスツリーが使用するCPUの合計。100%を超える場合は複数のCPUコアが動作しています。高い値が続くと、通常はUIの動作が重くなり、バッテリー消費も増えます。"
-
-msgid "Summarize failed CI runs every morning before standup"
-msgstr "毎朝スタンドアップ前に失敗したCI実行をまとめる"
 
 msgid "Summary"
 msgstr "概要"
@@ -14061,6 +14128,9 @@ msgstr "ホストは{targetVersion}ではなく{0}で復帰しました。"
 msgid "The host did not come back within fifteen minutes."
 msgstr "ホストが15分以内に復帰しませんでした。"
 
+msgid "The host hasn't answered."
+msgstr "ホストからの応答がありません。"
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "ホストがSupersetリレーに接続されていません。このデバイスの場合は、設定 > リモートアクセスで「リレー経由でこのデバイスへのリモートアクセスを許可」をオンにしてから再試行してください。"
 
@@ -14227,6 +14297,9 @@ msgstr "Web版のエージェントUIは現時点では読み取り専用のプ�
 msgid "The workspace is not ready yet. Try again."
 msgstr "ワークスペースの準備がまだできていません。もう一度お試しください。"
 
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "ワークスペースは作成されている可能性があります。表示された場合、この画面で開きます。"
+
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "ワークツリーと未コミットの変更が削除されます。この操作は元に戻せません。"
 
@@ -14277,6 +14350,13 @@ msgstr "このアプリケーションは次のことができます:"
 
 msgid "This application will have access to data in the selected organization."
 msgstr "このアプリケーションは選択した組織のデータにアクセスできます。"
+
+#. placeholder {0}: params?.organizationName
+msgid "This automation belongs to {0}. Switch to that organization to open it."
+msgstr "このオートメーションは {0} に属しています。開くにはその組織に切り替えてください。"
+
+msgid "This automation is in another organization"
+msgstr "このオートメーションは別の組織にあります"
 
 msgid "This cannot be undone."
 msgstr "この操作は元に戻せません。"
@@ -14548,9 +14628,6 @@ msgstr "ティア"
 
 msgid "Time range"
 msgstr "期間"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "ホストがワークスペースを作成するのを待つ間にタイムアウトしました。"
 
 msgid "Title"
 msgstr "タイトル"
@@ -15472,17 +15549,14 @@ msgstr "ダウンロードリンクの送信にのみ使用します。"
 msgid "We're hiring"
 msgstr "採用中"
 
-msgid "We're hiring engineers"
-msgstr "エンジニアを募集中"
-
-msgid "We're hiring engineers in San Francisco"
-msgstr "サンフランシスコでエンジニアを募集中"
-
 msgid "We're hiring engineers in San Francisco. Help us build the first software factory platform."
 msgstr "サンフランシスコでエンジニアを募集中。最初のソフトウェアファクトリープラットフォームを一緒に作りましょう。"
 
 msgid "We're hiring in San Francisco"
 msgstr "サンフランシスコで採用中"
+
+msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
+msgstr "クラウド版を一緒に作り上げる共同開発パートナーを募集しています。ワークフローについてお聞かせください。協力の可能性について、こちらからご連絡します。"
 
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "この機能は作り直し中です。しばらくお待ちください。"
@@ -15599,11 +15673,17 @@ msgstr "Supersetとは何か、誰が作っていて、誰のためのものか�
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "コンテンツの状況: セッションがどのページから始まるか、どれだけ公開されているか。"
 
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "これらが書かれた対象はページ上に存在しないため、ピンがありません。"
+
 msgid "What We're Building"
 msgstr "いま作っているもの"
 
 msgid "What we're building now and next."
 msgstr "いま作っているものと、次に作るもの。"
+
+msgid "What would you like to build with Superset in the cloud?"
+msgstr "クラウド上のSupersetで何を作りたいですか？"
 
 msgid "What would you like to know?"
 msgstr "何を知りたいですか?"
@@ -15692,6 +15772,9 @@ msgstr "ラベルあり"
 msgid "with or without attachments"
 msgstr "添付の有無を問わず"
 
+msgid "Work email"
+msgstr "勤務先のメールアドレス"
+
 msgid "Work from tickets"
 msgstr "チケットから作業を始める"
 
@@ -15709,6 +15792,10 @@ msgstr "ワークフローのチュートリアル"
 
 msgid "Working"
 msgstr "作業中"
+
+msgctxt "agent status"
+msgid "Working"
+msgstr "実行中"
 
 msgid "Works when environments are clean. Environments are rarely clean."
 msgstr "環境がきれいなら動きます。環境がきれいなことは滅多にありません。"

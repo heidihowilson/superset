@@ -676,6 +676,9 @@ msgstr "{hidden, plural, one {#行已隐藏} other {#行已隐藏}}"
 msgid "{hidden, plural, one {Show # hidden line} other {Show # hidden lines}}"
 msgstr "{hidden, plural, one {显示#行隐藏内容} other {显示#行隐藏内容}}"
 
+msgid "{hidden, plural, one {Show # reply} other {Show # replies}}"
+msgstr "{hidden, plural, one {显示 # 条回复} other {显示 # 条回复}}"
+
 msgid "{hiddenCount, plural, one {Show # more frame} other {Show # more frames}}"
 msgstr "{hiddenCount, plural, one {再显示#个栈帧} other {再显示#个栈帧}}"
 
@@ -759,6 +762,9 @@ msgstr "{name} 是内置的，无法替换"
 #. js-lingui-explicit-id
 msgid "serverError.plugins.marketplaceNotAdded"
 msgstr "{name} 尚未添加"
+
+msgid "{needing, plural, one {# needs you} other {# need you}}"
+msgstr "{needing, plural, other {# 个需要你}}"
 
 msgid "{nonBrandPct} of clicks"
 msgstr "占点击的 {nonBrandPct}"
@@ -874,6 +880,12 @@ msgstr "{threshold, plural, other {已合并 # 个智能体 PR}}"
 msgid "{toolName} interrupted"
 msgstr "{toolName}已中断"
 
+msgid "{total, plural, one {# agent working} other {# agents working}}"
+msgstr "{total, plural, other {# 个智能体运行中}}"
+
+msgid "{total, plural, one {# agent} other {# agents}}"
+msgstr "{total, plural, other {# 个智能体}}"
+
 msgid "{total, plural, one {The check passed} other {All # checks passed}}"
 msgstr "{total, plural, one {#项检查全部通过} other {#项检查全部通过}}"
 
@@ -961,6 +973,9 @@ msgstr "⇧点击"
 #. placeholder {2}: changeset.files.length
 msgid "+{0} −{1} · {2, plural, one {# file} other {# files}}"
 msgstr "+{0} −{1} · {2, plural, one {#个文件} other {#个文件}}"
+
+msgid "+{hidden} more"
+msgstr "还有 {hidden} 个"
 
 msgid "+{hiddenCount} earlier"
 msgstr "更早的+{hiddenCount}条"
@@ -1652,6 +1667,9 @@ msgstr "全部检查通过"
 msgid "All checks skipped or cancelled"
 msgstr "所有检查已跳过或取消"
 
+msgid "All comments"
+msgstr "全部评论"
+
 msgid "All commits"
 msgstr "所有提交"
 
@@ -2220,9 +2238,6 @@ msgstr "自动化（{myFailedCount}个失败）"
 msgid "Automations & event triggers"
 msgstr "自动化与事件触发"
 
-msgid "Automations docs"
-msgstr "自动化文档"
-
 msgid "Automations, {myFailedCount} failing"
 msgstr "自动化，{myFailedCount}个失败"
 
@@ -2353,6 +2368,9 @@ msgstr "基于PR #{0}"
 #. placeholder {1}: preview.providers.join(" and ")
 msgid "Based on {0} tokens in the last 30 days, counting {1}."
 msgstr "基于最近30天的{0}个token，统计{1}。"
+
+msgid "Become a design partner"
+msgstr "成为共创伙伴"
 
 msgid "Before"
 msgstr "变更前"
@@ -2555,6 +2573,9 @@ msgstr "浏览历史"
 
 msgid "Bug"
 msgstr "虫子"
+
+msgid "Build the future of Superset in the cloud"
+msgstr "共创 Superset 的云端未来"
 
 msgid "Building the last piece of software"
 msgstr "打造最后一款软件"
@@ -3154,6 +3175,9 @@ msgstr "关闭聊天"
 msgid "Close Comment"
 msgstr "关闭评论"
 
+msgid "Close comments"
+msgstr "关闭评论"
+
 msgid "Close Diff"
 msgstr "关闭差异"
 
@@ -3262,6 +3286,9 @@ msgstr "关闭此终端将结束正在运行的进程。"
 
 msgid "Cloud"
 msgstr "云端"
+
+msgid "Cloud is coming. Become a design partner"
+msgstr "云端版本即将推出。成为共创伙伴"
 
 msgid "Cloud sandboxes"
 msgstr "云端沙箱"
@@ -4000,6 +4027,9 @@ msgstr "无法连接到主机以加载此拉取请求。"
 msgid "Could not reach the host to start the update. Check that it is online and try again."
 msgstr "无法连接主机以开始更新。请确认主机在线后重试。"
 
+msgid "Could not reach the server."
+msgstr "无法连接到服务器。"
+
 msgid "Could not reach this workspace's machine"
 msgstr "无法连接到这个工作区所在的机器"
 
@@ -4245,11 +4275,11 @@ msgstr "创建团队"
 msgid "Create a workspace for the auth feature on my MacBook"
 msgstr "在我的MacBook上为认证功能创建一个工作区"
 
+msgid "Create again"
+msgstr "再次创建"
+
 msgid "Create an account"
 msgstr "创建账户"
-
-msgid "Create an automation with an agent"
-msgstr "用智能体创建自动化"
 
 msgid "Create failed: {message}"
 msgstr "创建失败：{message}"
@@ -4870,6 +4900,9 @@ msgstr "语音输入"
 msgid "Dictation is not available on this device"
 msgstr "此设备不支持语音输入"
 
+msgid "Didn't hear back"
+msgstr "未收到响应"
+
 msgid "diff"
 msgstr "差异"
 
@@ -5467,9 +5500,6 @@ msgstr "每个智能体都跑在自己的Git worktree里，十个智能体可以
 msgid "Every axis is carrying its weight for the next tier. Hold it and the tier follows."
 msgstr "每个维度都在为下一等级出力。保持住，等级自然会来。"
 
-msgid "Every Friday at 4pm, draft release notes from this week's merged PRs"
-msgstr "每周五下午4点，根据本周合并的PR起草发布说明"
-
 msgid "Every Friday at 4pm, draft release notes from this week's merged PRs."
 msgstr "每周五下午4点，根据本周合并的PR起草发布说明。"
 
@@ -5490,9 +5520,6 @@ msgstr "每周三上午9点，回顾本周合并的PR，更新被它们改过时
 
 msgid "Every weekday at 9am, read new GitHub issues, apply labels, and draft a first reply for my review."
 msgstr "每个工作日上午9点，阅读新的GitHub议题，打上标签，并起草初步回复供我审阅。"
-
-msgid "Every weekday at 9am, triage new GitHub issues and draft replies for my review"
-msgstr "每个工作日上午9点，分类新的GitHub议题并起草回复供我审阅"
 
 msgid "Everyone argues about whether this generalizes. That argument is the sign the level was reached."
 msgstr "所有人都在争论这能否推广。这场争论本身就说明这一级别已经达到了。"
@@ -5641,6 +5668,10 @@ msgstr "工厂等级{tier}"
 msgid "failed"
 msgstr "失败"
 
+msgid "Failed"
+msgstr "失败"
+
+msgctxt "agent status"
 msgid "Failed"
 msgstr "失败"
 
@@ -6806,6 +6837,9 @@ msgstr "隐藏拉取请求列表"
 msgid "Hide pull request preview"
 msgstr "隐藏拉取请求预览"
 
+msgid "Hide resolved ({resolvedCount})"
+msgstr "隐藏已解决 ({resolvedCount})"
+
 msgid "Hide review comments"
 msgstr "隐藏审查评论"
 
@@ -7907,6 +7941,9 @@ msgstr "加载状态与进行中活动的指示器"
 msgid "Loading changes..."
 msgstr "正在加载更改..."
 
+msgid "Loading comments…"
+msgstr "正在加载评论…"
+
 msgid "Loading contributors…"
 msgstr "正在加载贡献者…"
 
@@ -8455,6 +8492,9 @@ msgstr "更多{kindLower}主题"
 msgid "More actions"
 msgstr "更多操作"
 
+msgid "More options"
+msgstr "更多选项"
+
 msgid "More pages"
 msgstr "更多页面"
 
@@ -8577,6 +8617,10 @@ msgstr "需要更新"
 msgid "Needs update"
 msgstr "需要更新"
 
+msgctxt "agent status"
+msgid "Needs you"
+msgstr "需要你"
+
 msgid "Nerd Fonts"
 msgstr "Nerd Fonts"
 
@@ -8618,6 +8662,9 @@ msgstr "换对手"
 
 msgid "New chat"
 msgstr "新建聊天"
+
+msgid "New cloud workspace"
+msgstr "新建云端工作区"
 
 msgid "New environment"
 msgstr "新建环境"
@@ -8761,9 +8808,6 @@ msgstr "下一级：{nextLabel}"
 msgid "Nice, open a PR when ready."
 msgstr "不错，准备好就开个PR。"
 
-msgid "Nightly at 2am, find one small bug, fix it, and open a PR"
-msgstr "每晚2点，找一个小bug，修好它并提一个PR"
-
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "No {0} logins on this host — sign in and usage appears here."
 msgstr "此主机上没有{0}登录——登录后用量会显示在这里。"
@@ -8880,6 +8924,9 @@ msgstr "没有评论正文"
 msgid "No comments yet."
 msgstr "暂无评论。"
 
+msgid "No comments yet. Turn on comment mode and click anything on the page to start one."
+msgstr "还没有评论。开启评论模式，点击页面上的任意元素即可开始。"
+
 msgid "No commits on this branch yet."
 msgstr "此分支上还没有提交。"
 
@@ -8978,6 +9025,9 @@ msgstr "无图标"
 
 msgid "No Internet Connection"
 msgstr "无网络连接"
+
+msgid "No internet connection."
+msgstr "无网络连接。"
 
 msgid "No issues found."
 msgstr "未找到议题。"
@@ -9343,6 +9393,9 @@ msgstr "暂不"
 msgid "Not on the leaderboard. Opt in first."
 msgstr "不在排行榜中。请先加入。"
 
+msgid "Not on this version"
+msgstr "不在此版本中"
+
 msgid "Not receiving events yet: Microsoft Graph refused the notification subscriptions. Check the app's admin consent and protected API approval, then reconnect."
 msgstr "尚未接收到事件：Microsoft Graph拒绝了通知订阅。请检查应用的管理员同意和受保护API的审批，然后重新连接。"
 
@@ -9360,6 +9413,10 @@ msgstr "尚未在此主机上配置"
 
 msgid "not sorted"
 msgstr "未排序"
+
+msgctxt "agent status"
+msgid "Not updating"
+msgstr "未更新"
 
 msgid "Notes"
 msgstr "笔记"
@@ -10883,9 +10940,6 @@ msgstr "公开"
 msgid "Public leaderboard"
 msgstr "公开排行榜"
 
-msgid "Publish a page from an agent or the CLI and it will show up here."
-msgstr "从智能体或CLI发布一个页面，它就会出现在这里。"
-
 msgid "Published"
 msgstr "发布时间"
 
@@ -11747,6 +11801,10 @@ msgstr "显示我的排名"
 
 msgid "Review"
 msgstr "审查"
+
+msgctxt "agent status"
+msgid "Review"
+msgstr "待查看"
 
 msgid "Review and CI queues eat the gains agents create."
 msgstr "审查和CI排队把智能体带来的收益吃掉了。"
@@ -12628,6 +12686,9 @@ msgstr "深浅以该开发者最忙的一天为基准"
 msgid "Share"
 msgstr "分享"
 
+msgid "Share designs and reports. Let your agent handle the feedback."
+msgstr "分享设计和报告，让你的智能体处理反馈。"
+
 msgid "Share page"
 msgstr "分享页面"
 
@@ -12675,6 +12736,9 @@ msgstr "显示全部{count}条"
 
 msgid "Show all automations again"
 msgstr "重新显示所有自动化"
+
+msgid "Show all comments"
+msgstr "显示全部评论"
 
 msgid "Show all lines"
 msgstr "显示所有行"
@@ -12765,6 +12829,9 @@ msgstr "显示拉取请求列表"
 
 msgid "Show pull request preview"
 msgstr "显示拉取请求预览"
+
+msgid "Show resolved ({resolvedCount})"
+msgstr "显示已解决 ({resolvedCount})"
 
 msgid "Show review comments"
 msgstr "显示评审评论"
@@ -13330,6 +13397,9 @@ msgstr "第{0}步，共2步"
 msgid "Step {step}: {name}"
 msgstr "第{step}步：{name}"
 
+msgid "Still can't reach the host."
+msgstr "仍然无法连接到主机。"
+
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "仍在处理 — 大仓库可能需要几分钟。你可以离开；工作区就绪后会出现在首页。"
 
@@ -13440,9 +13510,6 @@ msgstr "套件，以及共享应用组件。点击任意导入路径即可复制
 
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Superset与受监控的终端进程树占用的CPU总和。超过100%表示有多个CPU核心处于繁忙状态。持续偏高通常会导致界面卡顿和耗电增加。"
-
-msgid "Summarize failed CI runs every morning before standup"
-msgstr "每天早上站会前总结失败的CI运行"
 
 msgid "Summary"
 msgstr "摘要"
@@ -14061,6 +14128,9 @@ msgstr "主机以 {0} 而非 {targetVersion} 恢复。"
 msgid "The host did not come back within fifteen minutes."
 msgstr "主机未在十五分钟内恢复。"
 
+msgid "The host hasn't answered."
+msgstr "主机未响应。"
+
 msgid "The host isn't connected to the Superset relay. If it's this device, turn on \"Allow remote access to this device via relay\" in Settings > Remote Access, then try again."
 msgstr "该主机没有连接到Superset中继。如果就是此设备，请在“设置>远程访问”中打开“允许通过中继远程访问本设备”，然后重试。"
 
@@ -14227,6 +14297,9 @@ msgstr "网页版智能体界面目前是只读预览。"
 msgid "The workspace is not ready yet. Try again."
 msgstr "工作区尚未就绪。请重试。"
 
+msgid "The workspace may still have been created. This screen opens it if it appears."
+msgstr "工作区可能已经创建。如果出现，此界面会自动打开它。"
+
 msgid "The worktree and any uncommitted changes will be removed. This cannot be undone."
 msgstr "worktree及其中所有未提交的更改都会被移除。此操作无法撤销。"
 
@@ -14277,6 +14350,13 @@ msgstr "该应用将能够："
 
 msgid "This application will have access to data in the selected organization."
 msgstr "该应用将可以访问所选组织中的数据。"
+
+#. placeholder {0}: params?.organizationName
+msgid "This automation belongs to {0}. Switch to that organization to open it."
+msgstr "此自动化属于 {0}。请切换到该组织后打开。"
+
+msgid "This automation is in another organization"
+msgstr "此自动化位于其他组织"
 
 msgid "This cannot be undone."
 msgstr "此操作无法撤销。"
@@ -14548,9 +14628,6 @@ msgstr "等级"
 
 msgid "Time range"
 msgstr "时间范围"
-
-msgid "Timed out waiting for the host to create the workspace."
-msgstr "等待主机创建工作区超时。"
 
 msgid "Title"
 msgstr "标题"
@@ -15472,17 +15549,14 @@ msgstr "我们只会用它给你发送下载链接。"
 msgid "We're hiring"
 msgstr "我们在招聘"
 
-msgid "We're hiring engineers"
-msgstr "我们正在招聘工程师"
-
-msgid "We're hiring engineers in San Francisco"
-msgstr "我们在旧金山招聘工程师"
-
 msgid "We're hiring engineers in San Francisco. Help us build the first software factory platform."
 msgstr "我们正在旧金山招聘工程师。与我们一起打造首个软件工厂平台。"
 
 msgid "We're hiring in San Francisco"
 msgstr "我们在旧金山招聘"
+
+msgid "We're looking for design partners to help shape our cloud offering. Tell us about your workflow and we'll be in touch to explore working together."
+msgstr "我们正在寻找共创伙伴，共同打造云端产品。请告诉我们您的工作流程，我们会与您联系，探讨合作机会。"
 
 msgid "We're rebuilding this feature. Check back soon."
 msgstr "我们正在重做这个功能，敬请期待。"
@@ -15599,11 +15673,17 @@ msgstr "Superset 是什么、由谁打造、为谁而建。一支由三位前 YC
 msgid "What the content is doing: which pages sessions start on, and how much is being published."
 msgstr "内容的表现：会话从哪些页面开始，以及发布了多少。"
 
+msgid "What these were written against is no longer on the page, so they have no pin."
+msgstr "这些评论所针对的内容已不在页面上，因此没有标记。"
+
 msgid "What We're Building"
 msgstr "我们正在构建什么"
 
 msgid "What we're building now and next."
 msgstr "我们正在做什么，接下来做什么。"
+
+msgid "What would you like to build with Superset in the cloud?"
+msgstr "您想用云端 Superset 构建什么？"
 
 msgid "What would you like to know?"
 msgstr "你想了解什么？"
@@ -15692,6 +15772,9 @@ msgstr "带标签"
 msgid "with or without attachments"
 msgstr "有无附件均可"
 
+msgid "Work email"
+msgstr "工作邮箱"
+
 msgid "Work from tickets"
 msgstr "从工单开始工作"
 
@@ -15709,6 +15792,10 @@ msgstr "工作流教程"
 
 msgid "Working"
 msgstr "工作中"
+
+msgctxt "agent status"
+msgid "Working"
+msgstr "运行中"
 
 msgid "Works when environments are clean. Environments are rarely clean."
 msgstr "环境干净时可行。而环境很少干净。"
