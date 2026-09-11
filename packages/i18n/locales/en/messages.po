@@ -310,7 +310,7 @@ msgstr "{0} actions"
 msgid "{0} and {1} settle it as terminal dinosaurs. Stats decide the winner."
 msgstr "{0} and {1} settle it as terminal dinosaurs. Stats decide the winner."
 
-#. placeholder {0}: formatTokens(me.tokens - below.tokens)
+#. placeholder {0}: formatTokens(Math.max(0, me.tokens - below.tokens))
 msgid "{0} behind you"
 msgstr "{0} behind you"
 
@@ -444,7 +444,7 @@ msgstr "{0} sessions terminated"
 msgid "{0} terminated, {1} remaining"
 msgstr "{0} terminated, {1} remaining"
 
-#. placeholder {0}: formatTokens(above.tokens - me.tokens)
+#. placeholder {0}: formatTokens(Math.max(0, above.tokens - me.tokens))
 #. placeholder {1}: formatNumber(above.rank)
 msgid "{0} to pass #{1}"
 msgstr "{0} to pass #{1}"
@@ -643,6 +643,9 @@ msgstr "{days}d ago"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 
+msgid "{developerCount}+"
+msgstr "{developerCount}+"
+
 msgid "{distance} ago"
 msgstr "{distance} ago"
 
@@ -663,6 +666,9 @@ msgstr "{focusShortcutText} to focus"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted} {count, plural, one {dev} other {devs}}"
+
+msgid "{founderCount} ex-YC founders"
+msgstr "{founderCount} ex-YC founders"
 
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
@@ -2003,6 +2009,10 @@ msgstr "Applies to the file tree, changes list, and diff header."
 msgid "Applies to URLs in terminals, chat messages, and task browsers."
 msgstr "Applies to URLs in terminals, chat messages, and task browsers."
 
+msgid "Apply"
+msgstr "Apply"
+
+msgctxt "job application"
 msgid "Apply"
 msgstr "Apply"
 
@@ -3358,11 +3368,12 @@ msgstr "Cloud is coming. Become a design partner"
 msgid "Cloud sandboxes"
 msgstr "Cloud sandboxes"
 
+#. js-lingui-explicit-id
+msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
+msgstr "Cloud sandboxes are not enabled for {account}. Ask the Superset team for access."
+
 msgid "Cloud workspace"
 msgstr "Cloud workspace"
-
-msgid "Cloud workspaces are not available yet"
-msgstr "Cloud workspaces are not available yet"
 
 msgid "Code"
 msgstr "Code"
@@ -12289,6 +12300,9 @@ msgstr "Same version as this app."
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO & SCIM provisioning"
 
+msgid "San Francisco"
+msgstr "San Francisco"
+
 msgid "Sandbox preview has no URL"
 msgstr "Sandbox preview has no URL"
 
@@ -13009,6 +13023,9 @@ msgstr "Shortcut already in use"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Show a confirmation dialog when quitting the app"
 
+msgid "Show a Usage button in the home sidebar, under Pull requests"
+msgstr "Show a Usage button in the home sidebar, under Pull requests"
+
 msgid "Show all {count}"
 msgstr "Show all {count}"
 
@@ -13128,6 +13145,9 @@ msgstr "Show status and send notifications for this agent."
 
 msgid "Show translation"
 msgstr "Show translation"
+
+msgid "Show usage tab on sidebar"
+msgstr "Show usage tab on sidebar"
 
 msgid "showArrow opt-in"
 msgstr "showArrow opt-in"
@@ -13408,6 +13428,9 @@ msgstr "Something went wrong. Try again, or contact support@superset.sh."
 
 msgid "soon"
 msgstr "soon"
+
+msgid "Soon, teams will run hundreds of agents in parallel—software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
+msgstr "Soon, teams will run hundreds of agents in parallel—software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
 
 msgid "Sort"
 msgstr "Sort"
@@ -13879,8 +13902,8 @@ msgstr "Superset is building self-improving software. It starts with giving engi
 msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
 msgstr "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
 
-msgid "Superset is built in Superset, so we're our own #1 users - you get paid to make your own life easier. We're building a flat and talent-dense team, and we're looking for people who have crazy ideas and are crazy enough to ship them. If you've ever wanted to build a product you love to use, come build it with us."
-msgstr "Superset is built in Superset, so we're our own #1 users - you get paid to make your own life easier. We're building a flat and talent-dense team, and we're looking for people who have crazy ideas and are crazy enough to ship them. If you've ever wanted to build a product you love to use, come build it with us."
+msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
+msgstr "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
 
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
@@ -14966,9 +14989,6 @@ msgstr "Today"
 
 msgid "TODAY"
 msgstr "TODAY"
-
-msgid "Today, tens of thousands of engineers run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix. Soon, teams will run 100s of agents in parallel - software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
-msgstr "Today, tens of thousands of engineers run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix. Soon, teams will run 100s of agents in parallel - software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
 
 msgid "Todo"
 msgstr "Todo"

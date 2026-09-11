@@ -310,7 +310,7 @@ msgstr "Acties voor {0}"
 msgid "{0} and {1} settle it as terminal dinosaurs. Stats decide the winner."
 msgstr "{0} en {1} beslechten het als terminaldinosaurussen. De statistieken bepalen de winnaar."
 
-#. placeholder {0}: formatTokens(me.tokens - below.tokens)
+#. placeholder {0}: formatTokens(Math.max(0, me.tokens - below.tokens))
 msgid "{0} behind you"
 msgstr "{0} achter je"
 
@@ -444,7 +444,7 @@ msgstr "{0} sessies beëindigd"
 msgid "{0} terminated, {1} remaining"
 msgstr "{0} beëindigd, {1} over"
 
-#. placeholder {0}: formatTokens(above.tokens - me.tokens)
+#. placeholder {0}: formatTokens(Math.max(0, above.tokens - me.tokens))
 #. placeholder {1}: formatNumber(above.rank)
 msgid "{0} to pass #{1}"
 msgstr "{0} om #{1} voorbij te gaan"
@@ -643,6 +643,9 @@ msgstr "{days}d geleden"
 msgid "{daysRemaining, plural, one {Your account is deactivated and will be permanently deleted in # day. Reactivate to restore it exactly as you left it.} other {Your account is deactivated and will be permanently deleted in # days. Reactivate to restore it exactly as you left it.}}"
 msgstr "{daysRemaining, plural, one {Je account is gedeactiveerd en wordt over # dag definitief verwijderd. Reactiveer het om alles terug te krijgen zoals je het achterliet.} other {Je account is gedeactiveerd en wordt over # dagen definitief verwijderd. Reactiveer het om alles terug te krijgen zoals je het achterliet.}}"
 
+msgid "{developerCount}+"
+msgstr "{developerCount}+"
+
 msgid "{distance} ago"
 msgstr "{distance} geleden"
 
@@ -663,6 +666,9 @@ msgstr "{focusShortcutText} om te focussen"
 
 msgid "{formatted} {count, plural, one {dev} other {devs}}"
 msgstr "{formatted} {count, plural, one {dev} other {devs}}"
+
+msgid "{founderCount} ex-YC founders"
+msgstr "{founderCount} oprichters uit het YC-netwerk"
 
 msgid "{gate} · {statusLabel}"
 msgstr "{gate} · {statusLabel}"
@@ -2005,6 +2011,10 @@ msgstr "Geldt voor URL's in terminals, chatberichten en taakbrowsers."
 
 msgid "Apply"
 msgstr "Toepassen"
+
+msgctxt "job application"
+msgid "Apply"
+msgstr "Solliciteer"
 
 msgid "Approve"
 msgstr "Goedkeuren"
@@ -3358,11 +3368,12 @@ msgstr "De cloud komt eraan. Word ontwerppartner"
 msgid "Cloud sandboxes"
 msgstr "Cloudsandboxen"
 
+#. js-lingui-explicit-id
+msgid "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly"
+msgstr "Cloudsandboxen zijn niet ingeschakeld voor {account}. Vraag het Superset-team om toegang."
+
 msgid "Cloud workspace"
 msgstr "Cloudwerkruimte"
-
-msgid "Cloud workspaces are not available yet"
-msgstr "Cloudwerkruimtes zijn nog niet beschikbaar"
 
 msgid "Code"
 msgstr "Code"
@@ -12289,6 +12300,9 @@ msgstr "Dezelfde versie als deze app."
 msgid "SAML SSO & SCIM provisioning"
 msgstr "SAML SSO en SCIM-provisioning"
 
+msgid "San Francisco"
+msgstr "San Francisco"
+
 msgid "Sandbox preview has no URL"
 msgstr "Sandboxpreview heeft geen URL"
 
@@ -13009,6 +13023,9 @@ msgstr "Sneltoets al in gebruik"
 msgid "Show a confirmation dialog when quitting the app"
 msgstr "Toon een bevestiging bij het afsluiten van de app"
 
+msgid "Show a Usage button in the home sidebar, under Pull requests"
+msgstr "Toon een knop Gebruik in de zijbalk van het startscherm, onder Pull requests"
+
 msgid "Show all {count}"
 msgstr "Alle {count} tonen"
 
@@ -13128,6 +13145,9 @@ msgstr "Status tonen en meldingen sturen voor deze agent."
 
 msgid "Show translation"
 msgstr "Vertaling tonen"
+
+msgid "Show usage tab on sidebar"
+msgstr "Gebruikstabblad tonen in zijbalk"
 
 msgid "showArrow opt-in"
 msgstr "showArrow inschakelen"
@@ -13408,6 +13428,9 @@ msgstr "Er is iets misgegaan. Probeer het opnieuw of neem contact op via support
 
 msgid "soon"
 msgstr "binnenkort"
+
+msgid "Soon, teams will run hundreds of agents in parallel—software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
+msgstr "Binnenkort laten teams honderden agents parallel draaien: softwarefabrieken die zelfstandig code produceren en opleveren. We maken van Superset de plek waar teams die fabrieken draaien en beheren, te beginnen met onze eigen fabriek."
 
 msgid "Sort"
 msgstr "Sorteren"
@@ -13879,8 +13902,8 @@ msgstr "Superset bouwt zelfverbeterende software. Dat begint met engineers de be
 msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
 msgstr "Superset wordt gebouwd door een team in San Francisco, Californië. Voor productsupport of vragen over je account mail je <0>{supportEmail}</0>; we reageren binnen één werkdag. Voor partnerships, pers, enterprise of iets voor het oprichtersteam schrijf je naar <1>{foundersEmail}</1>."
 
-msgid "Superset is built in Superset, so we're our own #1 users - you get paid to make your own life easier. We're building a flat and talent-dense team, and we're looking for people who have crazy ideas and are crazy enough to ship them. If you've ever wanted to build a product you love to use, come build it with us."
-msgstr "Superset wordt in Superset gebouwd, dus we zijn onze eigen gebruiker nummer één — je wordt betaald om je eigen leven makkelijker te maken. We bouwen een plat team vol talent en zoeken mensen met gekke ideeën die gek genoeg zijn om ze te bouwen. Als je ooit een product wilde bouwen dat je zelf graag gebruikt, kom het dan met ons bouwen."
+msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
+msgstr "Superset wordt gebouwd in Superset, dus we zijn zelf onze belangrijkste gebruikers: je krijgt betaald om je eigen leven makkelijker te maken. Als je altijd al een product wilde bouwen dat je graag gebruikt, kom het dan samen met ons bouwen."
 
 msgid "Superset is designed to work with your existing tool, we natively support deep-linking to IDEs like Cursor so you can open your workspaces and files in your IDE."
 msgstr "Superset is gemaakt om samen te werken met je bestaande tool; we ondersteunen deeplinks naar IDE's zoals Cursor, zodat je je werkruimtes en bestanden in je IDE kunt openen."
@@ -14966,9 +14989,6 @@ msgstr "Vandaag"
 
 msgid "TODAY"
 msgstr "VANDAAG"
-
-msgid "Today, tens of thousands of engineers run Superset as their primary IDE, at companies like Wix, DoorDash, and Netflix. Soon, teams will run 100s of agents in parallel - software factories that autonomously manufacture and ship code. We're making Superset the place where teams run and manage those factories, starting with our own."
-msgstr "Vandaag draaien tienduizenden engineers Superset als hun belangrijkste IDE, bij bedrijven als Wix, DoorDash en Netflix. Binnenkort draaien teams honderden agents parallel — softwarefabrieken die autonoom code maken en uitleveren. Wij maken van Superset de plek waar teams die fabrieken draaien en beheren, te beginnen met de onze."
 
 msgid "Todo"
 msgstr "Te doen"

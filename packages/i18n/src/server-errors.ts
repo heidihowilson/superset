@@ -145,12 +145,13 @@ export const serverErrorMessages: Record<
 				message: "No active organization selected",
 			}),
 		),
-	"serverError.cloudWorkspace.cloudWorkspacesAreNotAvailableYet": () =>
-		i18n._(
-			msg({
-				message: "Cloud workspaces are not available yet",
-			}),
-		),
+	"serverError.cloudWorkspace.cloudSandboxesAreInternalOnly": (params) =>
+		i18n._({
+			id: "serverError.cloudWorkspace.cloudSandboxesAreInternalOnly",
+			message:
+				"Cloud sandboxes are not enabled for {account}. Ask the Superset team for access.",
+			values: params,
+		}),
 	"serverError.cloudWorkspace.couldNotRecordCloudWorkspace": () =>
 		i18n._(
 			msg({
