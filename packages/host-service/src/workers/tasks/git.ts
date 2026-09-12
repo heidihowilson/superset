@@ -390,6 +390,26 @@ export const gitDeleteBranchTask = defineWorkerTask<
 	},
 });
 
+export const gitStagePathsTask = defineWorkerTask<
+	{
+		worktreePath: string;
+		paths: string[];
+		action: "stage" | "unstage";
+		gitEnv: GitTaskEnv;
+	},
+	{ success: true }
+>({
+	type: "git/stagePaths",
+	handler: async ({ worktreePath, paths, action, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath).env(gitEnv);
+		// Paths come from status output, not from a pathspec the user typed;
+		// without this, a name like `:(glob)**` would match the whole tree.
+		const command = action === "stage" ? ["add", "-A"] : ["reset", "HEAD"];
+		await git.raw(["--literal-pathspecs", ...command, "--", ...paths]);
+		return { success: true };
+	},
+});
+
 export const gitCommitTask = defineWorkerTask<
 	{
 		worktreePath: string;
