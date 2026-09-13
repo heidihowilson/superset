@@ -14,7 +14,7 @@ import { nudge } from "../../lib/realtime";
 import {
 	deleteSandbox,
 	provisionSandbox,
-	sandboxAccessVerifier,
+	sandboxHostSecretFor,
 } from "../../lib/sandbox";
 import { resolveCloneTarget } from "../../lib/sandbox/clone-token";
 import { cloudRepo } from "../../lib/sandbox/cloud-repo";
@@ -125,9 +125,8 @@ export async function provisionCloudWorkspace(
 					SUPERSET_API_URL: env.NEXT_PUBLIC_API_URL,
 					SUPERSET_HOST_RUN_MODE: "sandbox",
 					SUPERSET_SANDBOX_WORKSPACE_ID: row.id,
-					// Verifies the access tokens this API signs for the row's id;
-					// the sandbox can check them and nothing else.
-					SUPERSET_SANDBOX_ACCESS_PUBLIC_KEY: sandboxAccessVerifier(),
+					// What the gate presents; nothing else reaches host-service.
+					HOST_SERVICE_SECRET: await sandboxHostSecretFor(row.id),
 					SUPERSET_SANDBOX_WORKSPACE_NAME: resolvedName,
 					SUPERSET_SANDBOX_BRANCH: row.branch,
 					SUPERSET_SANDBOX_WORKSPACE_PATH: SANDBOX_WORKSPACE_PATH,

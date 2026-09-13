@@ -31,6 +31,8 @@ import {
 } from "../../trpc/router/git/utils/git-helpers.ts";
 import type { GitStatusSnapshotComputation } from "../../trpc/router/git/utils/git-status.ts";
 import { getGitStatusSnapshot } from "../../trpc/router/git/utils/git-status.ts";
+import type { GitStatusPartial } from "../../trpc/router/git/utils/git-status-partial/index.ts";
+import { getGitStatusPartial } from "../../trpc/router/git/utils/git-status-partial/index.ts";
 import {
 	normalizeWorktreePath,
 	parseWorktreeList,
@@ -54,6 +56,17 @@ export const gitStatusSnapshotTask = defineWorkerTask<
 	handler: async ({ worktreePath, baseBranch, gitEnv }) => {
 		const git = createUserSimpleGit(worktreePath).env(gitEnv);
 		return getGitStatusSnapshot({ git, worktreePath, baseBranch });
+	},
+});
+
+export const gitStatusPartialTask = defineWorkerTask<
+	{ worktreePath: string; paths: string[]; gitEnv: GitTaskEnv },
+	GitStatusPartial
+>({
+	type: "git/getStatusPartial",
+	handler: async ({ worktreePath, paths, gitEnv }) => {
+		const git = createUserSimpleGit(worktreePath).env(gitEnv);
+		return getGitStatusPartial({ git, worktreePath, paths });
 	},
 });
 
@@ -544,6 +557,7 @@ export const gitPrHeadBaseTask = defineWorkerTask<
 
 export const gitTasks = [
 	gitStatusSnapshotTask,
+	gitStatusPartialTask,
 	gitFetchBaseRefTask,
 	gitCommitFilesTask,
 	gitDiffBulkTask,
@@ -555,6 +569,7 @@ export const gitTasks = [
 	gitWorktreeStateTask,
 	gitWorktreeRemoveTask,
 	gitDeleteBranchTask,
+	gitStagePathsTask,
 	gitCommitTask,
 	gitPushTask,
 	gitPrHeadBaseTask,

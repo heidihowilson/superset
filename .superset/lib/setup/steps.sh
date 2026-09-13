@@ -325,6 +325,7 @@ step_write_env() {
     local CODE_INSPECTOR_PORT=$((BASE + 11))
     local RELAY_PORT=$((BASE + 13))
     local USERCONTENT_DEV_PORT=$((BASE + 14))
+    local SANDBOX_GATE_DEV_PORT=$((BASE + 15))
     local REALTIME_PORT=$((BASE + 18))
 
     echo ""
@@ -342,6 +343,7 @@ step_write_env() {
     write_env_var "CODE_INSPECTOR_PORT" "$CODE_INSPECTOR_PORT"
     write_env_var "RELAY_PORT" "$RELAY_PORT"
     write_env_var "USERCONTENT_DEV_PORT" "$USERCONTENT_DEV_PORT"
+    write_env_var "SANDBOX_GATE_DEV_PORT" "$SANDBOX_GATE_DEV_PORT"
     write_env_var "REALTIME_PORT" "$REALTIME_PORT"
     echo ""
     echo "# Cross-app URLs (overrides from root .env)"
@@ -360,6 +362,7 @@ step_write_env() {
     write_env_var "REALTIME_NUDGE_SECRET" "fake-realtime-nudge-secret"
     write_env_var "SUPERSET_WEB_URL" "http://localhost:$WEB_PORT"
     write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
+    write_env_var "SANDBOX_GATE_ORIGIN" "http://127.0.0.1:$SANDBOX_GATE_DEV_PORT"
     echo ""
     echo "# Streams URLs (overrides from root .env)"
     write_env_var "PORT" "$STREAMS_PORT"
@@ -388,6 +391,7 @@ step_write_env() {
     { "port": $STREAMS_PORT, "label": "Streams" },
     { "port": $STREAMS_INTERNAL_PORT, "label": "Streams Internal" },
     { "port": $USERCONTENT_DEV_PORT, "label": "Usercontent Worker" },
+    { "port": $SANDBOX_GATE_DEV_PORT, "label": "Gate Worker" },
     { "port": $CODE_INSPECTOR_PORT, "label": "Code Inspector" }
   ]
 }
@@ -605,5 +609,35 @@ step_seed_local_db() {
   fi
 
   success "Local DB seeded from $source_db"
+  return 0
+}
+
+step_seed_env_placeholders() {
+  echo "🧩 Seeding placeholders for keys missing from .env..."
+  seed_missing_env_placeholders ".env.local.example" ".env"
+}
+
+# The API validates its env with zod at module load; a missing key turns every
+# /api/trpc response into Next's HTML 500 and the desktop renders blank. Catch
+# that here, where the zod issues name the keys, instead of at first boot.
+step_validate_env() {
+  echo "🔎 Validating .env against the API env schemas..."
+
+  if ! command -v bun &> /dev/null; then
+    error "bun not available"
+    return 1
+  fi
+  if [ ! -f .env ]; then
+    error ".env not found"
+    return 1
+  fi
+
+  if ! env -u SKIP_ENV_VALIDATION bun --env-file=.env -e \
+      'await import("./packages/trpc/src/env.ts"); await import("./apps/api/src/env.ts");'; then
+    error ".env is missing a key the API requires (issues above). Give it a fake value in .env.local.example and re-run setup, which seeds it."
+    return 1
+  fi
+
+  success ".env satisfies packages/trpc/src/env.ts and apps/api/src/env.ts"
   return 0
 }

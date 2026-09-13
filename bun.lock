@@ -427,6 +427,21 @@
         "typescript": "6.0.3",
       },
     },
+    "apps/gate": {
+      "name": "@superset/gate",
+      "version": "0.1.0",
+      "dependencies": {
+        "@superset/shared": "workspace:*",
+        "jose": "6.2.2",
+        "zod": "4.4.3",
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "5.20260801.1",
+        "@superset/typescript": "workspace:*",
+        "typescript": "6.0.3",
+        "wrangler": "4.118.0",
+      },
+    },
     "apps/marketing": {
       "name": "@superset/marketing",
       "version": "0.1.0",
@@ -1358,6 +1373,7 @@
     "trpc-electron@0.1.2": "patches/trpc-electron@0.1.2.patch",
     "node-pty@1.2.0-beta.14": "patches/node-pty@1.2.0-beta.14.patch",
     "@xterm/xterm@6.1.0-beta.302": "patches/@xterm%2Fxterm@6.1.0-beta.302.patch",
+    "react-native-screens@4.26.0": "patches/react-native-screens@4.26.0.patch",
   },
   "overrides": {
     "@tiptap/extension-dropcursor": "3.30.5",
@@ -3100,6 +3116,8 @@
     "@superset/docs": ["@superset/docs@workspace:apps/docs"],
 
     "@superset/email": ["@superset/email@workspace:packages/email"],
+
+    "@superset/gate": ["@superset/gate@workspace:apps/gate"],
 
     "@superset/host-client": ["@superset/host-client@workspace:packages/host-client"],
 
