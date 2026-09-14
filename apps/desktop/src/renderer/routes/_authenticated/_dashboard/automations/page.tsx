@@ -663,8 +663,11 @@ function AutomationsPage() {
 						onCreate={handleCreateWithAgent}
 						isCreating={creatingWithAgent}
 						showCreate={!orgEmpty}
+						createMenuLabel={<Trans>New automation</Trans>}
+						createDescription={<Trans>Describe the work to your agent</Trans>}
 						secondaryAction={{
-							label: <Trans>New automation</Trans>,
+							label: <Trans>Create manually</Trans>,
+							description: <Trans>Configure the automation yourself</Trans>,
 							onSelect: handleCreateManually,
 							disabled: createMutation.isPending,
 						}}

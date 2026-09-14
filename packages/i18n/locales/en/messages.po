@@ -816,6 +816,9 @@ msgstr "{pending} of {total} check running"
 msgid "{pending} of {total} checks running"
 msgstr "{pending} of {total} checks running"
 
+msgid "{percent} used"
+msgstr "{percent} used"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Joined {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# file changed} other {# files changed}}
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel} restored to defaults"
+
+msgid "{used} used"
+msgstr "{used} used"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} Waiting"
@@ -1236,6 +1242,9 @@ msgstr "A process is still running in this tab"
 msgid "A process is still running in this terminal"
 msgstr "A process is still running in this terminal"
 
+msgid "A pull request always gets its own worktree"
+msgstr "A pull request always gets its own worktree"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 
@@ -1312,6 +1321,9 @@ msgstr "Account is pending deletion."
 
 msgid "Account pending deletion"
 msgstr "Account pending deletion"
+
+msgid "Account usage"
+msgstr "Account usage"
 
 msgid "Achievements"
 msgstr "Achievements"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "API billing"
+
 msgid "API key"
 msgstr "API key"
 
@@ -2271,6 +2286,9 @@ msgstr "Auto-run on new tab"
 
 msgid "Auto-run on workspace creation"
 msgstr "Auto-run on workspace creation"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Auto-updates are disabled in development mode."
@@ -3026,6 +3044,9 @@ msgstr "Checking…"
 msgid "Checklist"
 msgstr "Checklist"
 
+msgid "Checkout: {label}"
+msgstr "Checkout: {label}"
+
 msgid "Checkpoint"
 msgstr "Checkpoint"
 
@@ -3645,6 +3666,9 @@ msgstr "Configure how tasks sync between Superset and Linear."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Configure terminal behavior and reusable terminal scripts"
+
+msgid "Configure the automation yourself"
+msgstr "Configure the automation yourself"
 
 msgid "Configure the in-app browser"
 msgstr "Configure the in-app browser"
@@ -4461,6 +4485,9 @@ msgstr "Create an account"
 msgid "Create failed: {message}"
 msgstr "Create failed: {message}"
 
+msgid "Create manually"
+msgstr "Create manually"
+
 msgid "Create merge commit"
 msgstr "Create merge commit"
 
@@ -5013,6 +5040,9 @@ msgstr "Describe the change…"
 
 msgid "Describe the task for the agent…"
 msgstr "Describe the task for the agent…"
+
+msgid "Describe the work to your agent"
+msgstr "Describe the work to your agent"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
@@ -6145,6 +6175,9 @@ msgstr "Failed to open worktree"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Failed to open: {0}"
+
+msgid "Failed to post reply"
+msgstr "Failed to post reply"
 
 msgid "Failed to prepare agent launch"
 msgstr "Failed to prepare agent launch"
@@ -7719,6 +7752,9 @@ msgstr "Italic"
 msgid "Item"
 msgstr "Item"
 
+msgid "Its own branch and copy of the files"
+msgstr "Its own branch and copy of the files"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 
@@ -8299,6 +8335,9 @@ msgstr "Loading..."
 msgid "Loading…"
 msgstr "Loading…"
 
+msgid "Local"
+msgstr "Local"
+
 msgid "Local Device"
 msgstr "Local Device"
 
@@ -8325,6 +8364,9 @@ msgstr "Log out"
 
 msgid "Log out?"
 msgstr "Log out?"
+
+msgid "Login unverified"
+msgstr "Login unverified"
 
 msgid "Logins (cookies)"
 msgstr "Logins (cookies)"
@@ -8373,9 +8415,6 @@ msgstr "Magenta"
 
 msgid "Main"
 msgstr "Main"
-
-msgid "Main workspace"
-msgstr "Main workspace"
 
 msgid "Make all panes equal size"
 msgstr "Make all panes equal size"
@@ -8787,9 +8826,6 @@ msgstr "More {kindLower} themes"
 
 msgid "More actions"
 msgstr "More actions"
-
-msgid "More options"
-msgstr "More options"
 
 msgid "More pages"
 msgstr "More pages"
@@ -10102,6 +10138,9 @@ msgstr "Open in any IDE"
 
 msgid "Open in Any IDE"
 msgstr "Open in Any IDE"
+
+msgid "Open in app"
+msgstr "Open in app"
 
 msgid "Open in App"
 msgstr "Open in App"
@@ -11976,6 +12015,9 @@ msgstr "Reset location"
 msgid "Reset terminal"
 msgstr "Reset terminal"
 
+msgid "Reset time unavailable"
+msgstr "Reset time unavailable"
+
 msgid "Reset to default"
 msgstr "Reset to default"
 
@@ -13144,6 +13186,9 @@ msgstr "Share this page"
 msgid "Share via…"
 msgstr "Share via…"
 
+msgid "Shared across sessions using this login."
+msgstr "Shared across sessions using this login."
+
 msgid "Shared app components"
 msgstr "Shared app components"
 
@@ -13155,6 +13200,9 @@ msgstr "Shared theme JSON files you can import into Superset."
 
 msgid "Shared version"
 msgstr "Shared version"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Shares the project's checkout — files, git index and branch — with its other local workspaces"
 
 msgid "Sheet"
 msgstr "Sheet"
@@ -14746,6 +14794,9 @@ msgstr "The page you're looking for doesn't exist."
 msgid "The people behind Superset."
 msgstr "The people behind Superset."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "The project's checkout as it is: files and branch are shared"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "The provider answered {0}."
@@ -14908,6 +14959,12 @@ msgstr "This closes every terminal session — in this workspace and any others 
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+
 msgid "This comment is no longer here"
 msgstr "This comment is no longer here"
 
@@ -15049,8 +15106,8 @@ msgstr "This removes the host, its access, and its workspaces. Files on the mach
 msgid "This removes the project from every reachable device."
 msgstr "This removes the project from every reachable device."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "This removes the worktree from disk. The cloud workspace record will also be removed."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "This removes the worktree from disk and closes the workspace."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
@@ -15806,6 +15863,9 @@ msgstr "URL-friendly identifier, unique within your organization."
 msgid "Usage"
 msgstr "Usage"
 
+msgid "Usage is out of date"
+msgstr "Usage is out of date"
+
 msgid "Usage sections"
 msgstr "Usage sections"
 
@@ -16495,6 +16555,9 @@ msgstr "Worktree location updated"
 msgid "Worktree missing"
 msgstr "Worktree missing"
 
+msgid "Worktree on this device"
+msgstr "Worktree on this device"
+
 msgid "Worktree opened"
 msgstr "Worktree opened"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree out of sync"
 
 msgid "Worktrees"
 msgstr "Worktrees"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Worktrees with uncommitted changes are left on disk."

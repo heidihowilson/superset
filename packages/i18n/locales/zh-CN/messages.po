@@ -816,6 +816,9 @@ msgstr "{total}项检查中有{pending}项运行中"
 msgid "{pending} of {total} checks running"
 msgstr "{total}项检查中有{pending}项运行中"
 
+msgid "{percent} used"
+msgstr "已使用 {percent}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · 加入于{joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {#个文件已更改} other {#个文件�
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel}已恢复为默认值"
+
+msgid "{used} used"
+msgstr "已使用 {used}"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting}人等待"
@@ -1236,6 +1242,9 @@ msgstr "此标签页中仍有进程在运行"
 msgid "A process is still running in this terminal"
 msgstr "此终端中仍有进程在运行"
 
+msgid "A pull request always gets its own worktree"
+msgstr "拉取请求总是使用自己的 worktree"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "重建的智能体驱动聊天界面：更丰富的工具输出、更顺手的引导，一切都更快。"
 
@@ -1312,6 +1321,9 @@ msgstr "账户正在等待删除。"
 
 msgid "Account pending deletion"
 msgstr "账户待删除"
+
+msgid "Account usage"
+msgstr "账户用量"
 
 msgid "Achievements"
 msgstr "成就"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "API 计费"
+
 msgid "API key"
 msgstr "API密钥"
 
@@ -2271,6 +2286,9 @@ msgstr "新建标签页时自动运行"
 
 msgid "Auto-run on workspace creation"
 msgstr "创建工作区时自动运行"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "自动更新已被 DISABLE_UPDATE_CHECK 环境变量禁用。"
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "开发模式下已禁用自动更新。"
@@ -3026,6 +3044,9 @@ msgstr "正在检查…"
 msgid "Checklist"
 msgstr "清单"
 
+msgid "Checkout: {label}"
+msgstr "检出：{label}"
+
 msgid "Checkpoint"
 msgstr "检查点"
 
@@ -3645,6 +3666,9 @@ msgstr "配置任务在Superset和Linear之间的同步方式。"
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "配置终端行为和可复用的终端脚本"
+
+msgid "Configure the automation yourself"
+msgstr "自行配置自动化"
 
 msgid "Configure the in-app browser"
 msgstr "配置应用内浏览器"
@@ -4461,6 +4485,9 @@ msgstr "创建账户"
 msgid "Create failed: {message}"
 msgstr "创建失败：{message}"
 
+msgid "Create manually"
+msgstr "手动创建"
+
 msgid "Create merge commit"
 msgstr "创建合并提交"
 
@@ -5013,6 +5040,9 @@ msgstr "描述要做的更改…"
 
 msgid "Describe the task for the agent…"
 msgstr "描述交给智能体的任务…"
+
+msgid "Describe the work to your agent"
+msgstr "向智能体描述工作内容"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "描述你的需求。Superset会为该任务创建隔离的工作区和干净的分支。"
@@ -6145,6 +6175,9 @@ msgstr "打开worktree失败"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "打开失败：{0}"
+
+msgid "Failed to post reply"
+msgstr "回复发送失败"
 
 msgid "Failed to prepare agent launch"
 msgstr "准备启动智能体失败"
@@ -7719,6 +7752,9 @@ msgstr "斜体"
 msgid "Item"
 msgstr "条目"
 
+msgid "Its own branch and copy of the files"
+msgstr "独立的分支和文件副本"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "在它重启之前，其工作区和终端都不可用，请使用Superset托盘菜单 > 主机服务 > 重启。"
 
@@ -8299,6 +8335,9 @@ msgstr "加载中..."
 msgid "Loading…"
 msgstr "正在加载…"
 
+msgid "Local"
+msgstr "本地"
+
 msgid "Local Device"
 msgstr "本地设备"
 
@@ -8325,6 +8364,9 @@ msgstr "退出登录"
 
 msgid "Log out?"
 msgstr "退出登录？"
+
+msgid "Login unverified"
+msgstr "登录未验证"
 
 msgid "Logins (cookies)"
 msgstr "登录信息（cookie）"
@@ -8373,9 +8415,6 @@ msgstr "品红"
 
 msgid "Main"
 msgstr "主进程"
-
-msgid "Main workspace"
-msgstr "主工作区"
 
 msgid "Make all panes equal size"
 msgstr "使所有窗格大小相同"
@@ -8787,9 +8826,6 @@ msgstr "更多{kindLower}主题"
 
 msgid "More actions"
 msgstr "更多操作"
-
-msgid "More options"
-msgstr "更多选项"
 
 msgid "More pages"
 msgstr "更多页面"
@@ -10102,6 +10138,9 @@ msgstr "在任意IDE中打开"
 
 msgid "Open in Any IDE"
 msgstr "在任意IDE中打开"
+
+msgid "Open in app"
+msgstr "在应用中打开"
 
 msgid "Open in App"
 msgstr "在应用中打开"
@@ -11976,6 +12015,9 @@ msgstr "重置位置"
 msgid "Reset terminal"
 msgstr "重置终端"
 
+msgid "Reset time unavailable"
+msgstr "重置时间不可用"
+
 msgid "Reset to default"
 msgstr "恢复默认"
 
@@ -13144,6 +13186,9 @@ msgstr "分享此页面"
 msgid "Share via…"
 msgstr "分享方式…"
 
+msgid "Shared across sessions using this login."
+msgstr "使用此登录的所有会话共享此额度。"
+
 msgid "Shared app components"
 msgstr "共享应用组件"
 
@@ -13155,6 +13200,9 @@ msgstr "可导入Superset的共享主题JSON文件。"
 
 msgid "Shared version"
 msgstr "分享的版本"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "与该项目的其他本地工作区共享项目的检出（文件、git 索引和分支）"
 
 msgid "Sheet"
 msgstr "侧边面板"
@@ -14746,6 +14794,9 @@ msgstr "你要找的页面不存在。"
 msgid "The people behind Superset."
 msgstr "Superset背后的团队。"
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "按原样使用项目的检出: 文件和分支是共享的"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "提供商返回了{0}。"
@@ -14908,6 +14959,12 @@ msgstr "这会关闭所有终端会话 — 包括此工作区和其他工作区�
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "这会关闭你组织的所有终端会话{runningCountSuffix}并启动全新的守护进程。"
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "这将关闭所选工作区及其终端。项目的文件和分支保持不变。"
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "这将关闭该工作区及其终端。项目的文件、分支和其他工作区保持不变。"
+
 msgid "This comment is no longer here"
 msgstr "此评论已不存在"
 
@@ -15049,8 +15106,8 @@ msgstr "这将移除该主机、其访问权限及其工作区。机器上的文
 msgid "This removes the project from every reachable device."
 msgstr "这会从所有可访问的设备中移除该项目。"
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "这会把worktree从磁盘上移除。云端的工作区记录也会一并移除。"
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "这将从磁盘中删除该 worktree 并关闭工作区。"
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "这会用当前内置配置替换它的名称、命令、参数、提示词与恢复设置、环境变量和图标。"
@@ -15806,6 +15863,9 @@ msgstr "URL友好的标识符，在你的组织内唯一。"
 msgid "Usage"
 msgstr "用量"
 
+msgid "Usage is out of date"
+msgstr "用量数据已过时"
+
 msgid "Usage sections"
 msgstr "用量分区"
 
@@ -16495,6 +16555,9 @@ msgstr "已更新worktree位置"
 msgid "Worktree missing"
 msgstr "worktree缺失"
 
+msgid "Worktree on this device"
+msgstr "此设备上的 worktree"
+
 msgid "Worktree opened"
 msgstr "worktree已打开"
 
@@ -16503,6 +16566,9 @@ msgstr "worktree不同步"
 
 msgid "Worktrees"
 msgstr "Worktree"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "worktree 会从磁盘中删除；位于项目检出上的工作区仅会关闭。检出中的文件保持不变。"
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "有未提交更改的worktree会保留在磁盘上。"

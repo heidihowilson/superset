@@ -447,4 +447,81 @@ describe("rethrowEnvironmentalGitError", () => {
 			),
 		).toBeNull();
 	});
+
+	test("push refused by a pre-push hook → PRECONDITION_FAILED / PUSH_REJECTED", () => {
+		const message =
+			"❯ verify-tools\n" +
+			"  verify-tools – 2 files –  – bun scripts/validators/tools.ts\n" +
+			"tracker: sync failed — history is local-only. Retry once the remote is reachable.\n" +
+			"error: failed to push some refs to 'git@example.invalid:team/repo.git'\n";
+		const thrown = capture(new Error(message));
+		expect(thrown?.code).toBe("PRECONDITION_FAILED");
+		expect(causeKind(thrown)).toBe("PUSH_REJECTED");
+		expect(thrown?.message).toBe(message);
+	});
+
+	test("push refused as non-fast-forward or by the remote → PUSH_REJECTED", () => {
+		expect(
+			causeKind(
+				capture(
+					new Error(
+						"To example.invalid:team/repo.git\n" +
+							" ! [rejected]        HEAD -> feature (fetch first)\n" +
+							"error: failed to push some refs to 'git@example.invalid:team/repo.git'\n" +
+							"hint: Updates were rejected because the remote contains work that you do not\n" +
+							"hint: have locally.\n",
+					),
+				),
+			),
+		).toBe("PUSH_REJECTED");
+		expect(
+			causeKind(
+				capture(
+					new Error(
+						"remote: error: GH006: Protected branch update failed for refs/heads/main.\n" +
+							"To https://example.invalid/team/repo.git\n" +
+							" ! [remote rejected] HEAD -> main (protected branch hook declined)\n" +
+							"error: failed to push some refs to 'https://example.invalid/team/repo.git'\n",
+					),
+				),
+			),
+		).toBe("PUSH_REJECTED");
+	});
+
+	test("does not claim a push that never reached the remote", () => {
+		// Auth and network failures die before any ref is offered, so git never
+		// prints its refusal sentence; they stay unclassified here.
+		expect(
+			capture(
+				new Error(
+					"git@example.invalid: Permission denied (publickey).\n" +
+						"fatal: Could not read from remote repository.\n\n" +
+						"Please make sure you have the correct access rights\n" +
+						"and the repository exists.\n",
+				),
+			),
+		).toBeNull();
+		expect(
+			capture(
+				new Error(
+					"ssh: Could not resolve hostname example.invalid: nodename nor servname provided, or not known\n" +
+						"fatal: Could not read from remote repository.\n",
+				),
+			),
+		).toBeNull();
+	});
+
+	test("keeps a push with a refspec of our own making that git cannot resolve as a 500", () => {
+		// The same refusal sentence follows git's complaint about the source
+		// refspec, but nothing refused the push: the arguments were wrong,
+		// which is ours to fix.
+		expect(
+			capture(
+				new Error(
+					"error: src refspec feature does not match any\n" +
+						"error: failed to push some refs to 'git@example.invalid:team/repo.git'\n",
+				),
+			),
+		).toBeNull();
+	});
 });

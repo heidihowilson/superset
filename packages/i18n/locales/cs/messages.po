@@ -816,6 +816,9 @@ msgstr "Běží {pending} z {total} kontroly"
 msgid "{pending} of {total} checks running"
 msgstr "Běží {pending} z {total} kontrol"
 
+msgid "{percent} used"
+msgstr "Využito {percent}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Připojeno {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# změněný soubor} few {# změněné s
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel} obnoveno na výchozí"
+
+msgid "{used} used"
+msgstr "Využito {used}"
 
 msgid "{waiting} Waiting"
 msgstr "Čeká: {waiting}"
@@ -1236,6 +1242,9 @@ msgstr "V této kartě pořád běží proces"
 msgid "A process is still running in this terminal"
 msgstr "V tomto terminálu pořád běží proces"
 
+msgid "A pull request always gets its own worktree"
+msgstr "Pull request má vždy vlastní worktree"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Přestavěné chatovací rozhraní pro řízení agentů: bohatší výstup nástrojů, plynulejší usměrňování, všechno rychlejší."
 
@@ -1312,6 +1321,9 @@ msgstr "Účet čeká na smazání."
 
 msgid "Account pending deletion"
 msgstr "Účet čeká na smazání"
+
+msgid "Account usage"
+msgstr "Využití účtu"
 
 msgid "Achievements"
 msgstr "Úspěchy"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "Fakturace API"
+
 msgid "API key"
 msgstr "API klíč"
 
@@ -2271,6 +2286,9 @@ msgstr "Automaticky spustit na nové kartě"
 
 msgid "Auto-run on workspace creation"
 msgstr "Automaticky spustit při vytvoření pracovního prostoru"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Automatické aktualizace jsou vypnuté proměnnou prostředí DISABLE_UPDATE_CHECK."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Automatické aktualizace jsou ve vývojovém režimu vypnuté."
@@ -3026,6 +3044,9 @@ msgstr "Kontroluji…"
 msgid "Checklist"
 msgstr "Zaškrtávací seznam"
 
+msgid "Checkout: {label}"
+msgstr "Checkout: {label}"
+
 msgid "Checkpoint"
 msgstr "Kontrolní bod"
 
@@ -3645,6 +3666,9 @@ msgstr "Nastavte, jak se úkoly synchronizují mezi Superset a Linearem."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Nastavte chování terminálu a znovupoužitelné terminálové skripty"
+
+msgid "Configure the automation yourself"
+msgstr "Nastavte automatizaci sami"
 
 msgid "Configure the in-app browser"
 msgstr "Nastavte vestavěný prohlížeč"
@@ -4461,6 +4485,9 @@ msgstr "Vytvořit účet"
 msgid "Create failed: {message}"
 msgstr "Vytvoření selhalo: {message}"
 
+msgid "Create manually"
+msgstr "Vytvořit ručně"
+
 msgid "Create merge commit"
 msgstr "Vytvořit merge commit"
 
@@ -5013,6 +5040,9 @@ msgstr "Popište změnu…"
 
 msgid "Describe the task for the agent…"
 msgstr "Popište úkol pro agenta…"
+
+msgid "Describe the work to your agent"
+msgstr "Popište práci svému agentovi"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Popište, co potřebujete. Superset pro úkol vytvoří izolovaný pracovní prostor a čistou větev."
@@ -6145,6 +6175,9 @@ msgstr "Nepodařilo se otevřít worktree"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Nepodařilo se otevřít: {0}"
+
+msgid "Failed to post reply"
+msgstr "Nepodařilo se odeslat odpověď"
 
 msgid "Failed to prepare agent launch"
 msgstr "Nepodařilo se připravit spuštění agenta"
@@ -7719,6 +7752,9 @@ msgstr "Kurzíva"
 msgid "Item"
 msgstr "Položka"
 
+msgid "Its own branch and copy of the files"
+msgstr "Vlastní větev a vlastní kopie souborů"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Její pracovní prostory a terminály nebudou dostupné, dokud se nerestartuje — použijte nabídku Superset na liště > Host Service > Restart."
 
@@ -8299,6 +8335,9 @@ msgstr "Načítám..."
 msgid "Loading…"
 msgstr "Načítání…"
 
+msgid "Local"
+msgstr "Lokální"
+
 msgid "Local Device"
 msgstr "Lokální zařízení"
 
@@ -8325,6 +8364,9 @@ msgstr "Odhlásit se"
 
 msgid "Log out?"
 msgstr "Odhlásit se?"
+
+msgid "Login unverified"
+msgstr "Přihlášení neověřeno"
 
 msgid "Logins (cookies)"
 msgstr "Přihlášení (cookies)"
@@ -8373,9 +8415,6 @@ msgstr "Purpurová"
 
 msgid "Main"
 msgstr "Hlavní"
-
-msgid "Main workspace"
-msgstr "Hlavní pracovní prostor"
 
 msgid "Make all panes equal size"
 msgstr "Nastavit všem panelům stejnou velikost"
@@ -8787,9 +8826,6 @@ msgstr "Další {kindLower} motivy"
 
 msgid "More actions"
 msgstr "Další akce"
-
-msgid "More options"
-msgstr "Další možnosti"
 
 msgid "More pages"
 msgstr "Další stránky"
@@ -10102,6 +10138,9 @@ msgstr "Otevřete v jakémkoli IDE"
 
 msgid "Open in Any IDE"
 msgstr "Otevřete v libovolném IDE"
+
+msgid "Open in app"
+msgstr "Otevřít v aplikaci"
 
 msgid "Open in App"
 msgstr "Otevřít v aplikaci"
@@ -11976,6 +12015,9 @@ msgstr "Obnovit umístění"
 msgid "Reset terminal"
 msgstr "Obnovit terminál"
 
+msgid "Reset time unavailable"
+msgstr "Čas resetu není k dispozici"
+
 msgid "Reset to default"
 msgstr "Obnovit výchozí"
 
@@ -13144,6 +13186,9 @@ msgstr "Sdílet tuto stránku"
 msgid "Share via…"
 msgstr "Sdílet přes…"
 
+msgid "Shared across sessions using this login."
+msgstr "Sdíleno mezi relacemi používajícími toto přihlášení."
+
 msgid "Shared app components"
 msgstr "Sdílené komponenty aplikace"
 
@@ -13155,6 +13200,9 @@ msgstr "Sdílené JSON soubory motivů, které si můžete naimportovat do Super
 
 msgid "Shared version"
 msgstr "Sdílená verze"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Sdílí checkout projektu — soubory, git index a větev — s ostatními lokálními pracovními prostory"
 
 msgid "Sheet"
 msgstr "Sheet"
@@ -14746,6 +14794,9 @@ msgstr "Stránka, kterou hledáte, neexistuje."
 msgid "The people behind Superset."
 msgstr "Lidé za Supersetem."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "Checkout projektu tak, jak je: soubory a větev jsou sdílené"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Poskytovatel odpověděl {0}."
@@ -14908,6 +14959,12 @@ msgstr "Tímto se zavřou všechny relace terminálu — v tomto pracovním pros
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Tímto se zavře každá relace terminálu vaší organizace{runningCountSuffix} a spustí se čerstvý démon."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "Tím se zavřou vybrané pracovní prostory a jejich terminály. Soubory a větve projektu zůstanou beze změny."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "Tím se zavře pracovní prostor a jeho terminály. Soubory, větve a ostatní pracovní prostory projektu zůstanou beze změny."
+
 msgid "This comment is no longer here"
 msgstr "Tento komentář už tu není"
 
@@ -15049,8 +15106,8 @@ msgstr "Tímto se odstraní host, přístup k němu i jeho pracovní prostory. S
 msgid "This removes the project from every reachable device."
 msgstr "Tím se projekt odstraní ze všech dostupných zařízení."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "Tímto se z disku odstraní worktree. Odstraní se také záznam cloudového pracovního prostoru."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "Tím se worktree odstraní z disku a pracovní prostor se zavře."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "Nahradí to jeho popisek, příkaz, argumenty, nastavení promptu a pokračování, proměnné prostředí a ikonu aktuální dodávanou konfigurací."
@@ -15806,6 +15863,9 @@ msgstr "Identifikátor vhodný do URL, jedinečný v rámci vaší organizace."
 msgid "Usage"
 msgstr "Využití"
 
+msgid "Usage is out of date"
+msgstr "Údaje o využití jsou zastaralé"
+
 msgid "Usage sections"
 msgstr "Sekce využití"
 
@@ -16495,6 +16555,9 @@ msgstr "Umístění worktree změněno"
 msgid "Worktree missing"
 msgstr "Chybí worktree"
 
+msgid "Worktree on this device"
+msgstr "Worktree na tomto zařízení"
+
 msgid "Worktree opened"
 msgstr "Worktree otevřen"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree není synchronizovaný"
 
 msgid "Worktrees"
 msgstr "Worktrees"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Worktree se odstraní z disku; pracovní prostory na checkoutu projektu se pouze zavřou. Soubory v checkoutu zůstanou beze změny."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Worktree s necommitnutými změnami zůstanou na disku."

@@ -271,14 +271,13 @@ export function getOpenCodePluginContent(notifyPath: string): string {
  * in ~/.claude/settings.json (createClaudeSettingsJson).
  */
 export function createClaudeWrapper(): void {
-	const script = buildWrapperScript(
-		"claude",
-		`${buildDefaultAccountResolver(
+	const script = buildWrapperScript("claude", `exec "$REAL_BIN" "$@"`, {
+		agentId: "claude",
+		beforeLaunch: buildDefaultAccountResolver(
 			"CLAUDE_CONFIG_DIR",
 			"default-claude-config-dir",
-		)}exec "$REAL_BIN" "$@"`,
-		{ agentId: "claude" },
-	);
+		),
+	});
 	createWrapper("claude", script);
 }
 
@@ -290,12 +289,15 @@ export function createCodexWrapper(): void {
 	const notifyPath = getNotifyScriptPath();
 	const script = buildWrapperScript(
 		"codex",
-		buildDefaultAccountResolver(
-			"CODEX_HOME",
-			"default-codex-home",
-			"SUPERSET_AMBIENT_CODEX_HOME",
-		) + buildCodexWrapperExecLine(notifyPath),
-		{ agentId: "codex" },
+		buildCodexWrapperExecLine(notifyPath),
+		{
+			agentId: "codex",
+			beforeLaunch: buildDefaultAccountResolver(
+				"CODEX_HOME",
+				"default-codex-home",
+				"SUPERSET_AMBIENT_CODEX_HOME",
+			),
+		},
 	);
 	createWrapper("codex", script);
 }

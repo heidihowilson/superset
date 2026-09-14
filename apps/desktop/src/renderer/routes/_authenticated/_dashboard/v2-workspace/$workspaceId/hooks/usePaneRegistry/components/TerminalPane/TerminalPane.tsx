@@ -27,6 +27,7 @@ import {
 	useTerminalFolderPolicy,
 	useTerminalUrlPolicy,
 } from "renderer/lib/clickPolicy";
+import { parseSupersetPageUrl } from "renderer/lib/parseSupersetPageUrl";
 import {
 	type ConnectionState,
 	terminalRuntimeRegistry,
@@ -60,7 +61,6 @@ import {
 } from "./richInputOpenStore";
 import { PasteUploadLimitError, uploadPastedFiles } from "./uploadPastedFiles";
 import { shellEscapePaths } from "./utils";
-import { parseSupersetPageUrl } from "./utils/parseSupersetPageUrl";
 import {
 	runFileLinkAction,
 	runFolderLinkAction,

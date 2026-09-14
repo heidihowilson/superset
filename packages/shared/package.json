@@ -4,6 +4,10 @@
 	"private": true,
 	"type": "module",
 	"exports": {
+		"./page-zoom": {
+			"types": "./src/page-zoom.ts",
+			"default": "./src/page-zoom.ts"
+		},
 		"./usercontent": {
 			"types": "./src/usercontent/index.ts",
 			"default": "./src/usercontent/index.ts"
@@ -11,6 +15,10 @@
 		"./page-comments-runtime": {
 			"types": "./src/page-comments-runtime.ts",
 			"default": "./src/page-comments-runtime.ts"
+		},
+		"./page-comments": {
+			"types": "./src/page-comments/index.ts",
+			"default": "./src/page-comments/index.ts"
 		},
 		"./automation-matching": {
 			"types": "./src/automation-matching/index.ts",

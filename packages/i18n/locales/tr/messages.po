@@ -816,6 +816,9 @@ msgstr "{total} kontrolden {pending} tanesi çalışıyor"
 msgid "{pending} of {total} checks running"
 msgstr "{total} kontrolden {pending} tanesi çalışıyor"
 
+msgid "{percent} used"
+msgstr "{percent} kullanıldı"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Katılım {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# dosya değişti} other {# dosya deği�
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel} varsayılanlara geri yüklendi"
+
+msgid "{used} used"
+msgstr "{used} kullanıldı"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} bekliyor"
@@ -1236,6 +1242,9 @@ msgstr "Bu sekmede hâlâ bir süreç çalışıyor"
 msgid "A process is still running in this terminal"
 msgstr "Bu terminalde hâlâ bir süreç çalışıyor"
 
+msgid "A pull request always gets its own worktree"
+msgstr "Bir pull request her zaman kendi worktree'sini alır"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Ajanları yönetmek için yeniden yapılmış bir sohbet yüzeyi: daha zengin araç çıktısı, daha akıcı yönlendirme, her şey daha hızlı."
 
@@ -1312,6 +1321,9 @@ msgstr "Hesap silinmeyi bekliyor."
 
 msgid "Account pending deletion"
 msgstr "Hesap silinmeyi bekliyor"
+
+msgid "Account usage"
+msgstr "Hesap kullanımı"
 
 msgid "Achievements"
 msgstr "Başarımlar"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "API faturalandırması"
+
 msgid "API key"
 msgstr "API anahtarı"
 
@@ -2271,6 +2286,9 @@ msgstr "Yeni sekmede otomatik çalıştır"
 
 msgid "Auto-run on workspace creation"
 msgstr "Çalışma alanı oluşturulunca otomatik çalıştır"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Otomatik güncellemeler DISABLE_UPDATE_CHECK ortam değişkeni tarafından devre dışı bırakıldı."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Geliştirme modunda otomatik güncellemeler devre dışıdır."
@@ -3026,6 +3044,9 @@ msgstr "Denetleniyor…"
 msgid "Checklist"
 msgstr "Kontrol listesi"
 
+msgid "Checkout: {label}"
+msgstr "Checkout: {label}"
+
 msgid "Checkpoint"
 msgstr "Kontrol noktası"
 
@@ -3645,6 +3666,9 @@ msgstr "Görevlerin Superset ile Linear arasında nasıl eşitleneceğini yapıl
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Terminal davranışını ve yeniden kullanılabilir terminal betiklerini yapılandırın"
+
+msgid "Configure the automation yourself"
+msgstr "Otomasyonu kendiniz yapılandırın"
 
 msgid "Configure the in-app browser"
 msgstr "Uygulama içi tarayıcıyı yapılandırın"
@@ -4461,6 +4485,9 @@ msgstr "Hesap oluşturun"
 msgid "Create failed: {message}"
 msgstr "Oluşturulamadı: {message}"
 
+msgid "Create manually"
+msgstr "Manuel oluştur"
+
 msgid "Create merge commit"
 msgstr "Birleştirme commit'i oluştur"
 
@@ -5013,6 +5040,9 @@ msgstr "Değişikliği anlatın…"
 
 msgid "Describe the task for the agent…"
 msgstr "Ajan için görevi anlatın…"
+
+msgid "Describe the work to your agent"
+msgstr "Yapılacak işi ajanınıza açıklayın"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Neye ihtiyacınız olduğunu anlatın. Superset, görev için yalıtılmış bir çalışma alanı ve temiz bir dal oluşturur."
@@ -6145,6 +6175,9 @@ msgstr "Worktree açılamadı"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Açılamadı: {0}"
+
+msgid "Failed to post reply"
+msgstr "Yanıt gönderilemedi"
 
 msgid "Failed to prepare agent launch"
 msgstr "Ajan başlatma hazırlığı başarısız"
@@ -7719,6 +7752,9 @@ msgstr "İtalik"
 msgid "Item"
 msgstr "Öğe"
 
+msgid "Its own branch and copy of the files"
+msgstr "Kendi dalı ve dosyaların kendi kopyası"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Yeniden başlayana kadar çalışma alanları ve terminalleri kullanılamaz — Superset tepsi menüsünde Host hizmeti > Yeniden başlat yolunu kullanın."
 
@@ -8299,6 +8335,9 @@ msgstr "Yükleniyor..."
 msgid "Loading…"
 msgstr "Yükleniyor…"
 
+msgid "Local"
+msgstr "Yerel"
+
 msgid "Local Device"
 msgstr "Yerel cihaz"
 
@@ -8325,6 +8364,9 @@ msgstr "Oturumu kapat"
 
 msgid "Log out?"
 msgstr "Oturum kapatılsın mı?"
+
+msgid "Login unverified"
+msgstr "Oturum açma doğrulanmadı"
 
 msgid "Logins (cookies)"
 msgstr "Oturum bilgileri (çerezler)"
@@ -8373,9 +8415,6 @@ msgstr "Macenta"
 
 msgid "Main"
 msgstr "Ana"
-
-msgid "Main workspace"
-msgstr "Ana çalışma alanı"
 
 msgid "Make all panes equal size"
 msgstr "Tüm bölmeleri eşit boyuta getir"
@@ -8787,9 +8826,6 @@ msgstr "Daha fazla {kindLower} tema"
 
 msgid "More actions"
 msgstr "Diğer eylemler"
-
-msgid "More options"
-msgstr "Diğer seçenekler"
 
 msgid "More pages"
 msgstr "Daha fazla sayfa"
@@ -10102,6 +10138,9 @@ msgstr "Herhangi bir IDE'de açın"
 
 msgid "Open in Any IDE"
 msgstr "Herhangi bir IDE'de açın"
+
+msgid "Open in app"
+msgstr "Uygulamada aç"
 
 msgid "Open in App"
 msgstr "Uygulamada aç"
@@ -11976,6 +12015,9 @@ msgstr "Konumu sıfırla"
 msgid "Reset terminal"
 msgstr "Terminali sıfırla"
 
+msgid "Reset time unavailable"
+msgstr "Sıfırlama zamanı kullanılamıyor"
+
 msgid "Reset to default"
 msgstr "Varsayılana sıfırla"
 
@@ -13144,6 +13186,9 @@ msgstr "Bu sayfayı paylaş"
 msgid "Share via…"
 msgstr "Şununla paylaş…"
 
+msgid "Shared across sessions using this login."
+msgstr "Bu hesabı kullanan oturumlar arasında paylaşılır."
+
 msgid "Shared app components"
 msgstr "Paylaşılan uygulama bileşenleri"
 
@@ -13155,6 +13200,9 @@ msgstr "Superset'e içe aktarabileceğiniz paylaşılan tema JSON dosyaları."
 
 msgid "Shared version"
 msgstr "Paylaşılan sürüm"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Projenin checkout'unu (dosyalar, git indeksi ve dal) diğer yerel çalışma alanlarıyla paylaşır"
 
 msgid "Sheet"
 msgstr "Sayfa"
@@ -14746,6 +14794,9 @@ msgstr "Aradığınız sayfa mevcut değil."
 msgid "The people behind Superset."
 msgstr "Superset'in arkasındaki insanlar."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "Projenin checkout'u olduğu gibi: dosyalar ve dal paylaşılır"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Sağlayıcı {0} yanıtı verdi."
@@ -14908,6 +14959,12 @@ msgstr "Bu işlem, bu çalışma alanındaki ve diğerlerindeki her terminal otu
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Bu işlem kuruluşunuzdaki her terminal oturumunu kapatır{runningCountSuffix} ve yeni bir daemon başlatır."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "Bu, seçili çalışma alanlarını ve terminallerini kapatır. Projenin dosyaları ve dalları olduğu gibi kalır."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "Bu, çalışma alanını ve terminallerini kapatır. Projenin dosyaları, dalları ve diğer çalışma alanları olduğu gibi kalır."
+
 msgid "This comment is no longer here"
 msgstr "Bu yorum artık burada değil"
 
@@ -15049,8 +15106,8 @@ msgstr "Bu işlem host'u, erişimini ve çalışma alanlarını kaldırır. Maki
 msgid "This removes the project from every reachable device."
 msgstr "Bu, projeyi erişilebilir tüm cihazlardan kaldırır."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "Bu işlem worktree'yi diskten kaldırır. Bulut çalışma alanı kaydı da kaldırılır."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "Bu, worktree'yi diskten kaldırır ve çalışma alanını kapatır."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "Bu işlem; etiketini, komutunu, argümanlarını, istem ve sürdürme ayarlarını, ortam değişkenlerini ve simgesini birlikte gelen güncel yapılandırmayla değiştirir."
@@ -15806,6 +15863,9 @@ msgstr "Kuruluşunuz içinde benzersiz, URL dostu tanımlayıcı."
 msgid "Usage"
 msgstr "Kullanım"
 
+msgid "Usage is out of date"
+msgstr "Kullanım verileri güncel değil"
+
 msgid "Usage sections"
 msgstr "Kullanım bölümleri"
 
@@ -16495,6 +16555,9 @@ msgstr "Worktree konumu güncellendi"
 msgid "Worktree missing"
 msgstr "Worktree eksik"
 
+msgid "Worktree on this device"
+msgstr "Bu cihazdaki worktree"
+
 msgid "Worktree opened"
 msgstr "Worktree açıldı"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree eşitlenmemiş"
 
 msgid "Worktrees"
 msgstr "Worktree'ler"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Worktree'ler diskten kaldırılır; projenin checkout'undaki çalışma alanları yalnızca kapanır. Checkout'taki dosyalar olduğu gibi kalır."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Commit edilmemiş değişiklikleri olan worktree'ler diskte bırakılır."

@@ -816,6 +816,9 @@ msgstr "{pending} из {total} проверки выполняется"
 msgid "{pending} of {total} checks running"
 msgstr "{pending} из {total} проверок выполняется"
 
+msgid "{percent} used"
+msgstr "Использовано {percent}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · присоединился {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# файл изменён} few {# фай
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel} восстановлен к значениям по умолчанию"
+
+msgid "{used} used"
+msgstr "Использовано {used}"
 
 msgid "{waiting} Waiting"
 msgstr "Ожидают: {waiting}"
@@ -1236,6 +1242,9 @@ msgstr "В этой вкладке ещё работает процесс"
 msgid "A process is still running in this terminal"
 msgstr "В этом терминале ещё работает процесс"
 
+msgid "A pull request always gets its own worktree"
+msgstr "У pull request всегда есть собственный worktree"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Переделанная поверхность чата для управления агентами: богаче вывод инструментов, плавнее управление, всё быстрее."
 
@@ -1312,6 +1321,9 @@ msgstr "Аккаунт ожидает удаления."
 
 msgid "Account pending deletion"
 msgstr "Аккаунт ожидает удаления"
+
+msgid "Account usage"
+msgstr "Использование аккаунта"
 
 msgid "Achievements"
 msgstr "Достижения"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "Оплата API"
+
 msgid "API key"
 msgstr "Ключ API"
 
@@ -2271,6 +2286,9 @@ msgstr "Автозапуск в новой вкладке"
 
 msgid "Auto-run on workspace creation"
 msgstr "Автозапуск при создании рабочей области"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Автообновления отключены переменной окружения DISABLE_UPDATE_CHECK."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Автообновления отключены в режиме разработки."
@@ -3026,6 +3044,9 @@ msgstr "Проверка…"
 msgid "Checklist"
 msgstr "Чек-лист"
 
+msgid "Checkout: {label}"
+msgstr "Checkout: {label}"
+
 msgid "Checkpoint"
 msgstr "Контрольная точка"
 
@@ -3645,6 +3666,9 @@ msgstr "Настройте, как задачи синхронизируются
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Настройка поведения терминала и переиспользуемых скриптов терминала"
+
+msgid "Configure the automation yourself"
+msgstr "Настройте автоматизацию самостоятельно"
 
 msgid "Configure the in-app browser"
 msgstr "Настройка встроенного браузера"
@@ -4461,6 +4485,9 @@ msgstr "Создать аккаунт"
 msgid "Create failed: {message}"
 msgstr "Не удалось создать: {message}"
 
+msgid "Create manually"
+msgstr "Создать вручную"
+
 msgid "Create merge commit"
 msgstr "Создать коммит слияния"
 
@@ -5013,6 +5040,9 @@ msgstr "Опишите изменение…"
 
 msgid "Describe the task for the agent…"
 msgstr "Опишите задачу для агента…"
+
+msgid "Describe the work to your agent"
+msgstr "Опишите задачу своему агенту"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Опишите, что нужно. Superset создаст изолированную рабочую область и чистую ветку под задачу."
@@ -6145,6 +6175,9 @@ msgstr "Не удалось открыть worktree"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Не удалось открыть: {0}"
+
+msgid "Failed to post reply"
+msgstr "Не удалось отправить ответ"
 
 msgid "Failed to prepare agent launch"
 msgstr "Не удалось подготовить запуск агента"
@@ -7719,6 +7752,9 @@ msgstr "Курсив"
 msgid "Item"
 msgstr "Элемент"
 
+msgid "Its own branch and copy of the files"
+msgstr "Собственная ветка и собственная копия файлов"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Её рабочие области и терминалы недоступны до перезапуска — откройте меню Superset в трее > Host Service > Restart."
 
@@ -8299,6 +8335,9 @@ msgstr "Загрузка..."
 msgid "Loading…"
 msgstr "Загрузка…"
 
+msgid "Local"
+msgstr "Локальная"
+
 msgid "Local Device"
 msgstr "Локальное устройство"
 
@@ -8325,6 +8364,9 @@ msgstr "Выйти"
 
 msgid "Log out?"
 msgstr "Выйти?"
+
+msgid "Login unverified"
+msgstr "Вход не подтверждён"
 
 msgid "Logins (cookies)"
 msgstr "Логины (cookies)"
@@ -8373,9 +8415,6 @@ msgstr "Пурпурный"
 
 msgid "Main"
 msgstr "Основной"
-
-msgid "Main workspace"
-msgstr "Основная рабочая область"
 
 msgid "Make all panes equal size"
 msgstr "Сделать все панели одинакового размера"
@@ -8787,9 +8826,6 @@ msgstr "Ещё {kindLower} темы"
 
 msgid "More actions"
 msgstr "Ещё действия"
-
-msgid "More options"
-msgstr "Другие варианты"
 
 msgid "More pages"
 msgstr "Ещё страницы"
@@ -10102,6 +10138,9 @@ msgstr "Открывайте в любой IDE"
 
 msgid "Open in Any IDE"
 msgstr "Открывайте в любой IDE"
+
+msgid "Open in app"
+msgstr "Открыть в приложении"
 
 msgid "Open in App"
 msgstr "Открыть в приложении"
@@ -11976,6 +12015,9 @@ msgstr "Сбросить расположение"
 msgid "Reset terminal"
 msgstr "Сбросить терминал"
 
+msgid "Reset time unavailable"
+msgstr "Время сброса недоступно"
+
 msgid "Reset to default"
 msgstr "Сбросить к значению по умолчанию"
 
@@ -13144,6 +13186,9 @@ msgstr "Поделиться этой страницей"
 msgid "Share via…"
 msgstr "Поделиться через…"
 
+msgid "Shared across sessions using this login."
+msgstr "Общий лимит для сеансов с этим аккаунтом."
+
 msgid "Shared app components"
 msgstr "Общие компоненты приложения"
 
@@ -13155,6 +13200,9 @@ msgstr "Общие JSON-файлы тем, которые можно импор�
 
 msgid "Shared version"
 msgstr "Общедоступная версия"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Использует checkout проекта — файлы, индекс git и ветку — совместно с другими локальными рабочими областями"
 
 msgid "Sheet"
 msgstr "Панель"
@@ -14746,6 +14794,9 @@ msgstr "Такой страницы не существует."
 msgid "The people behind Superset."
 msgstr "Люди, которые делают Superset."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "Checkout проекта как есть: файлы и ветка общие"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Провайдер ответил {0}."
@@ -14908,6 +14959,12 @@ msgstr "Это закроет все сессии терминала — в эт
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Это закроет все сессии терминала вашей организации{runningCountSuffix} и запустит новый демон."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "Выбранные рабочие области и их терминалы будут закрыты. Файлы и ветки проекта останутся без изменений."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "Рабочая область и её терминалы будут закрыты. Файлы, ветки и другие рабочие области проекта останутся без изменений."
+
 msgid "This comment is no longer here"
 msgstr "Этого комментария больше нет"
 
@@ -15049,8 +15106,8 @@ msgstr "Это удалит хост, доступ к нему и его раб�
 msgid "This removes the project from every reachable device."
 msgstr "Проект будет удалён со всех доступных устройств."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "Это удалит worktree с диска. Запись об облачной рабочей области также будет удалена."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "Worktree будет удалён с диска, а рабочая область закрыта."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "Это заменит его название, команду, аргументы, настройки промпта и возобновления, переменные окружения и иконку текущей встроенной конфигурацией."
@@ -15806,6 +15863,9 @@ msgstr "Идентификатор для URL, уникальный внутри
 msgid "Usage"
 msgstr "Использование"
 
+msgid "Usage is out of date"
+msgstr "Данные об использовании устарели"
+
 msgid "Usage sections"
 msgstr "Разделы использования"
 
@@ -16495,6 +16555,9 @@ msgstr "Расположение worktree обновлено"
 msgid "Worktree missing"
 msgstr "Worktree отсутствует"
 
+msgid "Worktree on this device"
+msgstr "Worktree на этом устройстве"
+
 msgid "Worktree opened"
 msgstr "Worktree открыт"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree рассинхронизирован"
 
 msgid "Worktrees"
 msgstr "Worktree"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Worktree удаляются с диска; рабочие области на checkout проекта только закрываются. Файлы в checkout останутся без изменений."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Worktree с незакоммиченными изменениями остаются на диске."

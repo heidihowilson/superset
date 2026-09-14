@@ -816,6 +816,9 @@ msgstr "{pending}/{total} check đang chạy"
 msgid "{pending} of {total} checks running"
 msgstr "{pending}/{total} check đang chạy"
 
+msgid "{percent} used"
+msgstr "Đã dùng {percent}"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Tham gia {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# tệp thay đổi} other {# tệp thay
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "Đã khôi phục {updatedLabel} về mặc định"
+
+msgid "{used} used"
+msgstr "Đã dùng {used}"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} đang chờ"
@@ -1236,6 +1242,9 @@ msgstr "Vẫn còn một tiến trình đang chạy trong tab này"
 msgid "A process is still running in this terminal"
 msgstr "Vẫn còn một tiến trình đang chạy trong terminal này"
 
+msgid "A pull request always gets its own worktree"
+msgstr "Pull request luôn có worktree riêng"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Giao diện chat được dựng lại để điều khiển agent: output tool phong phú hơn, lái mượt hơn, mọi thứ nhanh hơn."
 
@@ -1312,6 +1321,9 @@ msgstr "Tài khoản đang chờ xóa."
 
 msgid "Account pending deletion"
 msgstr "Tài khoản đang chờ xóa"
+
+msgid "Account usage"
+msgstr "Mức sử dụng tài khoản"
 
 msgid "Achievements"
 msgstr "Thành tích"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "Thanh toán API"
+
 msgid "API key"
 msgstr "Khóa API"
 
@@ -2271,6 +2286,9 @@ msgstr "Tự chạy khi mở tab mới"
 
 msgid "Auto-run on workspace creation"
 msgstr "Tự chạy khi tạo workspace"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Tự động cập nhật bị tắt bởi biến môi trường DISABLE_UPDATE_CHECK."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Tự động cập nhật bị tắt ở chế độ phát triển."
@@ -3026,6 +3044,9 @@ msgstr "Đang kiểm tra…"
 msgid "Checklist"
 msgstr "Danh sách kiểm"
 
+msgid "Checkout: {label}"
+msgstr "Checkout: {label}"
+
 msgid "Checkpoint"
 msgstr "Checkpoint"
 
@@ -3645,6 +3666,9 @@ msgstr "Cấu hình cách tác vụ đồng bộ giữa Superset và Linear."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Cấu hình hành vi terminal và các script terminal dùng lại được"
+
+msgid "Configure the automation yourself"
+msgstr "Tự cấu hình quy trình tự động hóa"
 
 msgid "Configure the in-app browser"
 msgstr "Cấu hình trình duyệt trong ứng dụng"
@@ -4461,6 +4485,9 @@ msgstr "Tạo tài khoản"
 msgid "Create failed: {message}"
 msgstr "Tạo thất bại: {message}"
 
+msgid "Create manually"
+msgstr "Tạo thủ công"
+
 msgid "Create merge commit"
 msgstr "Tạo merge commit"
 
@@ -5013,6 +5040,9 @@ msgstr "Mô tả thay đổi…"
 
 msgid "Describe the task for the agent…"
 msgstr "Mô tả tác vụ cho agent…"
+
+msgid "Describe the work to your agent"
+msgstr "Mô tả công việc cho tác tử của bạn"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Mô tả điều bạn cần. Superset tạo một workspace tách biệt và một nhánh sạch cho tác vụ đó."
@@ -6145,6 +6175,9 @@ msgstr "Không thể mở worktree"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Không thể mở: {0}"
+
+msgid "Failed to post reply"
+msgstr "Đăng trả lời thất bại"
 
 msgid "Failed to prepare agent launch"
 msgstr "Không thể chuẩn bị khởi chạy agent"
@@ -7719,6 +7752,9 @@ msgstr "Nghiêng"
 msgid "Item"
 msgstr "Item"
 
+msgid "Its own branch and copy of the files"
+msgstr "Nhánh riêng và bản sao tệp riêng"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Các workspace và terminal của nó không khả dụng cho đến khi khởi động lại — dùng menu khay Superset > Host Service > Restart."
 
@@ -8299,6 +8335,9 @@ msgstr "Đang tải..."
 msgid "Loading…"
 msgstr "Đang tải…"
 
+msgid "Local"
+msgstr "Cục bộ"
+
 msgid "Local Device"
 msgstr "Thiết bị cục bộ"
 
@@ -8325,6 +8364,9 @@ msgstr "Đăng xuất"
 
 msgid "Log out?"
 msgstr "Đăng xuất?"
+
+msgid "Login unverified"
+msgstr "Đăng nhập chưa được xác minh"
 
 msgid "Logins (cookies)"
 msgstr "Đăng nhập (cookie)"
@@ -8373,9 +8415,6 @@ msgstr "Đỏ tía"
 
 msgid "Main"
 msgstr "Main"
-
-msgid "Main workspace"
-msgstr "Workspace chính"
 
 msgid "Make all panes equal size"
 msgstr "Làm mọi khung bằng nhau"
@@ -8787,9 +8826,6 @@ msgstr "Thêm chủ đề {kindLower}"
 
 msgid "More actions"
 msgstr "Thêm hành động"
-
-msgid "More options"
-msgstr "Tùy chọn khác"
 
 msgid "More pages"
 msgstr "Thêm trang"
@@ -10102,6 +10138,9 @@ msgstr "Mở trong mọi IDE"
 
 msgid "Open in Any IDE"
 msgstr "Mở trong IDE bất kỳ"
+
+msgid "Open in app"
+msgstr "Mở trong ứng dụng"
 
 msgid "Open in App"
 msgstr "Mở trong ứng dụng"
@@ -11976,6 +12015,9 @@ msgstr "Đặt lại vị trí"
 msgid "Reset terminal"
 msgstr "Đặt lại terminal"
 
+msgid "Reset time unavailable"
+msgstr "Không có thời gian đặt lại"
+
 msgid "Reset to default"
 msgstr "Đặt lại về mặc định"
 
@@ -13144,6 +13186,9 @@ msgstr "Chia sẻ trang này"
 msgid "Share via…"
 msgstr "Chia sẻ qua…"
 
+msgid "Shared across sessions using this login."
+msgstr "Dùng chung giữa các phiên sử dụng tài khoản đăng nhập này."
+
 msgid "Shared app components"
 msgstr "Component dùng chung của ứng dụng"
 
@@ -13155,6 +13200,9 @@ msgstr "Các tệp JSON chủ đề được chia sẻ, bạn có thể nhập v
 
 msgid "Shared version"
 msgstr "Phiên bản được chia sẻ"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Dùng chung checkout của dự án — tệp, chỉ mục git và nhánh — với các workspace cục bộ khác"
 
 msgid "Sheet"
 msgstr "Sheet"
@@ -14746,6 +14794,9 @@ msgstr "Trang bạn tìm không tồn tại."
 msgid "The people behind Superset."
 msgstr "Những người đứng sau Superset."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "Checkout của dự án như hiện có: tệp và nhánh được dùng chung"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Nhà cung cấp trả về {0}."
@@ -14908,6 +14959,12 @@ msgstr "Thao tác này đóng mọi phiên terminal — trong workspace này và
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Thao tác này đóng mọi phiên terminal của tổ chức bạn{runningCountSuffix} và khởi động một daemon mới."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "Thao tác này đóng các workspace đã chọn và terminal của chúng. Tệp và nhánh của dự án vẫn giữ nguyên."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "Thao tác này đóng workspace và các terminal của nó. Tệp, nhánh và các workspace khác của dự án vẫn giữ nguyên."
+
 msgid "This comment is no longer here"
 msgstr "Bình luận này không còn ở đây"
 
@@ -15049,8 +15106,8 @@ msgstr "Thao tác này gỡ host, quyền truy cập và các workspace của n�
 msgid "This removes the project from every reachable device."
 msgstr "Thao tác này sẽ gỡ dự án khỏi mọi thiết bị có thể kết nối."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "Thao tác này xóa worktree khỏi đĩa. Bản ghi workspace trên cloud cũng sẽ bị xóa."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "Thao tác này xóa worktree khỏi ổ đĩa và đóng workspace."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "Thao tác này thay nhãn, lệnh, tham số, cài đặt prompt và resume, biến môi trường cùng biểu tượng bằng cấu hình đi kèm hiện tại."
@@ -15806,6 +15863,9 @@ msgstr "Định danh thân thiện với URL, duy nhất trong tổ chức của
 msgid "Usage"
 msgstr "Mức sử dụng"
 
+msgid "Usage is out of date"
+msgstr "Dữ liệu sử dụng đã cũ"
+
 msgid "Usage sections"
 msgstr "Các mục mức sử dụng"
 
@@ -16495,6 +16555,9 @@ msgstr "Đã cập nhật vị trí worktree"
 msgid "Worktree missing"
 msgstr "Thiếu worktree"
 
+msgid "Worktree on this device"
+msgstr "Worktree trên thiết bị này"
+
 msgid "Worktree opened"
 msgstr "Đã mở worktree"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree không còn đồng bộ"
 
 msgid "Worktrees"
 msgstr "Worktree"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Các worktree bị xóa khỏi ổ đĩa; các workspace trên checkout của dự án chỉ được đóng. Tệp trong checkout vẫn giữ nguyên."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Các worktree có thay đổi chưa commit sẽ được giữ lại trên ổ đĩa."

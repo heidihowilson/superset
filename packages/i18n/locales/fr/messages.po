@@ -816,6 +816,9 @@ msgstr "{pending} vérification sur {total} en cours"
 msgid "{pending} of {total} checks running"
 msgstr "{pending} vérifications sur {total} en cours"
 
+msgid "{percent} used"
+msgstr "{percent} utilisés"
+
 msgid "{planLabel} · Joined {joined}"
 msgstr "{planLabel} · Membre depuis {joined}"
 
@@ -928,6 +931,9 @@ msgstr "{uncommittedCount, plural, one {# fichier modifié} other {# fichiers mo
 
 msgid "{updatedLabel} restored to defaults"
 msgstr "{updatedLabel} restauré aux valeurs par défaut"
+
+msgid "{used} used"
+msgstr "{used} utilisés"
 
 msgid "{waiting} Waiting"
 msgstr "{waiting} en attente"
@@ -1236,6 +1242,9 @@ msgstr "Un processus est toujours en cours dans cet onglet"
 msgid "A process is still running in this terminal"
 msgstr "Un processus est toujours en cours dans ce terminal"
 
+msgid "A pull request always gets its own worktree"
+msgstr "Une pull request a toujours son propre worktree"
+
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Une surface de chat reconstruite pour piloter les agents : sortie d'outils plus riche, pilotage plus fluide, tout plus rapide."
 
@@ -1312,6 +1321,9 @@ msgstr "Le compte est en attente de suppression."
 
 msgid "Account pending deletion"
 msgstr "Compte en attente de suppression"
+
+msgid "Account usage"
+msgstr "Utilisation du compte"
 
 msgid "Achievements"
 msgstr "Distinctions"
@@ -1995,6 +2007,9 @@ msgstr "Apache Superset"
 msgid "API"
 msgstr "API"
 
+msgid "API billing"
+msgstr "Facturation API"
+
 msgid "API key"
 msgstr "Clé API"
 
@@ -2271,6 +2286,9 @@ msgstr "Exécution auto. à l'ouverture d'un onglet"
 
 msgid "Auto-run on workspace creation"
 msgstr "Exécution auto. à la création d'un espace de travail"
+
+msgid "Auto-updates are disabled by the DISABLE_UPDATE_CHECK environment variable."
+msgstr "Les mises à jour automatiques sont désactivées par la variable d'environnement DISABLE_UPDATE_CHECK."
 
 msgid "Auto-updates are disabled in development mode."
 msgstr "Les mises à jour automatiques sont désactivées en mode développement."
@@ -3026,6 +3044,9 @@ msgstr "Vérification…"
 msgid "Checklist"
 msgstr "Liste de cases à cocher"
 
+msgid "Checkout: {label}"
+msgstr "Checkout : {label}"
+
 msgid "Checkpoint"
 msgstr "Point de contrôle"
 
@@ -3645,6 +3666,9 @@ msgstr "Configurez la synchronisation des tâches entre Superset et Linear."
 
 msgid "Configure terminal behavior and reusable terminal scripts"
 msgstr "Configurez le comportement du terminal et les scripts de terminal réutilisables"
+
+msgid "Configure the automation yourself"
+msgstr "Configurez vous-même l’automatisation"
 
 msgid "Configure the in-app browser"
 msgstr "Configurez le navigateur intégré"
@@ -4461,6 +4485,9 @@ msgstr "Créer un compte"
 msgid "Create failed: {message}"
 msgstr "Échec de la création : {message}"
 
+msgid "Create manually"
+msgstr "Créer manuellement"
+
 msgid "Create merge commit"
 msgstr "Créer un commit de fusion"
 
@@ -5013,6 +5040,9 @@ msgstr "Décrivez la modification…"
 
 msgid "Describe the task for the agent…"
 msgstr "Décrivez la tâche pour l'agent…"
+
+msgid "Describe the work to your agent"
+msgstr "Décrivez le travail à votre agent"
 
 msgid "Describe what you need. Superset creates an isolated workspace and clean branch for the task."
 msgstr "Décrivez ce dont vous avez besoin. Superset crée un espace de travail isolé et une branche propre pour la tâche."
@@ -6145,6 +6175,9 @@ msgstr "Échec de l'ouverture du worktree"
 #. placeholder {0}: error.message
 msgid "Failed to open: {0}"
 msgstr "Échec de l'ouverture : {0}"
+
+msgid "Failed to post reply"
+msgstr "Échec de la publication de la réponse"
 
 msgid "Failed to prepare agent launch"
 msgstr "Échec de la préparation du lancement de l'agent"
@@ -7719,6 +7752,9 @@ msgstr "Italique"
 msgid "Item"
 msgstr "Élément"
 
+msgid "Its own branch and copy of the files"
+msgstr "Sa propre branche et sa propre copie des fichiers"
+
 msgid "Its workspaces and terminals are unavailable until it restarts — use the Superset tray menu > Host Service > Restart."
 msgstr "Ses espaces de travail et terminaux sont indisponibles jusqu'à son redémarrage — utilisez le menu de la barre d'état Superset > Service hôte > Redémarrer."
 
@@ -8299,6 +8335,9 @@ msgstr "Chargement..."
 msgid "Loading…"
 msgstr "Chargement…"
 
+msgid "Local"
+msgstr "Local"
+
 msgid "Local Device"
 msgstr "Appareil local"
 
@@ -8325,6 +8364,9 @@ msgstr "Se déconnecter"
 
 msgid "Log out?"
 msgstr "Se déconnecter ?"
+
+msgid "Login unverified"
+msgstr "Connexion non vérifiée"
 
 msgid "Logins (cookies)"
 msgstr "Identifiants (cookies)"
@@ -8373,9 +8415,6 @@ msgstr "Magenta"
 
 msgid "Main"
 msgstr "Principal"
-
-msgid "Main workspace"
-msgstr "Espace de travail principal"
 
 msgid "Make all panes equal size"
 msgstr "Donner la même taille à tous les volets"
@@ -8787,9 +8826,6 @@ msgstr "Plus de thèmes {kindLower}"
 
 msgid "More actions"
 msgstr "Plus d'actions"
-
-msgid "More options"
-msgstr "Plus d’options"
 
 msgid "More pages"
 msgstr "Plus de pages"
@@ -10102,6 +10138,9 @@ msgstr "Ouvrir dans n'importe quel IDE"
 
 msgid "Open in Any IDE"
 msgstr "Ouvrir dans n'importe quel IDE"
+
+msgid "Open in app"
+msgstr "Ouvrir dans l’application"
 
 msgid "Open in App"
 msgstr "Ouvrir dans une app"
@@ -11976,6 +12015,9 @@ msgstr "Réinitialiser l'emplacement"
 msgid "Reset terminal"
 msgstr "Réinitialiser le terminal"
 
+msgid "Reset time unavailable"
+msgstr "Heure de réinitialisation indisponible"
+
 msgid "Reset to default"
 msgstr "Rétablir la valeur par défaut"
 
@@ -13144,6 +13186,9 @@ msgstr "Partager cette page"
 msgid "Share via…"
 msgstr "Partager via…"
 
+msgid "Shared across sessions using this login."
+msgstr "Partagé entre les sessions utilisant cette connexion."
+
 msgid "Shared app components"
 msgstr "Composants d'application partagés"
 
@@ -13155,6 +13200,9 @@ msgstr "Des fichiers JSON de thèmes partagés que vous pouvez importer dans Sup
 
 msgid "Shared version"
 msgstr "Version partagée"
+
+msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
+msgstr "Partage le checkout du projet — fichiers, index git et branche — avec ses autres espaces de travail locaux"
 
 msgid "Sheet"
 msgstr "Sheet"
@@ -14746,6 +14794,9 @@ msgstr "La page que vous recherchez n'existe pas."
 msgid "The people behind Superset."
 msgstr "Les personnes derrière Superset."
 
+msgid "The project's checkout as it is: files and branch are shared"
+msgstr "Le checkout du projet tel quel: les fichiers et la branche sont partagés"
+
 #. placeholder {0}: params?.status
 msgid "The provider answered {0}."
 msgstr "Le fournisseur a répondu {0}."
@@ -14908,6 +14959,12 @@ msgstr "Cela ferme toutes les sessions de terminal — dans cet espace de travai
 msgid "This closes every terminal session for your organization{runningCountSuffix} and starts a fresh daemon."
 msgstr "Cette action ferme toutes les sessions de terminal de votre organisation{runningCountSuffix} et démarre un démon neuf."
 
+msgid "This closes the selected workspaces and their terminals. The project's files and branches stay as they are."
+msgstr "Cela ferme les espaces de travail sélectionnés et leurs terminaux. Les fichiers et les branches du projet restent tels quels."
+
+msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
+msgstr "Cela ferme l'espace de travail et ses terminaux. Les fichiers, les branches et les autres espaces de travail du projet restent tels quels."
+
 msgid "This comment is no longer here"
 msgstr "Ce commentaire n'existe plus"
 
@@ -15049,8 +15106,8 @@ msgstr "Cela supprime l'hôte, ses accès et ses espaces de travail. Les fichier
 msgid "This removes the project from every reachable device."
 msgstr "Cela retire le projet de chaque appareil joignable."
 
-msgid "This removes the worktree from disk. The cloud workspace record will also be removed."
-msgstr "Cette action retire le worktree du disque. L'enregistrement de l'espace de travail cloud sera également supprimé."
+msgid "This removes the worktree from disk and closes the workspace."
+msgstr "Cela supprime le worktree du disque et ferme l'espace de travail."
 
 msgid "This replaces its label, command, arguments, prompt and resume settings, environment variables, and icon with the current bundled configuration."
 msgstr "Cela remplace son libellé, sa commande, ses arguments, ses paramètres de prompt et de reprise, ses variables d'environnement et son icône par la configuration fournie actuelle."
@@ -15806,6 +15863,9 @@ msgstr "Identifiant compatible avec les URL, unique au sein de votre organisatio
 msgid "Usage"
 msgstr "Utilisation"
 
+msgid "Usage is out of date"
+msgstr "Les données d’utilisation ne sont plus à jour"
+
 msgid "Usage sections"
 msgstr "Sections d'utilisation"
 
@@ -16495,6 +16555,9 @@ msgstr "Emplacement des worktrees mis à jour"
 msgid "Worktree missing"
 msgstr "Worktree manquant"
 
+msgid "Worktree on this device"
+msgstr "Worktree sur cet appareil"
+
 msgid "Worktree opened"
 msgstr "Worktree ouvert"
 
@@ -16503,6 +16566,9 @@ msgstr "Worktree désynchronisé"
 
 msgid "Worktrees"
 msgstr "Worktrees"
+
+msgid "Worktrees are removed from disk; workspaces on the project's checkout only close. Files in the checkout stay as they are."
+msgstr "Les worktrees sont supprimés du disque ; les espaces de travail sur le checkout du projet sont seulement fermés. Les fichiers du checkout restent tels quels."
 
 msgid "Worktrees with uncommitted changes are left on disk."
 msgstr "Les worktrees avec des modifications non commitées restent sur le disque."

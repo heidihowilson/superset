@@ -706,15 +706,24 @@ export const gitRouter = router({
 						.sync()
 				: null;
 			const gitEnv = await resolveGitTaskEnv(ctx, worktreePath);
-			const result = await getHostWorkerPool().run(
-				gitPushTask,
-				{
-					worktreePath,
-					linkedPrHeadBranch: linkedPr?.headBranch ?? null,
-					gitEnv,
-				},
-				{ timeoutMs: 120_000 },
-			);
+			const result = await getHostWorkerPool()
+				.run(
+					gitPushTask,
+					{
+						worktreePath,
+						linkedPrHeadBranch: linkedPr?.headBranch ?? null,
+						gitEnv,
+					},
+					{ timeoutMs: 120_000 },
+				)
+				.catch((error: unknown) => {
+					// A push the user's hook or the remote refused arrives from the
+					// worker as a plain error carrying git's refusal text; the
+					// desktop shows that text as-is, so only the classification
+					// changes here.
+					rethrowEnvironmentalGitError(error);
+					throw error;
+				});
 			if (!result.ok) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
