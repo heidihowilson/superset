@@ -292,6 +292,7 @@ msgid "{0} · behind"
 msgstr "{0} · tertinggal"
 
 #. placeholder {0}: creator.name
+#. placeholder {0}: option.name
 msgid "{0} (you)"
 msgstr "{0} (Anda)"
 
@@ -950,6 +951,10 @@ msgstr "{worktreeCount, plural, one {Ini menghapus proyek beserta # workspace-ny
 msgid "{years}y ago"
 msgstr "{years}thn lalu"
 
+#. placeholder {0}: connection.login
+msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
+msgstr "@{0} · workspace cloud melakukan commit, push, dan membuka pull request atas nama Anda"
+
 msgid "@superset"
 msgstr "@superset"
 
@@ -1247,6 +1252,9 @@ msgstr "Pull request selalu mendapat worktree sendiri"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Permukaan chat yang dibangun ulang untuk mengendalikan agen: output alat lebih kaya, pengarahan lebih halus, semuanya lebih cepat."
+
+msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
+msgstr "Sebuah repositori tidak terhubung ke organisasi ini, atau repositori berasal dari instalasi GitHub yang berbeda"
 
 msgid "A run for this automation is already in progress."
 msgstr "Sebuah run untuk otomatisasi ini sedang berjalan."
@@ -2088,6 +2096,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "Arsipkan"
+
+msgid "Archive environment"
+msgstr "Arsipkan environment"
 
 msgid "Archived"
 msgstr "Diarsipkan"
@@ -3646,6 +3657,9 @@ msgstr "Tata letak form yang bisa dikomposisi — berpasangan dengan @superset/u
 msgid "Computing in Stripe — up to a minute on first load"
 msgstr "Menghitung di Stripe — hingga satu menit saat pemuatan pertama"
 
+msgid "Config location"
+msgstr "Lokasi konfigurasi"
+
 msgid "Configure"
 msgstr "Atur"
 
@@ -3787,6 +3801,9 @@ msgstr "Terhubung. Proses masuk dibatalkan, jadi pemicu oleh \"Saya\" tidak akan
 
 msgid "Connecting"
 msgstr "Menghubungkan"
+
+msgid "Connecting GitHub is not configured on this server"
+msgstr "Koneksi GitHub belum dikonfigurasi di server ini"
 
 msgid "Connecting to the desktop…"
 msgstr "Menghubungkan ke desktop…"
@@ -4113,6 +4130,9 @@ msgstr "Tidak bisa mengubah versi yang dibagikan"
 msgid "Could not change who can see this page"
 msgstr "Tidak bisa mengubah siapa yang bisa melihat halaman ini"
 
+msgid "Could not check your plan. Check your connection and try again."
+msgstr "Tidak dapat memeriksa paket Anda. Periksa koneksi Anda dan coba lagi."
+
 msgid "Could not clear browsing data"
 msgstr "Tidak bisa membersihkan data penjelajahan"
 
@@ -4230,6 +4250,9 @@ msgstr "Tidak bisa membaca akun Google. Silakan coba lagi."
 
 msgid "Could not record cloud workspace"
 msgstr "Tidak bisa mencatat workspace cloud"
+
+msgid "Could not record environment"
+msgstr "Tidak dapat menyimpan environment"
 
 msgid "Could not rename the session"
 msgstr "Tidak dapat mengganti nama sesi"
@@ -4364,6 +4387,9 @@ msgstr "Tidak bisa mengirim balasan"
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Tidak bisa menjangkau cloud untuk {0}: {1}"
+
+msgid "Couldn't reach workspace"
+msgstr "Tidak bisa menjangkau workspace"
 
 msgid "Couldn't read this terminal's context."
 msgstr "Konteks terminal ini tidak bisa dibaca."
@@ -5541,6 +5567,9 @@ msgstr "Edit komentar"
 msgid "Edit description"
 msgstr "Edit deskripsi"
 
+msgid "Edit environment"
+msgstr "Edit environment"
+
 msgid "Edit name"
 msgstr "Edit nama"
 
@@ -5689,6 +5718,9 @@ msgstr "Lingkungan"
 
 msgid "Environment created"
 msgstr "Environment dibuat"
+
+msgid "Environment saved"
+msgstr "Environment disimpan"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Penyiapan environment, tes flaky, dan urusan kredensial — mode kegagalan membosankan yang mematikan run tanpa pengawasan pada 2025 — sebagian besar diselesaikan lewat rekayasa, bukan lewat model."
@@ -6474,6 +6506,9 @@ msgstr "Filter agen..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Filter menurut @{normalizedSearch}"
 
+msgid "Filter by author: {label}"
+msgstr "Filter menurut penulis: {label}"
+
 msgid "Filter by device"
 msgstr "Filter berdasarkan perangkat"
 
@@ -6893,6 +6928,9 @@ msgstr "GitHub App berhasil dipasang!"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub terhubung, tapi sinkronisasi awal gagal dimulai. Silakan coba hubungkan ulang."
+
+msgid "GitHub disconnected"
+msgstr "GitHub terputus"
 
 msgid "GitHub installation not found"
 msgstr "Instalasi GitHub tidak ditemukan"
@@ -8776,8 +8814,8 @@ msgstr "Pantau, arahkan, dan bebaskan agen Anda dari hambatan lewat ponsel."
 msgid "Monitoring"
 msgstr "Pemantauan"
 
-msgid "monorepo-warm"
-msgstr "monorepo-warm"
+msgid "monorepo"
+msgstr "monorepo"
 
 msgid "Monospace"
 msgstr "Monospace"
@@ -9533,6 +9571,9 @@ msgstr "Tidak ada pull request ditemukan."
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Tidak ada repositori ditemukan. Pastikan GitHub App Anda punya akses ke repositori."
 
+msgid "No repositories. Connect GitHub in Integrations, then refresh."
+msgstr "Tidak ada repositori. Hubungkan GitHub di Integrasi, lalu segarkan."
+
 msgid "No results"
 msgstr "Tidak ada hasil"
 
@@ -9698,6 +9739,9 @@ msgstr "non-merek"
 msgid "Non-brand clicks"
 msgstr "Klik non-merek"
 
+msgid "None"
+msgstr "Tidak ada"
+
 msgid "none (session)"
 msgstr "tidak ada (sesi)"
 
@@ -9716,6 +9760,9 @@ msgstr "Belum terautentikasi. Silakan masuk."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Belum terautentikasi. Berikan bearer JWT, x-api-key, atau session."
 
+msgid "Not available on this server"
+msgstr "Tidak tersedia di server ini"
+
 msgid "Not bound · configure in Settings → Links"
 msgstr "Tidak terikat · atur di Pengaturan → Tautan"
 
@@ -9727,6 +9774,9 @@ msgstr "Tidak terhubung"
 
 msgid "Not Connected"
 msgstr "Tidak Terhubung"
+
+msgid "Not connected · cloud workspaces push as your organization's GitHub App"
+msgstr "Belum terhubung · workspace cloud melakukan push sebagai GitHub App organisasi Anda"
 
 msgid "Not connected: {unavailableReason}. Add a Google service account to the Search Console property and set GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
 msgstr "Tidak terhubung: {unavailableReason}. Tambahkan akun layanan Google ke properti Search Console dan atur GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
@@ -10426,6 +10476,9 @@ msgstr "Membuka TestFlight…"
 msgid "Opening worktree..."
 msgstr "Membuka worktree..."
 
+msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
+msgstr "Membuka workspace cloud tempat agen memasang yang dibutuhkan proyek dan menulis .superset/config.json miliknya"
+
 msgid "Operator"
 msgstr "Operator"
 
@@ -10522,9 +10575,6 @@ msgstr "URL organisasi diperbarui!"
 #. placeholder {0}: selectedOrg.name
 msgid "Organization: <0>{0}</0>"
 msgstr "Organisasi: <0>{0}</0>"
-
-msgid "Organizations"
-msgstr "Organisasi"
 
 msgid "Organizations with a second member vs single-member accounts; the line is teams per 1,000."
 msgstr "Organisasi dengan anggota kedua dibandingkan akun beranggota tunggal; garisnya adalah tim per 1.000."
@@ -11669,6 +11719,9 @@ msgstr "Segarkan metrik"
 msgid "Refresh pull requests"
 msgstr "Segarkan pull request"
 
+msgid "Refresh repositories"
+msgstr "Segarkan repositori"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Diperbarui saat Claude Code berikutnya dijalankan."
 
@@ -11951,6 +12004,9 @@ msgstr "Repositori"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repositori yang bisa diakses lewat instalasi GitHub App."
+
+msgid "Repositories refreshed"
+msgstr "Repositori disegarkan"
 
 msgid "Repositories will be updated shortly."
 msgstr "Repositori akan segera diperbarui."
@@ -12730,6 +12786,9 @@ msgstr "Cari pull request..."
 msgid "Search pull requests…"
 msgstr "Cari pull request…"
 
+msgid "Search repositories..."
+msgstr "Cari repositori..."
+
 msgid "Search sessions"
 msgstr "Cari sesi"
 
@@ -12955,6 +13014,9 @@ msgstr "Pilih lokasi worktree proyek"
 msgid "Select range..."
 msgstr "Pilih rentang..."
 
+msgid "Select repositories"
+msgstr "Pilih repositori"
+
 msgid "Select repository"
 msgstr "Pilih repositori"
 
@@ -13121,6 +13183,10 @@ msgstr "Setel Run"
 
 msgid "Set up"
 msgstr "Siapkan"
+
+#. placeholder {0}: name.trim()
+msgid "Set up {0}"
+msgstr "Siapkan {0}"
 
 msgid "Set up project on {hostName}"
 msgstr "Siapkan proyek di {hostName}"
@@ -13459,6 +13525,9 @@ msgstr "Sesi masuk kedaluwarsa — jalankan"
 msgid "Sign-in failed"
 msgstr "Gagal masuk"
 
+msgid "Sign-in failed ({reason}). Please try again."
+msgstr "Gagal masuk ({reason}). Silakan coba lagi."
+
 msgid "Signed in as {accountLabel}"
 msgstr "Masuk sebagai {accountLabel}"
 
@@ -13548,6 +13617,9 @@ msgstr "Skill hadir bersama plugin Superset dan selalu diperbarui otomatis di se
 
 msgid "Skip"
 msgstr "Lewati"
+
+msgid "Skip & save"
+msgstr "Lewati & simpan"
 
 msgid "Skip All"
 msgstr "Lewati Semua"
@@ -13841,6 +13913,9 @@ msgstr "Mulai sesi"
 msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
 msgstr "Mulai workspace langsung dari tiket Linear. Agen mengambilnya dan melapor kembali dengan sebuah PR."
 
+msgid "Start agent"
+msgstr "Mulai agen"
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Mulai sebuah agen atau terminal untuk mulai bekerja di workspace ini."
 
@@ -13936,6 +14011,9 @@ msgstr "Langkah {step}: {name}"
 
 msgid "Still can't reach the host."
 msgstr "Host masih tidak dapat dijangkau."
+
+msgid "Still trying. If it keeps failing, remove it and create a new one."
+msgstr "Masih mencoba. Jika terus gagal, hapus dan buat yang baru."
 
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Masih berjalan — repo besar bisa makan beberapa menit. Anda boleh keluar; workspace-nya akan muncul di Beranda saat siap."
@@ -14129,8 +14207,8 @@ msgstr "Superset sedang membangun perangkat lunak yang memperbaiki dirinya sendi
 msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
 msgstr "Superset sedang membangun perangkat lunak yang memperbaiki dirinya sendiri. Dimulai dengan memberi engineer alat terbaik yang menyesuaikan diri dengan kebutuhan mereka seiring waktu. Kami bertiga mantan CTO YC yang membangun alat yang kami cintai."
 
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
-msgstr "Superset dibangun oleh tim yang berbasis di San Francisco, California. Untuk dukungan produk atau pertanyaan akun, kirim email ke <0>{supportEmail}</0> dan kami akan membalas dalam satu hari kerja. Untuk kemitraan, media, enterprise, atau apa pun untuk tim pendiri, tulis ke <1>{foundersEmail}</1>."
+msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Superset dibangun oleh tim yang berbasis di San Francisco, California. Untuk dukungan produk atau pertanyaan akun, kirim email ke <0>{supportEmail}</0> dan kami akan membalas dalam satu hari kerja. Untuk kemitraan, media, enterprise, atau hal lainnya, tulis ke <1>{teamEmail}</1>."
 
 msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
 msgstr "Superset dibangun di dalam Superset, jadi kami sendiri adalah pengguna utamanya—Anda dibayar untuk mempermudah pekerjaan Anda sendiri. Jika Anda ingin membangun produk yang Anda sukai dan senang gunakan, mari bangun bersama kami."
@@ -14622,6 +14700,9 @@ msgstr "Agen terbaik akan berganti.<0/>Alur kerja Anda tidak perlu."
 msgid "The Codex sign-in"
 msgstr "Sesi masuk Codex"
 
+msgid "The config repository must be one of the environment's repositories"
+msgstr "Repositori konfigurasi harus salah satu repositori environment"
+
 msgid "The connection timed out"
 msgstr "Koneksinya kehabisan waktu"
 
@@ -14813,6 +14894,9 @@ msgstr "Branch remote sudah menyimpang. Lakukan pull sebelum melanjutkan."
 msgid "The renderer crashed during startup. Please check logs for details."
 msgstr "Renderer crash saat startup. Silakan periksa log untuk detailnya."
 
+msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
+msgstr "Repositori yang di-checkout oleh workspace cloud, dan .superset/config.json milik repositori mana yang diterapkan. Workspace dibuka di lokasi konfigurasi, atau di repositori pertama menurut nama."
+
 msgid "The repository folder itself is kept."
 msgstr "Folder repositori itu sendiri tetap dipertahankan."
 
@@ -14988,6 +15072,18 @@ msgstr "Perangkat ini tidak terhubung ke relay Superset, jadi run otomatisasi ak
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Direktori ini tidak ada. Skrip terminal akan memakai root workspace."
+
+msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+msgstr "Email ini sudah terdaftar dengan metode masuk lain, dan penyedia tidak mengonfirmasinya sebagai terverifikasi. Masuk dengan metode yang Anda gunakan sebelumnya."
+
+msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
+msgstr "Environment ini tidak memiliki repositori. Buat environment dengan repositori di Pengaturan, lalu mulai workspace dari environment tersebut"
+
+msgid "This environment was promoted from a workspace, so its repositories are fixed. Promote a workspace again to change them."
+msgstr "Environment ini dipromosikan dari sebuah workspace, sehingga repositorinya sudah tetap. Promosikan workspace lagi untuk mengubahnya."
+
+msgid "This environment's repositories are fixed; promote a workspace again to change them"
+msgstr "Repositori environment ini sudah tetap; promosikan workspace lagi untuk mengubahnya"
 
 msgid "this file"
 msgstr "file ini"
@@ -15634,6 +15730,9 @@ msgstr "Tidak diketahui"
 msgctxt "person"
 msgid "Unknown"
 msgstr "Tidak diketahui"
+
+msgid "Unknown author"
+msgstr "Penulis tidak dikenal"
 
 msgid "Unknown device"
 msgstr "Perangkat tidak diketahui"
@@ -16745,6 +16844,9 @@ msgstr "Kode Anda tetap lokal secara bawaan, dengan kendali eksplisit atas layan
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Unduhan Anda dimulai otomatis. Jika tidak, ambil di sini."
 
+msgid "Your GitHub account cannot reach a repository in this environment"
+msgstr "Akun GitHub Anda tidak dapat menjangkau repositori di environment ini"
+
 msgid "Your GitHub link comes from the account you signed in with, so it shows as verified and cannot be edited here."
 msgstr "Tautan GitHub Anda berasal dari akun yang Anda gunakan untuk masuk, jadi ditampilkan sebagai terverifikasi dan tidak bisa diubah di sini."
 
@@ -16756,6 +16858,9 @@ msgstr "Nama Anda"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "Nama Anda <0>(kalau prompt Anda kami pakai, kami akan mencantumkan Anda di changelog)</0>"
+
+msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
+msgstr "Akun milik Anda sendiri. Integrasi organisasi memungkinkan Superset menjangkau alat-alatnya; menghubungkan akun Anda membuat pekerjaan yang dilakukan Superset untuk Anda tampil atas nama Anda."
 
 msgid "Your rank"
 msgstr "Peringkat Anda"

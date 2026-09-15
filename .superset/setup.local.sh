@@ -246,7 +246,10 @@ local_write_env() {
     write_env_var "REALTIME_NUDGE_SECRET" "fake-realtime-nudge-secret"
     write_env_var "SUPERSET_WEB_URL" "http://localhost:$WEB_PORT"
     write_env_var "USERCONTENT_URL" "http://frame.usercontent.localhost:$USERCONTENT_DEV_PORT"
-    write_env_var "SANDBOX_GATE_ORIGIN" "http://127.0.0.1:$SANDBOX_GATE_DEV_PORT"
+    # A subdomain per workspace and port, as in production: with one shared
+    # origin the desktop's per-URL tickets for a workspace's two ports would
+    # overwrite each other. Chromium resolves *.localhost to loopback itself.
+    write_env_var "SANDBOX_GATE_ORIGIN" "http://*.localhost:$SANDBOX_GATE_DEV_PORT"
     echo ""
     echo "# Streams URLs"
     write_env_var "PORT" "$STREAMS_PORT"

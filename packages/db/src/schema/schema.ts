@@ -30,6 +30,7 @@ import {
 	desktopNoticeCtaActionValues,
 	desktopNoticeSeverityValues,
 	desktopNoticeTriggerValues,
+	environmentScopeValues,
 	environmentSourceKindValues,
 	integrationProviderValues,
 	pageCommentAnchorKindValues,
@@ -70,6 +71,10 @@ export const cloudWorkspaceStatus = pgEnum(
 export const environmentSourceKind = pgEnum(
 	"environment_source_kind",
 	environmentSourceKindValues,
+);
+export const environmentScope = pgEnum(
+	"environment_scope",
+	environmentScopeValues,
 );
 export const v2ClientType = pgEnum("v2_client_type", v2ClientTypeValues);
 export const v2UsersHostRole = pgEnum(
@@ -566,6 +571,20 @@ export const environments = pgTable(
 		provider: text().notNull().default("vercel"),
 		sourceKind: environmentSourceKind("source_kind").notNull(),
 		sourceRef: text("source_ref").notNull(),
+		/** The sandbox bundle every workspace of this environment boots on; null keeps the image's own. */
+		bundleSha: text("bundle_sha"),
+		/**
+		 * Which of the environment's repositories carries the `.superset/config.json`
+		 * the box acts on; null means none does and only `hooks` applies.
+		 */
+		hooksRepositoryId: uuid("hooks_repository_id").references(
+			() => githubRepositories.id,
+			{ onDelete: "set null" },
+		),
+		scope: environmentScope().notNull().default("organization"),
+		createdByUserId: uuid("created_by_user_id").references(() => users.id, {
+			onDelete: "set null",
+		}),
 		archivedAt: timestamp("archived_at", { withTimezone: true }),
 		createdAt: timestamp("created_at", { withTimezone: true })
 			.notNull()
@@ -580,6 +599,33 @@ export const environments = pgTable(
 		unique("environments_organization_id_name_unique").on(
 			table.organizationId,
 			table.name,
+		),
+	],
+);
+
+/**
+ * The repositories an environment checks out, in order; the first is the
+ * primary. An environment with none (the shared image environment) takes
+ * its repositories at workspace create.
+ */
+export const environmentRepositories = pgTable(
+	"environment_repositories",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		environmentId: uuid("environment_id")
+			.notNull()
+			.references(() => environments.id, { onDelete: "cascade" }),
+		repositoryId: uuid("repository_id")
+			.notNull()
+			.references(() => githubRepositories.id, { onDelete: "cascade" }),
+	},
+	(table) => [
+		unique("environment_repositories_environment_id_repository_id_unique").on(
+			table.environmentId,
+			table.repositoryId,
+		),
+		index("environment_repositories_environment_id_idx").on(
+			table.environmentId,
 		),
 	],
 );
@@ -658,6 +704,34 @@ export const cloudWorkspaces = pgTable(
 		unique("cloud_workspaces_provider_sandbox_id_unique").on(
 			table.provider,
 			table.providerSandboxId,
+		),
+	],
+);
+
+/**
+ * What a cloud workspace checked out, fixed at create: each repository on a
+ * branch at a path under the workspace root. The first is the primary, the
+ * one the workspace opens on.
+ */
+export const cloudWorkspaceRepositories = pgTable(
+	"cloud_workspace_repositories",
+	{
+		id: uuid().primaryKey().defaultRandom(),
+		cloudWorkspaceId: uuid("cloud_workspace_id")
+			.notNull()
+			.references(() => cloudWorkspaces.id, { onDelete: "cascade" }),
+		repositoryId: uuid("repository_id")
+			.notNull()
+			.references(() => githubRepositories.id, { onDelete: "cascade" }),
+		path: text().notNull(),
+	},
+	(table) => [
+		unique("cloud_workspace_repositories_workspace_repository_unique").on(
+			table.cloudWorkspaceId,
+			table.repositoryId,
+		),
+		index("cloud_workspace_repositories_cloud_workspace_id_idx").on(
+			table.cloudWorkspaceId,
 		),
 	],
 );
@@ -1617,3 +1691,38 @@ export const agentCredentials = pgTable(
 
 export type InsertAgentCredential = typeof agentCredentials.$inferInsert;
 export type SelectAgentCredential = typeof agentCredentials.$inferSelect;
+
+/**
+ * A person's own GitHub account, authorized through the GitHub App, so their
+ * cloud workspaces commit, push and open pull requests as them. One per user:
+ * a GitHub account belongs to a person, not an organization.
+ */
+export const githubUserConnections = pgTable("github_user_connections", {
+	id: uuid().primaryKey().defaultRandom(),
+	userId: uuid("user_id")
+		.notNull()
+		.unique()
+		.references(() => users.id, { onDelete: "cascade" }),
+	githubUserId: text("github_user_id").notNull(),
+	login: text().notNull(),
+	name: text(),
+	encryptedAccessToken: text("encrypted_access_token").notNull(),
+	/** Null when the App issues tokens that do not expire. */
+	accessTokenExpiresAt: timestamp("access_token_expires_at", {
+		withTimezone: true,
+	}),
+	encryptedRefreshToken: text("encrypted_refresh_token"),
+	refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+		withTimezone: true,
+	}),
+	createdAt: timestamp("created_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
+	updatedAt: timestamp("updated_at", { withTimezone: true })
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date()),
+});
+
+export type SelectGithubUserConnection =
+	typeof githubUserConnections.$inferSelect;

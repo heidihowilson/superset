@@ -1,4 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
+import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import { toast } from "@superset/ui/sonner";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
@@ -105,9 +106,9 @@ export function useSubmitWorkspace(
 			const environments = await cloudTrpcClient.environment.list.query({
 				organizationId: activeOrganizationId,
 			});
+			const startable = startableCloudEnvironments(environments);
 			const environment =
-				environments.find((row) => row.id === draft.environmentId) ??
-				environments[0];
+				startable.find((row) => row.id === draft.environmentId) ?? startable[0];
 			if (!environment) {
 				toast.error(
 					t({
@@ -146,7 +147,7 @@ export function useSubmitWorkspace(
 					// 20,000-character cap.
 					prompt:
 						(cloudPrompt ?? draft.prompt).trim().slice(0, 20_000) || undefined,
-					branch: branchName ?? "main",
+					branch: draft.baseBranch ?? branchName ?? undefined,
 					...(wantCloudAgent
 						? {
 								agent: selectedAgent,

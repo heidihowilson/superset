@@ -1,10 +1,12 @@
 import { LegendList } from "@legendapp/list/react-native";
 import { useLingui } from "@lingui/react/macro";
 import { i18n } from "@superset/i18n";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAfter } from "date-fns";
 import * as Haptics from "expo-haptics";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
+import { useFeatureFlag } from "posthog-react-native";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
@@ -43,7 +45,7 @@ import { ProjectSectionHeader } from "./components/ProjectSectionHeader";
 import { ScopeBar } from "./components/ScopeBar";
 import { WorkspaceRow } from "./components/WorkspaceRow";
 import { useAgentLiveActivity } from "./hooks/useAgentLiveActivity";
-import { useCloudRepoPrefix } from "./hooks/useCloudRepoPrefixes";
+import { useCloudRepoPrefixes } from "./hooks/useCloudRepoPrefixes";
 import { useFirstPaint } from "./hooks/useFirstPaint";
 import {
 	type TerminalsHost,
@@ -169,10 +171,14 @@ export function HomeScreen() {
 	// app is open. Foreground-only for now: nothing server-side knows an agent
 	// needs attention yet, so the card goes stale (and says so) once the app
 	// closes. ActivityKit push updates are the follow-up that fixes that.
+	const liveActivityEnabled = Boolean(
+		useFeatureFlag(FEATURE_FLAGS.MOBILE_LIVE_ACTIVITY),
+	);
 	useAgentLiveActivity({
 		terminalsByWorkspace,
 		workspaces,
 		projects,
+		enabled: liveActivityEnabled,
 	});
 	const pullRequests = usePullRequests();
 	const { query: hostsQuery } = useOrgHosts();
@@ -458,7 +464,7 @@ export function HomeScreen() {
 	// Projects are fully local: PR rows are matched by repo coordinates
 	// parsed from the PR URL (cloud repo UUIDs aren't known host-side).
 	// Cloud rows' projects come from the API instead.
-	const cloudRepoPrefix = useCloudRepoPrefix();
+	const cloudRepoPrefixes = useCloudRepoPrefixes();
 	const repoPrefixesByProject = useMemo(
 		() =>
 			new Map<string, string | null>([
@@ -510,7 +516,7 @@ export function HomeScreen() {
 			}
 			const { workspace, cloudStatus } = item;
 			const repoPrefix = cloudStatus
-				? cloudRepoPrefix
+				? (cloudRepoPrefixes.get(workspace.id) ?? null)
 				: workspace.projectId
 					? repoPrefixesByProject.get(workspace.projectId)
 					: undefined;
@@ -535,7 +541,7 @@ export function HomeScreen() {
 		},
 		[
 			pullRequestsByRepoBranch,
-			cloudRepoPrefix,
+			cloudRepoPrefixes,
 			repoPrefixesByProject,
 			diffStats,
 			cache,
@@ -581,7 +587,7 @@ export function HomeScreen() {
 				logo={activeOrganization?.logo}
 				onPress={() => {
 					void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-					router.push("/(authenticated)/(home)/organizations");
+					router.push("/(authenticated)/settings");
 				}}
 			/>
 			{/* Search opens as a sheet rather than a search bar in this header: on

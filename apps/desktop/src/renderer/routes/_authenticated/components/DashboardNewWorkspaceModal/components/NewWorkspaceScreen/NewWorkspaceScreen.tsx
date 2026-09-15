@@ -5,6 +5,7 @@ import {
 	getAgentModelSupport,
 	getAgentModeSupport,
 } from "@superset/shared/agent-models";
+import { startableCloudEnvironments } from "@superset/shared/cloud-environments";
 import {
 	PromptInput,
 	PromptInputButton,
@@ -157,10 +158,23 @@ export function NewWorkspaceScreen({
 		{ organizationId: activeOrganizationId ?? "" },
 		{ enabled: draft.hostId === CLOUD_HOST_ID && !!activeOrganizationId },
 	);
-	const environmentOptions = environmentsQuery.data ?? [];
+	const environmentOptions = startableCloudEnvironments(
+		environmentsQuery.data ?? [],
+	);
 	const selectedEnvironment =
 		environmentOptions.find((row) => row.id === draft.environmentId) ??
 		environmentOptions[0];
+	const cloudRepository = useMemo(() => {
+		if (draft.hostId !== CLOUD_HOST_ID) return null;
+		const primary = selectedEnvironment?.repositories?.[0];
+		return primary
+			? {
+					owner: primary.owner,
+					name: primary.name,
+					defaultBranch: primary.defaultBranch,
+				}
+			: null;
+	}, [draft.hostId, selectedEnvironment]);
 	const setLastProjectId = useV2WorkspaceCreateDefaultsStore(
 		(state) => state.setLastProjectId,
 	);
@@ -494,6 +508,7 @@ export function NewWorkspaceScreen({
 	const { pickerProps } = useBranchPickerController({
 		projectId,
 		hostId: draft.hostId,
+		cloudRepository,
 		baseBranch: draft.baseBranch,
 		typedWorkspaceName: draft.workspaceName,
 		onBaseBranchChange: (branch, source) => {
@@ -1033,7 +1048,9 @@ export function NewWorkspaceScreen({
 										<Trans>based off PR #{draft.linkedPR.prNumber}</Trans>
 									</span>
 								</>
-							) : draft.isSession || draft.hostId === CLOUD_HOST_ID ? null : (
+							) : draft.hostId === CLOUD_HOST_ID ? (
+								<CompareBaseBranchPicker {...pickerProps} />
+							) : draft.isSession ? null : (
 								<>
 									<CheckoutPickerPill
 										checkout={draft.checkout}

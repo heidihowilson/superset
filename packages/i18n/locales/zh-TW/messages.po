@@ -292,6 +292,7 @@ msgid "{0} · behind"
 msgstr "{0} · 落後"
 
 #. placeholder {0}: creator.name
+#. placeholder {0}: option.name
 msgid "{0} (you)"
 msgstr "{0}（你）"
 
@@ -950,6 +951,10 @@ msgstr "{worktreeCount, plural, one {這會從所有可連線的裝置中移除�
 msgid "{years}y ago"
 msgstr "{years}年前"
 
+#. placeholder {0}: connection.login
+msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
+msgstr "@{0} · 雲端工作區以你的身分提交、推送並建立提取請求"
+
 msgid "@superset"
 msgstr "@superset"
 
@@ -1247,6 +1252,9 @@ msgstr "拉取請求總是使用自己的 worktree"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "重建的代理程式驅動聊天介面：更豐富的工具輸出、更順手的引導，一切都更快。"
+
+msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
+msgstr "某個儲存庫未連結至此組織，或這些儲存庫來自不同的 GitHub 安裝"
 
 msgid "A run for this automation is already in progress."
 msgstr "此自動化已有一次執行正在進行中。"
@@ -2088,6 +2096,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "歸檔"
+
+msgid "Archive environment"
+msgstr "封存環境"
 
 msgid "Archived"
 msgstr "已歸檔"
@@ -3646,6 +3657,9 @@ msgstr "可組合的表單佈局——搭配@superset/ui/form用於react-hook-fo
 msgid "Computing in Stripe — up to a minute on first load"
 msgstr "正在Stripe中計算 — 首次載入最多需要一分鐘"
 
+msgid "Config location"
+msgstr "設定位置"
+
 msgid "Configure"
 msgstr "配置"
 
@@ -3787,6 +3801,9 @@ msgstr "已連線。登入被取消，因此在你重新連線之前，按「我
 
 msgid "Connecting"
 msgstr "連線中"
+
+msgid "Connecting GitHub is not configured on this server"
+msgstr "此伺服器未設定 GitHub 連結"
 
 msgid "Connecting to the desktop…"
 msgstr "正在連線至桌面…"
@@ -4113,6 +4130,9 @@ msgstr "無法更改分享的版本"
 msgid "Could not change who can see this page"
 msgstr "無法更改誰可以檢視這個頁面"
 
+msgid "Could not check your plan. Check your connection and try again."
+msgstr "無法檢查您的方案。請檢查網路連線後再試一次。"
+
 msgid "Could not clear browsing data"
 msgstr "無法清除瀏覽資料"
 
@@ -4230,6 +4250,9 @@ msgstr "無法讀取該Google帳戶。請重試。"
 
 msgid "Could not record cloud workspace"
 msgstr "無法記錄雲端工作區"
+
+msgid "Could not record environment"
+msgstr "無法儲存環境"
 
 msgid "Could not rename the session"
 msgstr "無法重新命名會話"
@@ -4364,6 +4387,9 @@ msgstr "無法釋出回覆"
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "無法為{0}連線雲端：{1}"
+
+msgid "Couldn't reach workspace"
+msgstr "無法連線到工作區"
 
 msgid "Couldn't read this terminal's context."
 msgstr "無法讀取這個終端的上下文。"
@@ -5541,6 +5567,9 @@ msgstr "編輯評論"
 msgid "Edit description"
 msgstr "編輯描述"
 
+msgid "Edit environment"
+msgstr "編輯環境"
+
 msgid "Edit name"
 msgstr "編輯名稱"
 
@@ -5689,6 +5718,9 @@ msgstr "環境"
 
 msgid "Environment created"
 msgstr "環境已建立"
+
+msgid "Environment saved"
+msgstr "環境已儲存"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "環境搭建、不穩定的測試、憑證串聯，這些在2025年讓無人值守執行折戟的無聊失敗模式，大多是被工程手段消除的，而不是被模型消除的。"
@@ -6474,6 +6506,9 @@ msgstr "篩選代理程式..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "按@{normalizedSearch}篩選"
 
+msgid "Filter by author: {label}"
+msgstr "依作者篩選：{label}"
+
 msgid "Filter by device"
 msgstr "依裝置篩選"
 
@@ -6893,6 +6928,9 @@ msgstr "GitHub App安裝成功！"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub已連線，但初始同步未能啟動。請嘗試重新連線。"
+
+msgid "GitHub disconnected"
+msgstr "已中斷 GitHub 連結"
 
 msgid "GitHub installation not found"
 msgstr "未找到GitHub安裝"
@@ -8776,8 +8814,8 @@ msgstr "在手機上監控、引導併為代理程式解阻。"
 msgid "Monitoring"
 msgstr "監控"
 
-msgid "monorepo-warm"
-msgstr "monorepo-warm"
+msgid "monorepo"
+msgstr "monorepo"
 
 msgid "Monospace"
 msgstr "等寬字型"
@@ -9533,6 +9571,9 @@ msgstr "未找到拉取請求。"
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "未找到儲存庫。請確認你的GitHub App有權存取儲存庫。"
 
+msgid "No repositories. Connect GitHub in Integrations, then refresh."
+msgstr "沒有儲存庫。請在「整合」中連結 GitHub，然後重新整理。"
+
 msgid "No results"
 msgstr "無結果"
 
@@ -9698,6 +9739,9 @@ msgstr "非品牌"
 msgid "Non-brand clicks"
 msgstr "非品牌點擊"
 
+msgid "None"
+msgstr "無"
+
 msgid "none (session)"
 msgstr "無（會話）"
 
@@ -9716,6 +9760,9 @@ msgstr "未通過身份驗證。請登入。"
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "未通過身份驗證。請提供bearer JWT、x-api-key或session。"
 
+msgid "Not available on this server"
+msgstr "此伺服器無法使用"
+
 msgid "Not bound · configure in Settings → Links"
 msgstr "未繫結 · 在設定→連結中配置"
 
@@ -9727,6 +9774,9 @@ msgstr "未連線"
 
 msgid "Not Connected"
 msgstr "未連線"
+
+msgid "Not connected · cloud workspaces push as your organization's GitHub App"
+msgstr "未連結 · 雲端工作區以組織的 GitHub App 身分推送"
 
 msgid "Not connected: {unavailableReason}. Add a Google service account to the Search Console property and set GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
 msgstr "未連線：{unavailableReason}。請將 Google 服務帳號加入 Search Console 資源，並設定 GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT。"
@@ -10426,6 +10476,9 @@ msgstr "正在開啟TestFlight…"
 msgid "Opening worktree..."
 msgstr "正在開啟worktree..."
 
+msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
+msgstr "開啟雲端工作區，由代理安裝專案所需內容並寫入其 .superset/config.json"
+
 msgid "Operator"
 msgstr "操作員"
 
@@ -10522,9 +10575,6 @@ msgstr "組織URL已更新！"
 #. placeholder {0}: selectedOrg.name
 msgid "Organization: <0>{0}</0>"
 msgstr "組織：<0>{0}</0>"
-
-msgid "Organizations"
-msgstr "組織"
 
 msgid "Organizations with a second member vs single-member accounts; the line is teams per 1,000."
 msgstr "擁有第二名成員的組織與單一成員帳戶的對比；折線為每 1,000 個組織的團隊數。"
@@ -11669,6 +11719,9 @@ msgstr "重新整理指標"
 msgid "Refresh pull requests"
 msgstr "重新整理拉取請求"
 
+msgid "Refresh repositories"
+msgstr "重新整理儲存庫"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "下次執行 Claude Code 時重新整理。"
 
@@ -11951,6 +12004,9 @@ msgstr "儲存庫"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "通過GitHub App安裝可存取的儲存庫。"
+
+msgid "Repositories refreshed"
+msgstr "儲存庫已重新整理"
 
 msgid "Repositories will be updated shortly."
 msgstr "儲存庫將很快更新。"
@@ -12730,6 +12786,9 @@ msgstr "搜尋拉取請求..."
 msgid "Search pull requests…"
 msgstr "搜尋拉取請求…"
 
+msgid "Search repositories..."
+msgstr "搜尋儲存庫..."
+
 msgid "Search sessions"
 msgstr "搜尋會話"
 
@@ -12955,6 +13014,9 @@ msgstr "選擇專案worktree位置"
 msgid "Select range..."
 msgstr "選擇範圍..."
 
+msgid "Select repositories"
+msgstr "選擇儲存庫"
+
 msgid "Select repository"
 msgstr "選擇儲存庫"
 
@@ -13121,6 +13183,10 @@ msgstr "設定執行命令"
 
 msgid "Set up"
 msgstr "設定"
+
+#. placeholder {0}: name.trim()
+msgid "Set up {0}"
+msgstr "設定 {0}"
 
 msgid "Set up project on {hostName}"
 msgstr "在{hostName}上設定專案"
@@ -13459,6 +13525,9 @@ msgstr "登入已過期——請執行"
 msgid "Sign-in failed"
 msgstr "登入失敗"
 
+msgid "Sign-in failed ({reason}). Please try again."
+msgstr "登入失敗（{reason}）。請再試一次。"
+
 msgid "Signed in as {accountLabel}"
 msgstr "已登入為{accountLabel}"
 
@@ -13548,6 +13617,9 @@ msgstr "技能隨Superset外掛一起提供，並會在你使用的每個代理�
 
 msgid "Skip"
 msgstr "跳過"
+
+msgid "Skip & save"
+msgstr "略過並儲存"
 
 msgid "Skip All"
 msgstr "全部跳過"
@@ -13841,6 +13913,9 @@ msgstr "開始一個會話"
 msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
 msgstr "直接從Linear工單啟動工作區。代理程式接手，並以一個PR回報結果。"
 
+msgid "Start agent"
+msgstr "啟動代理"
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "啟動一個代理程式或終端，開始在此工作區中工作。"
 
@@ -13936,6 +14011,9 @@ msgstr "第{step}步：{name}"
 
 msgid "Still can't reach the host."
 msgstr "仍然無法連線到主機。"
+
+msgid "Still trying. If it keeps failing, remove it and create a new one."
+msgstr "仍在重試。如果一直失敗，移除它，再建一個。"
 
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "仍在處理 — 大儲存庫可能需要幾分鐘。你可以離開；工作區就緒後會出現在首頁。"
@@ -14129,8 +14207,8 @@ msgstr "Superset正在構建能自我改進的軟體。第一步，是給工程�
 msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
 msgstr "Superset正在構建能自我改進的軟體。第一步，是給工程師最好的工具，並讓它隨需求一起演進。我們是3位YC出身的前CTO，在做一個自己喜歡的工具。"
 
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
-msgstr "Superset由一支位於加州舊金山的團隊打造。產品支援或帳戶問題，請發郵件至<0>{supportEmail}</0>，我們會在一個工作日內回覆。合作、媒體、企業版，或任何想直接找創始團隊的事，請寫信至<1>{foundersEmail}</1>。"
+msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Superset由一支位於加州舊金山的團隊打造。產品支援或帳戶問題，請發郵件至<0>{supportEmail}</0>，我們會在一個工作日內回覆。合作、媒體、企業版或其他任何事宜，請寫信至<1>{teamEmail}</1>。"
 
 msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
 msgstr "Superset 就是在 Superset 中建構的，因此我們自己就是它的頭號使用者——你可以透過讓自己的工作更輕鬆來獲得報酬。如果你一直想打造一款自己愛用的產品，就來和我們一起建構吧。"
@@ -14622,6 +14700,9 @@ msgstr "最好的代理程式會變。<0/>你的工作流不該變。"
 msgid "The Codex sign-in"
 msgstr "Codex登入"
 
+msgid "The config repository must be one of the environment's repositories"
+msgstr "設定儲存庫必須是該環境的儲存庫之一"
+
 msgid "The connection timed out"
 msgstr "連線已逾時"
 
@@ -14813,6 +14894,9 @@ msgstr "遠端分支已分叉。請先拉取再繼續。"
 msgid "The renderer crashed during startup. Please check logs for details."
 msgstr "渲染處理程序在啟動時崩潰。請檢視日誌瞭解詳情。"
 
+msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
+msgstr "雲端工作區簽出的儲存庫，以及它套用哪個儲存庫的 .superset/config.json。工作區會在設定位置開啟，否則在依名稱排序的第一個儲存庫開啟。"
+
 msgid "The repository folder itself is kept."
 msgstr "儲存庫資料夾本身會保留。"
 
@@ -14988,6 +15072,18 @@ msgstr "此裝置沒有連線到Superset中繼，自動化的執行會被跳過�
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "此目錄不存在。終端指令碼將回退到工作區根目錄。"
+
+msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+msgstr "此電子郵件已透過其他登入方式註冊，且提供者未將其確認為已驗證。請使用你先前使用的方式登入。"
+
+msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
+msgstr "此環境沒有儲存庫。請先在設定中建立包含儲存庫的環境，再從該環境啟動工作區"
+
+msgid "This environment was promoted from a workspace, so its repositories are fixed. Promote a workspace again to change them."
+msgstr "此環境由工作區提升而來，因此其儲存庫已固定。請再次提升一個工作區以變更它們。"
+
+msgid "This environment's repositories are fixed; promote a workspace again to change them"
+msgstr "此環境的儲存庫已固定；請再次提升一個工作區以變更它們"
 
 msgid "this file"
 msgstr "該檔案"
@@ -15634,6 +15730,9 @@ msgstr "未知"
 msgctxt "person"
 msgid "Unknown"
 msgstr "未知"
+
+msgid "Unknown author"
+msgstr "未知作者"
 
 msgid "Unknown device"
 msgstr "未知裝置"
@@ -16745,6 +16844,9 @@ msgstr "你的程式碼預設留在本地，連線哪些服務由你明確決定
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "下載將自動開始。若未開始，請由此取得。"
 
+msgid "Your GitHub account cannot reach a repository in this environment"
+msgstr "你的 GitHub 帳戶無法存取此環境中的某個儲存庫"
+
 msgid "Your GitHub link comes from the account you signed in with, so it shows as verified and cannot be edited here."
 msgstr "你的 GitHub 連結來自登入所用的帳號，因此顯示為已驗證，無法在此編輯。"
 
@@ -16756,6 +16858,9 @@ msgstr "你的姓名"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "你的名字 <0>（若我們採用你的提示詞，會在更新日誌中署名致謝）</0>"
+
+msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
+msgstr "你自己的帳戶。組織的整合讓 Superset 存取其工具；連結你自己的帳戶後，Superset 為你完成的工作會以你的名義顯示。"
 
 msgid "Your rank"
 msgstr "你的排名"

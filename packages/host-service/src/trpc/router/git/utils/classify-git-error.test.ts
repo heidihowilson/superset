@@ -422,6 +422,34 @@ describe("rethrowEnvironmentalGitError", () => {
 		).toBeNull();
 	});
 
+	test("Xcode license not accepted → PRECONDITION_FAILED / GIT_ENVIRONMENT", () => {
+		const message =
+			"You have not agreed to the Xcode license agreements. Please run 'sudo xcodebuild -license' from within a Terminal window to review and agree to the Xcode and Apple SDKs license.\n";
+		const thrown = capture(new Error(message));
+		expect(thrown?.code).toBe("PRECONDITION_FAILED");
+		expect(causeKind(thrown)).toBe("GIT_ENVIRONMENT");
+		expect(thrown?.message).toBe(message);
+	});
+
+	test("does not claim the license refusal alongside a failure of git's own", () => {
+		expect(
+			capture(
+				new Error(
+					"You have not agreed to the Xcode license agreements. Please run 'sudo xcodebuild -license' from within a Terminal window to review and agree to the Xcode and Apple SDKs license.\n" +
+						"fatal: unable to access 'https://example.invalid/repo.git/': Could not resolve host: example.invalid\n",
+				),
+			),
+		).toBeNull();
+		expect(
+			capture(
+				new Error(
+					"hint: The '.git/hooks/pre-commit' hook was ignored because it's not set as executable.\n" +
+						"You have not agreed to the Xcode license agreements. Please run 'sudo xcodebuild -license' from within a Terminal window to review and agree to the Xcode and Apple SDKs license.\n",
+				),
+			),
+		).toBeNull();
+	});
+
 	test("genuine failures naming a .git path, a conflict or the network keep reporting", () => {
 		expect(capture(new Error("fatal: bad object HEAD\n"))).toBeNull();
 		expect(

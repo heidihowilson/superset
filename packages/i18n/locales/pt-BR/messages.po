@@ -292,6 +292,7 @@ msgid "{0} · behind"
 msgstr "{0} · desatualizado"
 
 #. placeholder {0}: creator.name
+#. placeholder {0}: option.name
 msgid "{0} (you)"
 msgstr "{0} (você)"
 
@@ -950,6 +951,10 @@ msgstr "{worktreeCount, plural, one {Isso remove o projeto e sua # área de trab
 msgid "{years}y ago"
 msgstr "há {years}a"
 
+#. placeholder {0}: connection.login
+msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
+msgstr "@{0} · as áreas de trabalho na nuvem fazem commit, push e abrem pull requests como você"
+
 msgid "@superset"
 msgstr "@superset"
 
@@ -1247,6 +1252,9 @@ msgstr "Um pull request sempre tem seu próprio worktree"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Uma superfície de chat reconstruída para conduzir agentes: saída de ferramentas mais rica, condução mais fluida e tudo mais rápido."
+
+msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
+msgstr "Um repositório não está conectado a esta organização, ou os repositórios vêm de instalações diferentes do GitHub"
 
 msgid "A run for this automation is already in progress."
 msgstr "Já há uma execução desta automação em andamento."
@@ -2088,6 +2096,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "Arquivar"
+
+msgid "Archive environment"
+msgstr "Arquivar ambiente"
 
 msgid "Archived"
 msgstr "Arquivadas"
@@ -3646,6 +3657,9 @@ msgstr "Layout de formulário componível — combina com @superset/ui/form para
 msgid "Computing in Stripe — up to a minute on first load"
 msgstr "Calculando no Stripe — até um minuto na primeira carga"
 
+msgid "Config location"
+msgstr "Local da configuração"
+
 msgid "Configure"
 msgstr "Configurar"
 
@@ -3787,6 +3801,9 @@ msgstr "Conectado. O login foi cancelado, então gatilhos de \"Eu\" não vão co
 
 msgid "Connecting"
 msgstr "Conectando"
+
+msgid "Connecting GitHub is not configured on this server"
+msgstr "A conexão com o GitHub não está configurada neste servidor"
 
 msgid "Connecting to the desktop…"
 msgstr "Conectando à área de trabalho…"
@@ -4113,6 +4130,9 @@ msgstr "Não foi possível mudar a versão compartilhada"
 msgid "Could not change who can see this page"
 msgstr "Não foi possível mudar quem pode ver esta página"
 
+msgid "Could not check your plan. Check your connection and try again."
+msgstr "Não foi possível verificar seu plano. Verifique sua conexão e tente novamente."
+
 msgid "Could not clear browsing data"
 msgstr "Não foi possível limpar os dados de navegação"
 
@@ -4230,6 +4250,9 @@ msgstr "Não foi possível ler a conta Google. Tente novamente."
 
 msgid "Could not record cloud workspace"
 msgstr "Não foi possível registrar a área de trabalho na nuvem"
+
+msgid "Could not record environment"
+msgstr "Não foi possível salvar o ambiente"
 
 msgid "Could not rename the session"
 msgstr "Não foi possível renomear a sessão"
@@ -4364,6 +4387,9 @@ msgstr "Não foi possível publicar a resposta"
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Não foi possível acessar a nuvem para {0}: {1}"
+
+msgid "Couldn't reach workspace"
+msgstr "Não foi possível acessar a área de trabalho"
 
 msgid "Couldn't read this terminal's context."
 msgstr "Não foi possível ler o contexto deste terminal."
@@ -5541,6 +5567,9 @@ msgstr "Editar comentário"
 msgid "Edit description"
 msgstr "Editar descrição"
 
+msgid "Edit environment"
+msgstr "Editar ambiente"
+
 msgid "Edit name"
 msgstr "Editar nome"
 
@@ -5689,6 +5718,9 @@ msgstr "Ambiente"
 
 msgid "Environment created"
 msgstr "Ambiente criado"
+
+msgid "Environment saved"
+msgstr "Ambiente salvo"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Preparo de ambiente, testes instáveis e encanamento de credenciais, os modos de falha chatos que mataram as execuções sem supervisão em 2025, são resolvidos por engenharia, não por modelagem."
@@ -6474,6 +6506,9 @@ msgstr "Filtrar agentes..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Filtrar por @{normalizedSearch}"
 
+msgid "Filter by author: {label}"
+msgstr "Filtrar por autor: {label}"
+
 msgid "Filter by device"
 msgstr "Filtrar por dispositivo"
 
@@ -6893,6 +6928,9 @@ msgstr "GitHub App instalado com sucesso!"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "GitHub conectado, mas a sincronização inicial não começou. Tente reconectar."
+
+msgid "GitHub disconnected"
+msgstr "GitHub desconectado"
 
 msgid "GitHub installation not found"
 msgstr "Instalação do GitHub não encontrada"
@@ -8776,8 +8814,8 @@ msgstr "Acompanhe, conduza e destrave seus agentes pelo celular."
 msgid "Monitoring"
 msgstr "Monitoramento"
 
-msgid "monorepo-warm"
-msgstr "monorepo-warm"
+msgid "monorepo"
+msgstr "monorepo"
 
 msgid "Monospace"
 msgstr "Monoespaçadas"
@@ -9533,6 +9571,9 @@ msgstr "Nenhum pull request encontrado."
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Nenhum repositório encontrado. Confirme se o seu GitHub App tem acesso aos repositórios."
 
+msgid "No repositories. Connect GitHub in Integrations, then refresh."
+msgstr "Nenhum repositório. Conecte o GitHub em Integrações e depois atualize."
+
 msgid "No results"
 msgstr "Nenhum resultado"
 
@@ -9698,6 +9739,9 @@ msgstr "sem marca"
 msgid "Non-brand clicks"
 msgstr "Cliques sem marca"
 
+msgid "None"
+msgstr "Nenhum"
+
 msgid "none (session)"
 msgstr "nenhum (sessão)"
 
@@ -9716,6 +9760,9 @@ msgstr "Não autenticado. Entre na sua conta."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Não autenticado. Forneça um bearer JWT, x-api-key ou sessão."
 
+msgid "Not available on this server"
+msgstr "Indisponível neste servidor"
+
 msgid "Not bound · configure in Settings → Links"
 msgstr "Sem atalho · configure em Configurações → Links"
 
@@ -9727,6 +9774,9 @@ msgstr "Não conectado"
 
 msgid "Not Connected"
 msgstr "Não conectado"
+
+msgid "Not connected · cloud workspaces push as your organization's GitHub App"
+msgstr "Não conectado · as áreas de trabalho na nuvem fazem push como a GitHub App da sua organização"
 
 msgid "Not connected: {unavailableReason}. Add a Google service account to the Search Console property and set GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
 msgstr "Não conectado: {unavailableReason}. Adicione uma conta de serviço do Google à propriedade do Search Console e defina GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
@@ -10426,6 +10476,9 @@ msgstr "Abrindo o TestFlight…"
 msgid "Opening worktree..."
 msgstr "Abrindo worktree..."
 
+msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
+msgstr "Abre uma área de trabalho na nuvem onde um agente instala o que o projeto precisa e escreve seu .superset/config.json"
+
 msgid "Operator"
 msgstr "Operador"
 
@@ -10522,9 +10575,6 @@ msgstr "URL da organização atualizada!"
 #. placeholder {0}: selectedOrg.name
 msgid "Organization: <0>{0}</0>"
 msgstr "Organização: <0>{0}</0>"
-
-msgid "Organizations"
-msgstr "Organizações"
 
 msgid "Organizations with a second member vs single-member accounts; the line is teams per 1,000."
 msgstr "Organizações com um segundo membro em relação a contas de um só membro; a linha são times por 1.000."
@@ -11669,6 +11719,9 @@ msgstr "Atualizar métricas"
 msgid "Refresh pull requests"
 msgstr "Atualizar os pull requests"
 
+msgid "Refresh repositories"
+msgstr "Atualizar repositórios"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Atualiza na próxima execução do Claude Code."
 
@@ -11951,6 +12004,9 @@ msgstr "Repositórios"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Repositórios acessíveis pela instalação do GitHub App."
+
+msgid "Repositories refreshed"
+msgstr "Repositórios atualizados"
 
 msgid "Repositories will be updated shortly."
 msgstr "Os repositórios serão atualizados em instantes."
@@ -12730,6 +12786,9 @@ msgstr "Buscar pull requests..."
 msgid "Search pull requests…"
 msgstr "Buscar pull requests…"
 
+msgid "Search repositories..."
+msgstr "Buscar repositórios..."
+
 msgid "Search sessions"
 msgstr "Buscar sessões"
 
@@ -12955,6 +13014,9 @@ msgstr "Selecionar o local das worktrees do projeto"
 msgid "Select range..."
 msgstr "Selecionar intervalo..."
 
+msgid "Select repositories"
+msgstr "Selecionar repositórios"
+
 msgid "Select repository"
 msgstr "Selecionar repositório"
 
@@ -13121,6 +13183,10 @@ msgstr "Definir execução"
 
 msgid "Set up"
 msgstr "Configurar"
+
+#. placeholder {0}: name.trim()
+msgid "Set up {0}"
+msgstr "Configurar {0}"
 
 msgid "Set up project on {hostName}"
 msgstr "Configurar o projeto em {hostName}"
@@ -13459,6 +13525,9 @@ msgstr "Login expirado — execute"
 msgid "Sign-in failed"
 msgstr "Falha no login"
 
+msgid "Sign-in failed ({reason}). Please try again."
+msgstr "Falha ao entrar ({reason}). Tente novamente."
+
 msgid "Signed in as {accountLabel}"
 msgstr "Conectado como {accountLabel}"
 
@@ -13548,6 +13617,9 @@ msgstr "As skills vêm com o plugin do Superset e são mantidas atualizadas auto
 
 msgid "Skip"
 msgstr "Pular"
+
+msgid "Skip & save"
+msgstr "Pular e salvar"
 
 msgid "Skip All"
 msgstr "Pular tudo"
@@ -13841,6 +13913,9 @@ msgstr "Iniciar uma sessão"
 msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
 msgstr "Crie uma área de trabalho direto de um ticket do Linear. O agente assume e volta com um PR."
 
+msgid "Start agent"
+msgstr "Iniciar agente"
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Inicie um agente ou um terminal para começar a trabalhar nesta área de trabalho."
 
@@ -13936,6 +14011,9 @@ msgstr "Etapa {step}: {name}"
 
 msgid "Still can't reach the host."
 msgstr "O host continua inacessível."
+
+msgid "Still trying. If it keeps failing, remove it and create a new one."
+msgstr "Ainda tentando. Se continuar falhando, remova e crie outra."
 
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Ainda trabalhando — repositórios grandes podem levar alguns minutos. Você pode sair; a área de trabalho aparece no Início quando ficar pronta."
@@ -14129,8 +14207,8 @@ msgstr "O Superset está construindo software que se aprimora sozinho. Isso come
 msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
 msgstr "O Superset está construindo software que se aprimora sozinho. Isso começa entregando a quem desenvolve as melhores ferramentas, que se adaptam às suas necessidades com o tempo. Somos 3 ex-CTOs da YC construindo uma ferramenta que amamos."
 
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
-msgstr "O Superset é feito por um time em San Francisco, Califórnia. Para suporte do produto ou dúvidas sobre a conta, escreva para <0>{supportEmail}</0> e respondemos em até um dia útil. Para parcerias, imprensa, enterprise ou assuntos para o time fundador, escreva para <1>{foundersEmail}</1>."
+msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "O Superset é feito por um time em San Francisco, Califórnia. Para suporte do produto ou dúvidas sobre a conta, escreva para <0>{supportEmail}</0> e respondemos em até um dia útil. Para parcerias, imprensa, enterprise ou qualquer outro assunto, escreva para <1>{teamEmail}</1>."
 
 msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
 msgstr "O Superset é desenvolvido no Superset, então somos nossos próprios usuários número um: você recebe para facilitar a própria vida. Se você sempre quis criar um produto que adora usar, venha construí-lo com a gente."
@@ -14622,6 +14700,9 @@ msgstr "O melhor agente vai mudar.<0/>Seu fluxo de trabalho, não."
 msgid "The Codex sign-in"
 msgstr "O login do Codex"
 
+msgid "The config repository must be one of the environment's repositories"
+msgstr "O repositório de configuração deve ser um dos repositórios do ambiente"
+
 msgid "The connection timed out"
 msgstr "O tempo de conexão esgotou"
 
@@ -14813,6 +14894,9 @@ msgstr "A branch remota divergiu. Faça pull antes de continuar."
 msgid "The renderer crashed during startup. Please check logs for details."
 msgstr "O renderer travou durante a inicialização. Verifique os logs para mais detalhes."
 
+msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
+msgstr "Os repositórios que uma área de trabalho na nuvem faz checkout, e de qual deles o .superset/config.json é aplicado. A área de trabalho abre no local da configuração, ou no primeiro repositório por nome."
+
 msgid "The repository folder itself is kept."
 msgstr "A pasta do repositório em si é mantida."
 
@@ -14988,6 +15072,18 @@ msgstr "Este dispositivo não está conectado ao relay do Superset, então as ex
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Este diretório não existe. O script de terminal vai usar a raiz da área de trabalho."
+
+msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+msgstr "Este e-mail já está registrado com outro método de login, e o provedor não o confirmou como verificado. Entre com o método que você usou antes."
+
+msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
+msgstr "Este ambiente não tem repositórios. Crie um ambiente com repositórios em Configurações e inicie a área de trabalho a partir dele"
+
+msgid "This environment was promoted from a workspace, so its repositories are fixed. Promote a workspace again to change them."
+msgstr "Este ambiente foi promovido a partir de uma área de trabalho, então seus repositórios são fixos. Promova uma área de trabalho novamente para alterá-los."
+
+msgid "This environment's repositories are fixed; promote a workspace again to change them"
+msgstr "Os repositórios deste ambiente são fixos; promova uma área de trabalho novamente para alterá-los"
 
 msgid "this file"
 msgstr "este arquivo"
@@ -15634,6 +15730,9 @@ msgstr "Desconhecida"
 msgctxt "person"
 msgid "Unknown"
 msgstr "Desconhecido"
+
+msgid "Unknown author"
+msgstr "Autor desconhecido"
 
 msgid "Unknown device"
 msgstr "Dispositivo desconhecido"
@@ -16745,6 +16844,9 @@ msgstr "Seu código fica local por padrão, com controle explícito sobre os ser
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Seu download começa automaticamente. Se não começou, baixe aqui."
 
+msgid "Your GitHub account cannot reach a repository in this environment"
+msgstr "Sua conta do GitHub não consegue acessar um repositório deste ambiente"
+
 msgid "Your GitHub link comes from the account you signed in with, so it shows as verified and cannot be edited here."
 msgstr "Seu link do GitHub vem da conta com que você entrou, por isso aparece como verificado e não pode ser editado aqui."
 
@@ -16756,6 +16858,9 @@ msgstr "Seu nome"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "Seu nome <0>(se usarmos seu prompt, damos os créditos no changelog)</0>"
+
+msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
+msgstr "Suas próprias contas. As integrações da sua organização permitem que o Superset acesse as ferramentas dela; conectar as suas faz o trabalho que o Superset faz por você aparecer em seu nome."
 
 msgid "Your rank"
 msgstr "Sua posição"

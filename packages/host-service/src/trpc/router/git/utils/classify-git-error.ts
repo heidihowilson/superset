@@ -38,6 +38,13 @@ const XCODE_SELECT_NO_TOOLS_PATTERN =
 // off a hook that reaches some other tool through the same stub.
 const XCODE_SELECT_GIT_NOT_LOCATED_PATTERN =
 	/^xcode-select: Failed to locate 'git', requesting installation of command line developer tools\.$/im;
+// The same stub after an Xcode update whose license nobody has accepted yet:
+// it refuses to run git with this sentence and nothing else, and every git
+// command fails the same way until the license is agreed to. The sentence
+// names no tool, so a hook reaching any shimmed tool prints the same line;
+// anchoring the whole message keeps this to the case where git never ran.
+const XCODE_LICENSE_NOT_ACCEPTED_PATTERN =
+	/^You have not agreed to the Xcode license agreements\. Please run 'sudo xcodebuild -license' from within a Terminal window to review and agree to the Xcode and Apple SDKs license\.\n?$/;
 // A content filter's helper program is not installed on this machine. Git runs
 // `filter.<name>.process`/`.clean` through the shell with the configured
 // command as the shell's $0, so an absent helper fails as
@@ -134,7 +141,8 @@ export function rethrowEnvironmentalGitError(error: unknown): void {
 	}
 	if (
 		XCODE_SELECT_NO_TOOLS_PATTERN.test(error.message) ||
-		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message)
+		XCODE_SELECT_GIT_NOT_LOCATED_PATTERN.test(error.message) ||
+		XCODE_LICENSE_NOT_ACCEPTED_PATTERN.test(error.message)
 	) {
 		throw new TRPCError({
 			code: "PRECONDITION_FAILED",

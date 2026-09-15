@@ -292,6 +292,7 @@ msgid "{0} · behind"
 msgstr "{0} · cũ"
 
 #. placeholder {0}: creator.name
+#. placeholder {0}: option.name
 msgid "{0} (you)"
 msgstr "{0} (bạn)"
 
@@ -950,6 +951,10 @@ msgstr "{worktreeCount, plural, one {Thao tác này sẽ gỡ dự án và # wor
 msgid "{years}y ago"
 msgstr "{years} năm trước"
 
+#. placeholder {0}: connection.login
+msgid "@{0} · cloud workspaces commit, push and open pull requests as you"
+msgstr "@{0} · workspace cloud commit, push và mở pull request dưới tên bạn"
+
 msgid "@superset"
 msgstr "@superset"
 
@@ -1247,6 +1252,9 @@ msgstr "Pull request luôn có worktree riêng"
 
 msgid "A rebuilt chat surface for driving agents: richer tool output, smoother steering, faster everything."
 msgstr "Giao diện chat được dựng lại để điều khiển agent: output tool phong phú hơn, lái mượt hơn, mọi thứ nhanh hơn."
+
+msgid "A repository is not connected to this organization, or the repositories come from different GitHub installations"
+msgstr "Một repository chưa được kết nối với tổ chức này, hoặc các repository đến từ những cài đặt GitHub khác nhau"
 
 msgid "A run for this automation is already in progress."
 msgstr "Một lần chạy của tự động hóa này đang diễn ra."
@@ -2088,6 +2096,9 @@ msgstr "apps/web/src/app/design/components/LayoutSection/LayoutSection.tsx"
 
 msgid "Archive"
 msgstr "Lưu trữ"
+
+msgid "Archive environment"
+msgstr "Lưu trữ environment"
 
 msgid "Archived"
 msgstr "Đã lưu trữ"
@@ -3646,6 +3657,9 @@ msgstr "Bố cục form ghép được — dùng chung với @superset/ui/form c
 msgid "Computing in Stripe — up to a minute on first load"
 msgstr "Đang tính trong Stripe — có thể mất đến một phút ở lần tải đầu"
 
+msgid "Config location"
+msgstr "Vị trí cấu hình"
+
 msgid "Configure"
 msgstr "Cấu hình"
 
@@ -3787,6 +3801,9 @@ msgstr "Đã kết nối. Việc đăng nhập bị hủy nên các trigger theo
 
 msgid "Connecting"
 msgstr "Đang kết nối"
+
+msgid "Connecting GitHub is not configured on this server"
+msgstr "Máy chủ này chưa cấu hình kết nối GitHub"
 
 msgid "Connecting to the desktop…"
 msgstr "Đang kết nối tới màn hình nền…"
@@ -4113,6 +4130,9 @@ msgstr "Không thể đổi phiên bản được chia sẻ"
 msgid "Could not change who can see this page"
 msgstr "Không thể đổi ai được xem trang này"
 
+msgid "Could not check your plan. Check your connection and try again."
+msgstr "Không thể kiểm tra gói của bạn. Hãy kiểm tra kết nối và thử lại."
+
 msgid "Could not clear browsing data"
 msgstr "Không thể xóa dữ liệu duyệt web"
 
@@ -4230,6 +4250,9 @@ msgstr "Không đọc được tài khoản Google. Vui lòng thử lại."
 
 msgid "Could not record cloud workspace"
 msgstr "Không thể ghi nhận workspace trên cloud"
+
+msgid "Could not record environment"
+msgstr "Không thể lưu environment"
 
 msgid "Could not rename the session"
 msgstr "Không thể đổi tên phiên"
@@ -4364,6 +4387,9 @@ msgstr "Không thể đăng trả lời"
 #. placeholder {1}: first.message
 msgid "Couldn't reach cloud for {0}: {1}"
 msgstr "Không kết nối được tới cloud cho {0}: {1}"
+
+msgid "Couldn't reach workspace"
+msgstr "Không kết nối được workspace"
 
 msgid "Couldn't read this terminal's context."
 msgstr "Không đọc được ngữ cảnh của terminal này."
@@ -5541,6 +5567,9 @@ msgstr "Sửa bình luận"
 msgid "Edit description"
 msgstr "Sửa mô tả"
 
+msgid "Edit environment"
+msgstr "Chỉnh sửa environment"
+
 msgid "Edit name"
 msgstr "Sửa tên"
 
@@ -5689,6 +5718,9 @@ msgstr "Môi trường"
 
 msgid "Environment created"
 msgstr "Đã tạo environment"
+
+msgid "Environment saved"
+msgstr "Đã lưu environment"
 
 msgid "Environment setup, flaky tests, and credential plumbing, the boring failure modes that killed unattended runs in 2025, are mostly engineered away rather than modeled away."
 msgstr "Thiết lập môi trường, test chập chờn và việc đấu nối thông tin đăng nhập, những kiểu hỏng buồn tẻ đã giết các lần chạy không giám sát năm 2025, phần lớn được xử lý bằng kỹ thuật chứ không phải bằng mô hình."
@@ -6474,6 +6506,9 @@ msgstr "Lọc agent..."
 msgid "Filter by @{normalizedSearch}"
 msgstr "Lọc theo @{normalizedSearch}"
 
+msgid "Filter by author: {label}"
+msgstr "Lọc theo tác giả: {label}"
+
 msgid "Filter by device"
 msgstr "Lọc theo thiết bị"
 
@@ -6893,6 +6928,9 @@ msgstr "Đã cài GitHub App thành công!"
 
 msgid "GitHub connected, but initial sync failed to start. Please try reconnecting."
 msgstr "Đã kết nối GitHub, nhưng lần đồng bộ đầu tiên không khởi động được. Vui lòng thử kết nối lại."
+
+msgid "GitHub disconnected"
+msgstr "Đã ngắt kết nối GitHub"
 
 msgid "GitHub installation not found"
 msgstr "Không tìm thấy bản cài đặt GitHub"
@@ -8776,8 +8814,8 @@ msgstr "Theo dõi, điều hướng và gỡ vướng cho agent ngay trên đi�
 msgid "Monitoring"
 msgstr "Giám sát"
 
-msgid "monorepo-warm"
-msgstr "monorepo-warm"
+msgid "monorepo"
+msgstr "monorepo"
 
 msgid "Monospace"
 msgstr "Monospace"
@@ -9533,6 +9571,9 @@ msgstr "Không tìm thấy pull request nào."
 msgid "No repositories found. Make sure your GitHub App has access to repositories."
 msgstr "Không tìm thấy repository nào. Hãy đảm bảo GitHub App của bạn có quyền truy cập repository."
 
+msgid "No repositories. Connect GitHub in Integrations, then refresh."
+msgstr "Không có repository. Hãy kết nối GitHub trong Tích hợp rồi làm mới."
+
 msgid "No results"
 msgstr "Không có kết quả"
 
@@ -9698,6 +9739,9 @@ msgstr "không thương hiệu"
 msgid "Non-brand clicks"
 msgstr "Lượt nhấp không thương hiệu"
 
+msgid "None"
+msgstr "Không có"
+
 msgid "none (session)"
 msgstr "không có (phiên)"
 
@@ -9716,6 +9760,9 @@ msgstr "Chưa xác thực. Vui lòng đăng nhập."
 msgid "Not authenticated. Provide a bearer JWT, x-api-key, or session."
 msgstr "Chưa xác thực. Hãy cung cấp bearer JWT, x-api-key hoặc session."
 
+msgid "Not available on this server"
+msgstr "Không khả dụng trên máy chủ này"
+
 msgid "Not bound · configure in Settings → Links"
 msgstr "Chưa gán · cấu hình trong Cài đặt → Liên kết"
 
@@ -9727,6 +9774,9 @@ msgstr "Chưa kết nối"
 
 msgid "Not Connected"
 msgstr "Chưa kết nối"
+
+msgid "Not connected · cloud workspaces push as your organization's GitHub App"
+msgstr "Chưa kết nối · workspace cloud push dưới danh nghĩa GitHub App của tổ chức bạn"
 
 msgid "Not connected: {unavailableReason}. Add a Google service account to the Search Console property and set GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
 msgstr "Chưa kết nối: {unavailableReason}. Thêm tài khoản dịch vụ Google vào thuộc tính Search Console và đặt GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT."
@@ -10426,6 +10476,9 @@ msgstr "Đang mở TestFlight…"
 msgid "Opening worktree..."
 msgstr "Đang mở worktree..."
 
+msgid "Opens a cloud workspace where an agent installs what the project needs and writes its .superset/config.json"
+msgstr "Mở một workspace cloud để agent cài đặt những gì dự án cần và ghi .superset/config.json của nó"
+
 msgid "Operator"
 msgstr "Người vận hành"
 
@@ -10522,9 +10575,6 @@ msgstr "Đã cập nhật URL tổ chức!"
 #. placeholder {0}: selectedOrg.name
 msgid "Organization: <0>{0}</0>"
 msgstr "Tổ chức: <0>{0}</0>"
-
-msgid "Organizations"
-msgstr "Tổ chức"
 
 msgid "Organizations with a second member vs single-member accounts; the line is teams per 1,000."
 msgstr "Tổ chức có thành viên thứ hai so với tài khoản một thành viên; đường biểu thị số nhóm trên 1.000."
@@ -11669,6 +11719,9 @@ msgstr "Làm mới số liệu"
 msgid "Refresh pull requests"
 msgstr "Làm mới pull request"
 
+msgid "Refresh repositories"
+msgstr "Làm mới repository"
+
 msgid "Refreshes when Claude Code next runs."
 msgstr "Làm mới khi Claude Code chạy lần tiếp theo."
 
@@ -11951,6 +12004,9 @@ msgstr "Repository"
 
 msgid "Repositories accessible through the GitHub App installation."
 msgstr "Các repository truy cập được qua bản cài đặt GitHub App."
+
+msgid "Repositories refreshed"
+msgstr "Đã làm mới repository"
 
 msgid "Repositories will be updated shortly."
 msgstr "Các repository sẽ được cập nhật trong giây lát."
@@ -12730,6 +12786,9 @@ msgstr "Tìm pull request..."
 msgid "Search pull requests…"
 msgstr "Tìm pull request…"
 
+msgid "Search repositories..."
+msgstr "Tìm repository..."
+
 msgid "Search sessions"
 msgstr "Tìm phiên"
 
@@ -12955,6 +13014,9 @@ msgstr "Chọn vị trí worktree của dự án"
 msgid "Select range..."
 msgstr "Chọn khoảng..."
 
+msgid "Select repositories"
+msgstr "Chọn repository"
+
 msgid "Select repository"
 msgstr "Chọn repository"
 
@@ -13121,6 +13183,10 @@ msgstr "Đặt lệnh chạy"
 
 msgid "Set up"
 msgstr "Thiết lập"
+
+#. placeholder {0}: name.trim()
+msgid "Set up {0}"
+msgstr "Thiết lập {0}"
 
 msgid "Set up project on {hostName}"
 msgstr "Thiết lập dự án trên {hostName}"
@@ -13459,6 +13525,9 @@ msgstr "Đăng nhập đã hết hạn — hãy chạy"
 msgid "Sign-in failed"
 msgstr "Đăng nhập thất bại"
 
+msgid "Sign-in failed ({reason}). Please try again."
+msgstr "Đăng nhập thất bại ({reason}). Vui lòng thử lại."
+
 msgid "Signed in as {accountLabel}"
 msgstr "Đã đăng nhập với {accountLabel}"
 
@@ -13548,6 +13617,9 @@ msgstr "Skill đi kèm plugin Superset và được tự động cập nhật tr
 
 msgid "Skip"
 msgstr "Bỏ qua"
+
+msgid "Skip & save"
+msgstr "Bỏ qua & lưu"
 
 msgid "Skip All"
 msgstr "Bỏ qua tất cả"
@@ -13841,6 +13913,9 @@ msgstr "Bắt đầu một phiên"
 msgid "Start a workspace straight from a Linear ticket. The agent picks it up and reports back with a PR."
 msgstr "Tạo workspace ngay từ một ticket Linear. Agent nhận việc và báo lại bằng một PR."
 
+msgid "Start agent"
+msgstr "Bắt đầu agent"
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Hãy khởi động một agent hoặc terminal để bắt đầu làm việc trong workspace này."
 
@@ -13936,6 +14011,9 @@ msgstr "Bước {step}: {name}"
 
 msgid "Still can't reach the host."
 msgstr "Vẫn không thể kết nối tới host."
+
+msgid "Still trying. If it keeps failing, remove it and create a new one."
+msgstr "Vẫn đang thử. Nếu tiếp tục lỗi, hãy gỡ nó và tạo cái mới."
 
 msgid "Still working — large repos can take a few minutes. You can leave; the workspace will appear on Home when it's ready."
 msgstr "Vẫn đang xử lý — repo lớn có thể mất vài phút. Bạn có thể rời đi; workspace sẽ xuất hiện ở Trang chủ khi sẵn sàng."
@@ -14129,8 +14207,8 @@ msgstr "Superset đang xây dựng phần mềm tự cải thiện. Nó bắt đ
 msgid "Superset is building self-improving software. It starts with giving engineers the best tools that adapt to their needs over time. We're 3 ex-YC CTOs building a tool that we love."
 msgstr "Superset đang xây dựng phần mềm tự cải thiện. Nó bắt đầu bằng việc trao cho kỹ sư những công cụ tốt nhất, biết thích nghi với nhu cầu của họ theo thời gian. Chúng tôi là 3 cựu CTO của YC đang xây một công cụ mà chính mình yêu thích."
 
-msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything for the founding team, write to <1>{foundersEmail}</1>."
-msgstr "Superset được xây dựng bởi một đội ngũ tại San Francisco, California. Với hỗ trợ sản phẩm hoặc câu hỏi về tài khoản, hãy gửi email tới <0>{supportEmail}</0> và chúng tôi sẽ phản hồi trong vòng một ngày làm việc. Với hợp tác, báo chí, doanh nghiệp hoặc bất cứ điều gì dành cho đội ngũ sáng lập, hãy viết tới <1>{foundersEmail}</1>."
+msgid "Superset is built by a team based in San Francisco, California. For product support or account questions, email <0>{supportEmail}</0> and we'll get back to you within one business day. For partnerships, press, enterprise, or anything else, write to <1>{teamEmail}</1>."
+msgstr "Superset được xây dựng bởi một đội ngũ tại San Francisco, California. Với hỗ trợ sản phẩm hoặc câu hỏi về tài khoản, hãy gửi email tới <0>{supportEmail}</0> và chúng tôi sẽ phản hồi trong vòng một ngày làm việc. Với hợp tác, báo chí, doanh nghiệp hoặc bất cứ điều gì khác, hãy viết tới <1>{teamEmail}</1>."
 
 msgid "Superset is built in Superset, so we're our own #1 users—you get paid to make your own life easier. If you've ever wanted to build a product you love to use, come build it with us."
 msgstr "Superset được xây dựng ngay trong Superset, nên chúng tôi chính là những người dùng hàng đầu—bạn được trả lương để giúp công việc của mình dễ dàng hơn. Nếu bạn từng muốn xây dựng một sản phẩm mà mình yêu thích sử dụng, hãy cùng chúng tôi tạo ra nó."
@@ -14622,6 +14700,9 @@ msgstr "Agent tốt nhất sẽ thay đổi.<0/>Quy trình của bạn thì khô
 msgid "The Codex sign-in"
 msgstr "Lần đăng nhập Codex"
 
+msgid "The config repository must be one of the environment's repositories"
+msgstr "Repository cấu hình phải là một trong các repository của environment"
+
 msgid "The connection timed out"
 msgstr "Kết nối đã quá thời gian"
 
@@ -14813,6 +14894,9 @@ msgstr "Nhánh remote đã rẽ nhánh khác. Hãy pull trước khi tiếp tụ
 msgid "The renderer crashed during startup. Please check logs for details."
 msgstr "Renderer đã crash khi khởi động. Vui lòng xem log để biết chi tiết."
 
+msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
+msgstr "Các repository mà workspace cloud checkout, và .superset/config.json của repository nào được áp dụng. Workspace mở tại vị trí cấu hình, hoặc tại repository đầu tiên theo tên."
+
 msgid "The repository folder itself is kept."
 msgstr "Thư mục kho lưu trữ vẫn được giữ nguyên."
 
@@ -14988,6 +15072,18 @@ msgstr "Thiết bị này chưa kết nối tới relay của Superset nên các
 
 msgid "This directory does not exist. The terminal script will fall back to the workspace root."
 msgstr "Thư mục này không tồn tại. Script terminal sẽ quay về thư mục gốc của workspace."
+
+msgid "This email is already registered with another sign-in method, and the provider did not confirm it as verified. Sign in with the method you used before."
+msgstr "Email này đã được đăng ký bằng phương thức đăng nhập khác và nhà cung cấp chưa xác nhận email đã được xác minh. Hãy đăng nhập bằng phương thức bạn đã dùng trước đây."
+
+msgid "This environment has no repositories. Create an environment with repositories in Settings, then start the workspace from it"
+msgstr "Environment này không có repository nào. Hãy tạo một environment có repository trong Settings, rồi khởi động workspace từ environment đó"
+
+msgid "This environment was promoted from a workspace, so its repositories are fixed. Promote a workspace again to change them."
+msgstr "Environment này được promote từ một workspace nên các repository của nó đã cố định. Hãy promote lại một workspace để thay đổi."
+
+msgid "This environment's repositories are fixed; promote a workspace again to change them"
+msgstr "Các repository của environment này đã cố định; hãy promote lại một workspace để thay đổi"
 
 msgid "this file"
 msgstr "tệp này"
@@ -15634,6 +15730,9 @@ msgstr "Không rõ"
 msgctxt "person"
 msgid "Unknown"
 msgstr "Không rõ"
+
+msgid "Unknown author"
+msgstr "Tác giả không xác định"
 
 msgid "Unknown device"
 msgstr "Thiết bị không rõ"
@@ -16745,6 +16844,9 @@ msgstr "Code của bạn mặc định ở lại cục bộ, với quyền kiể
 msgid "Your download starts automatically. If it didn't, grab it here."
 msgstr "Quá trình tải xuống sẽ tự động bắt đầu. Nếu không, hãy tải tại đây."
 
+msgid "Your GitHub account cannot reach a repository in this environment"
+msgstr "Tài khoản GitHub của bạn không truy cập được một repository trong environment này"
+
 msgid "Your GitHub link comes from the account you signed in with, so it shows as verified and cannot be edited here."
 msgstr "Liên kết GitHub của bạn lấy từ tài khoản bạn đã đăng nhập, nên nó hiển thị là đã xác minh và không sửa được ở đây."
 
@@ -16756,6 +16858,9 @@ msgstr "Tên của bạn"
 
 msgid "Your name <0>(if we use your prompt, we'll credit you in the changelog)</0>"
 msgstr "Tên của bạn <0>(nếu dùng prompt của bạn, chúng tôi sẽ ghi công trong changelog)</0>"
+
+msgid "Your own accounts. Your organization's integrations let Superset reach its tools; connecting yours makes the work Superset does for you show up as you."
+msgstr "Tài khoản của riêng bạn. Các tích hợp của tổ chức giúp Superset truy cập công cụ của tổ chức; kết nối tài khoản của bạn giúp công việc Superset làm cho bạn hiển thị dưới tên bạn."
 
 msgid "Your rank"
 msgstr "Thứ hạng của bạn"

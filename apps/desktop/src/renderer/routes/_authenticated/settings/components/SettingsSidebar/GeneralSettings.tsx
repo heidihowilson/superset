@@ -1,8 +1,10 @@
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { i18n } from "@superset/i18n";
+import { FEATURE_FLAGS } from "@superset/shared/constants";
 import { cn } from "@superset/ui/utils";
 import { Link, useMatchRoute } from "@tanstack/react-router";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useMemo } from "react";
 import {
 	HiOutlineBeaker,
@@ -26,7 +28,7 @@ import {
 	HiOutlineUser,
 	HiOutlineUserGroup,
 } from "react-icons/hi2";
-import { LuGitBranch, LuKeyboard, LuKeyRound } from "react-icons/lu";
+import { LuGitBranch, LuKeyboard, LuKeyRound, LuLink } from "react-icons/lu";
 import { useHostsNeedingUpdateCount } from "renderer/hooks/host-version/useHostsNeedingUpdate";
 import { useIsV2CloudEnabled } from "renderer/hooks/useIsV2CloudEnabled";
 import { electronTrpc } from "renderer/lib/electron-trpc";
@@ -40,6 +42,7 @@ interface GeneralSettingsProps {
 
 type SettingsRoute =
 	| "/settings/account"
+	| "/settings/connections"
 	| "/settings/organization"
 	| "/settings/teams"
 	| "/settings/appearance"
@@ -91,6 +94,14 @@ const SECTION_GROUPS: SectionGroup[] = [
 					message: "Account",
 				}),
 				icon: <HiOutlineUser className="h-4 w-4" />,
+			},
+			{
+				id: "/settings/connections",
+				section: "connections",
+				label: msg({
+					message: "Connections",
+				}),
+				icon: <LuLink className="h-4 w-4" />,
 			},
 			{
 				id: "/settings/appearance",
@@ -322,9 +333,12 @@ export function GeneralSettings({ matchCounts }: GeneralSettingsProps) {
 	const { data: platform } = electronTrpc.window.getPlatform.useQuery();
 	const isMac = platform === "darwin";
 	const isV2CloudEnabled = useIsV2CloudEnabled();
+	const cloudWorkspacesEnabled =
+		useFeatureFlagEnabled(FEATURE_FLAGS.CLOUD_WORKSPACES) === true;
 	const allowedSections = useMemo(
-		() => getAllowedSectionsForVariant(isV2CloudEnabled),
-		[isV2CloudEnabled],
+		() =>
+			getAllowedSectionsForVariant(isV2CloudEnabled, cloudWorkspacesEnabled),
+		[isV2CloudEnabled, cloudWorkspacesEnabled],
 	);
 
 	return (
