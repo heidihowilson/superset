@@ -28,7 +28,6 @@ refuse() { stamp "boot.refused $*"; echo "superset-boot: $*" >&2; exit 1; }
 as_user() { runuser -u "$SUPERSET_USER" -- "$@"; }
 
 mkdir -p "$SUPERSET_LOG_DIR" "$SUPERSET_STATE_DIR"
-stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"
 
 # --- identity: the file the control plane writes before every boot.
 [ -f "$SUPERSET_CONF" ] || refuse "no ${SUPERSET_CONF}; the control plane writes it before boot"
@@ -43,9 +42,10 @@ set +a
 # A wake that races a wake, or a re-delivered provision, must not stack a
 # second host-service on a live one.
 if [ -f "${SUPERSET_RUN_DIR}/host-service.pid" ] && kill -0 "$(cat "${SUPERSET_RUN_DIR}/host-service.pid")" 2>/dev/null; then
-	stamp "boot.skipped host-service already running"
 	exit 0
 fi
+
+stamp "boot.start pid=$$ bundle=$(cat "${SUPERSET_BUNDLE_ROOT}/current.bundle-hash" 2>/dev/null | cut -c1-12)"
 
 # --- per-boot state: a restored disk carries the previous session's pids
 # and ready flags, which describe processes that no longer exist.
@@ -114,6 +114,13 @@ fi
 # The workspace files belong to the user; a golden built as root left them root's.
 [ -d "$SUPERSET_WORKSPACE_DIR" ] && [ "$(stat -c %U "$SUPERSET_WORKSPACE_DIR")" != "$SUPERSET_USER" ] &&
 	chown -R "$SUPERSET_USER:$SUPERSET_USER" "$SUPERSET_WORKSPACE_DIR" && stamp "workspace.chowned to ${SUPERSET_USER}"
+
+# The firewall terminates TLS for the hosts it injects credentials into and
+# mounts its CA in the system bundle. curl, git and bun read that bundle; node
+# does not, so without this every node fetch to GitHub fails the certificate
+# check — including host-service's own pull-request lookups.
+: "${NODE_EXTRA_CA_CERTS:=/etc/ssl/certs/ca-certificates.crt}"
+export NODE_EXTRA_CA_CERTS
 
 host_env=(
 	"HOME=${SUPERSET_HOME_DIR}" "USER=${SUPERSET_USER}" "LOGNAME=${SUPERSET_USER}"

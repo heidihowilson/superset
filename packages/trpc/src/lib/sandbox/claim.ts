@@ -107,7 +107,8 @@ export async function buildSandboxClaim(args: {
 			: {}),
 		...(cloudAgentLaunchToEnv(args.launch) as Partial<SandboxIdentity>),
 	};
-	const { networkPolicy, managedEnv } = deriveSandboxCredentials({
+	const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+		workspaceId: args.row.id,
 		environmentEnv: environment.envs,
 		userAgentEnv,
 		githubToken: token,

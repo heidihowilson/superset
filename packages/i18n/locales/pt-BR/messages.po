@@ -660,6 +660,10 @@ msgstr "há {distance}"
 msgid "{duration, plural, one {Thought for # second} other {Thought for # seconds}}"
 msgstr "{duration, plural, one {Pensou por # segundo} other {Pensou por # segundos}}"
 
+#. js-lingui-explicit-id
+msgid "serverError.page.entryPathHeldByAnotherOrganization"
+msgstr "{entryPath} neste workspace já está publicado como página em outra organização. Mova o arquivo ou publique com o id daquela página."
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {# falhou} other {# falharam}}"
 
@@ -1048,9 +1052,6 @@ msgstr "~{stars} projetadas esta semana"
 msgid "~{totalSeconds}s typical"
 msgstr "~{totalSeconds}s em média"
 
-msgid "~{TYPICAL_SECONDS}s typical"
-msgstr "~{TYPICAL_SECONDS}s em média"
-
 msgid "~/agent $"
 msgstr "~/agent $"
 
@@ -1201,6 +1202,10 @@ msgstr "Um navegador embutido melhor: veja suas mudanças e clique em qualquer e
 
 msgid "A better Superset is ready"
 msgstr "Uma versão melhor do Superset está pronta"
+
+#. js-lingui-explicit-id
+msgid "serverError.common.cloudWorkspaceCannotCallThis"
+msgstr "Um workspace na nuvem não pode chamar {path}. Faça isso em um cliente no qual você esteja conectado."
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "Já há uma exclusão em andamento para {workspaceName}."
@@ -2003,6 +2008,9 @@ msgstr "Qualquer pessoa"
 msgid "Anyone in your organization"
 msgstr "Qualquer pessoa da sua organização"
 
+msgid "Anyone with the link"
+msgstr "Qualquer pessoa com o link"
+
 msgid "anything"
 msgstr "qualquer coisa"
 
@@ -2409,6 +2417,9 @@ msgstr "Voltar para o changelog"
 
 msgid "Back to checklist"
 msgstr "Voltar para a lista"
+
+msgid "Back to current"
+msgstr "Voltar para a atual"
 
 msgid "Back to GitHub issues"
 msgstr "Voltar para as issues do GitHub"
@@ -4256,6 +4267,9 @@ msgstr "Não foi possível salvar o ambiente"
 
 msgid "Could not rename the session"
 msgstr "Não foi possível renomear a sessão"
+
+msgid "Could not rename this page"
+msgstr "Não foi possível renomear esta página"
 
 msgid "Could not reopen"
 msgstr "Não foi possível reabrir"
@@ -10688,6 +10702,9 @@ msgstr "Página não encontrada"
 msgid "Page Not Found"
 msgstr "Página não encontrada"
 
+msgid "Page title"
+msgstr "Título da página"
+
 msgid "Page views"
 msgstr "Visualizações de página"
 
@@ -11909,6 +11926,9 @@ msgstr "Renomear grupo"
 
 msgid "Rename host"
 msgstr "Renomear host"
+
+msgid "Rename page"
+msgstr "Renomear página"
 
 msgid "Rename session"
 msgstr "Renomear sessão"
@@ -13246,6 +13266,9 @@ msgstr "Compartilhe designs e relatórios. Deixe seu agente cuidar do feedback."
 msgid "Share page"
 msgstr "Compartilhar página"
 
+msgid "Share settings"
+msgstr "Configurações de compartilhamento"
+
 msgid "Share this page"
 msgstr "Compartilhar esta página"
 
@@ -13266,6 +13289,9 @@ msgstr "Arquivos JSON de tema compartilhados que você pode importar no Superset
 
 msgid "Shared version"
 msgstr "Versão compartilhada"
+
+msgid "Shared with everyone"
+msgstr "Compartilhada com todos"
 
 msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
 msgstr "Compartilha o checkout do projeto (arquivos, índice do git e branch) com suas outras áreas de trabalho locais"
@@ -13474,6 +13500,9 @@ msgstr "Entre para continuar no Superset"
 
 msgid "Sign in to get started"
 msgstr "Entre para começar"
+
+msgid "Sign in to view this page"
+msgstr "Entre para ver esta página"
 
 msgid "Sign in with email"
 msgstr "Entrar com e-mail"
@@ -13702,6 +13731,10 @@ msgstr "Alguns temas foram ignorados"
 
 msgid "Some triggers need additional configuration"
 msgstr "Alguns gatilhos precisam de configuração adicional"
+
+#. js-lingui-explicit-id
+msgid "serverError.page.entryPathHeldByColleague"
+msgstr "Outra pessoa já publicou {entryPath} deste workspace. Publique com um id de página explícito para adicionar uma versão à página dela, ou mova o arquivo."
 
 msgid "someone external"
 msgstr "alguém externo"
@@ -14961,6 +14994,9 @@ msgstr "o host de destino"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "O convite da equipe expirou ou não existe. Peça um novo link a quem é dono da equipe ou confira se a URL está correta."
 
+msgid "The title shows everywhere this page is listed and in its link preview."
+msgstr "O título aparece em todos os lugares onde esta página é listada e na prévia do link."
+
 msgid "The web agents UI is a read-only preview for now."
 msgstr "A interface web de agentes é uma prévia somente leitura por enquanto."
 
@@ -15159,6 +15195,10 @@ msgstr "Esta página está sendo publicada de outro lugar — tente de novo"
 
 msgid "This page is in another organization"
 msgstr "Esta página está em outra organização"
+
+#. placeholder {0}: url.replace(/^https?:\/\//, "")
+msgid "This page is live at <0>{0}</0>"
+msgstr "Esta página está no ar em <0>{0}</0>"
 
 msgid "This page isn't here"
 msgstr "Esta página não está aqui"
@@ -16762,6 +16802,9 @@ msgstr "Você é o único proprietário de uma organização que tem outros memb
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "You are unranked until {0} days carry usage. Scoring starts once the board can see a full picture."
 msgstr "Você fica sem classificação até que {0} dias tenham atividade. A pontuação começa quando o quadro enxerga o quadro completo."
+
+msgid "You are viewing version {version}, read-only"
+msgstr "Você está vendo a versão {version}, somente leitura"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "Você pode anexar até {MAX_ATTACHMENTS} arquivos"

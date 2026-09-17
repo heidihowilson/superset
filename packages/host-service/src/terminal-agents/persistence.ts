@@ -151,6 +151,27 @@ function resumeCandidatePredicate(workspaceId: string, terminalId: string) {
 	);
 }
 
+/**
+ * Every ended binding that can still be resumed, newest first.
+ */
+export function listResumeCandidateBindings(
+	db: HostDb,
+): TerminalAgentBinding[] {
+	return db
+		.select(bindingColumns)
+		.from(terminalAgentBindings)
+		.where(
+			and(
+				isNotNull(terminalAgentBindings.endedAt),
+				eq(terminalAgentBindings.endReason, "terminal-exited"),
+				isNotNull(terminalAgentBindings.agentSessionId),
+			),
+		)
+		.orderBy(desc(terminalAgentBindings.endedAt))
+		.all()
+		.map(rowToBinding);
+}
+
 /** The ended binding a dead terminal can be resumed from, if any. */
 export function findResumeCandidateBinding(
 	db: HostDb,

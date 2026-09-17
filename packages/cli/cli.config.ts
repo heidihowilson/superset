@@ -11,15 +11,6 @@ export default defineConfig({
 	outfile: "./dist/superset",
 	plugins: [linguiMacroPlugin],
 	define: {
-		"process.env.RELAY_URL": JSON.stringify(
-			process.env.RELAY_URL ?? "https://relay.superset.sh",
-		),
-		"process.env.SUPERSET_API_URL": JSON.stringify(
-			process.env.SUPERSET_API_URL ?? "https://api.superset.sh",
-		),
-		"process.env.SUPERSET_WEB_URL": JSON.stringify(
-			process.env.SUPERSET_WEB_URL ?? "https://app.superset.sh",
-		),
 		"process.env.SUPERSET_VERSION": JSON.stringify(VERSION),
 		"process.env.SUPERSET_CLI_CHANNEL": JSON.stringify(
 			process.env.SUPERSET_CLI_CHANNEL ?? "standalone",

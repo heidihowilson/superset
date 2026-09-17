@@ -8,7 +8,11 @@ import { z } from "zod";
 import type { HostDb } from "../../../db";
 import { workspaces } from "../../../db/schema";
 import type { EventBus } from "../../../events";
-import { hasHarnessSession } from "../../../terminal/harness-transcript";
+import {
+	hasHarnessSession,
+	readHarnessTranscript,
+} from "../../../terminal/harness-transcript";
+import { markStaleActiveRows } from "../../../terminal/reaper/reaper";
 import {
 	createTerminalSessionInternal,
 	disposeSessionAndWait,
@@ -23,10 +27,12 @@ import {
 	findResumeCandidateBinding,
 	findResumedSuccessorTerminalId,
 	getTerminalAgentBinding,
+	listResumeCandidateBindings,
 	markResumeCandidateResumedInto,
 	seedEndedTerminalAgentBinding,
 	unclaimResumeCandidateBinding,
 } from "../../../terminal-agents/persistence";
+import type { HostServiceContext } from "../../../types";
 import { protectedProcedure, router } from "../../index";
 import {
 	type AgentRunResult,
@@ -73,6 +79,13 @@ export interface ResumeSessionDeps {
 }
 
 const resumeInflight = new Map<string, Promise<ResumeResult>>();
+/** A box holds a handful of agents; a runaway list is a bug, not a workload. */
+const MAX_BOOT_RESUMES = 8;
+/**
+ * An agent the person let die last week must not come back because its box
+ * was reopened; one that died with the box was ended by the sweep moments ago.
+ */
+const RESUMABLE_WINDOW_MS = 5 * 60_000;
 
 /**
  * Whether the harness behind `binding` still holds its conversation, read
@@ -234,6 +247,58 @@ export function listAccountRestartCandidates(
 		out.push({ binding, agentLabel: config.label });
 	}
 	return out;
+}
+
+/** The one place the resume path's dependencies are assembled. */
+export function resumeSessionDepsFor(
+	ctx: HostServiceContext,
+): ResumeSessionDeps {
+	return {
+		db: ctx.db,
+		terminalAgentStore: ctx.terminalAgentStore,
+		runAgent: (runInput) => runAgentInWorkspace(ctx, runInput),
+		disposeSession: (terminalId) => disposeSessionAndWait(terminalId, ctx.db),
+		hasSession: (binding) => bindingHasHarnessSession(ctx.db, binding),
+		eventBus: ctx.eventBus,
+	};
+}
+
+/**
+ * Resume every agent whose terminal died without its own SessionEnd. Called
+ * from startup, so it must run after `sweepDefunct` has marked those bindings
+ * ended. Sandbox-only and capped: on a laptop the same sweep spans every
+ * worktree that machine has ever had.
+ */
+export async function resumeCrashedAgentSessions(
+	deps: ResumeSessionDeps,
+	limit = MAX_BOOT_RESUMES,
+): Promise<{ resumedTerminalIds: string[] }> {
+	// A stop leaves the terminal rows saying "active": nothing on the box was
+	// alive to write otherwise. `sweepDefunct` only backfills bindings whose
+	// row already says exited, so without this the list is empty on the boot
+	// that matters and the agents come back one boot late.
+	markStaleActiveRows(deps.db, [], new Map());
+
+	const resumedTerminalIds: string[] = [];
+	const since = Date.now() - RESUMABLE_WINDOW_MS;
+	const candidates = listResumeCandidateBindings(deps.db)
+		.filter((binding) => (binding.endedAt ?? 0) >= since)
+		.slice(0, limit);
+	for (const binding of candidates) {
+		try {
+			const result = await resumeTerminalAgentSession(deps, {
+				workspaceId: binding.workspaceId,
+				terminalId: binding.terminalId,
+			});
+			if (result.resumed) resumedTerminalIds.push(result.terminalId);
+		} catch (error) {
+			console.warn("[terminal-agents] boot resume failed", {
+				terminalId: binding.terminalId,
+				error,
+			});
+		}
+	}
+	return { resumedTerminalIds };
 }
 
 /**
@@ -413,6 +478,38 @@ export const terminalAgentsRouter = router({
 			};
 		}),
 
+	/**
+	 * The harness's own transcript for a bound session. A terminal snapshot is
+	 * the visible screen, and an agent that redraws a full-screen interface
+	 * keeps no scrollback, so this is the only way to read what it said before
+	 * the last frame.
+	 */
+	transcript: protectedProcedure
+		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
+		.query(({ ctx, input }) => {
+			const binding = getTerminalAgentBinding(ctx.db, input.terminalId);
+			if (!binding || binding.workspaceId !== input.workspaceId) return null;
+			const worktreePath = ctx.db
+				.select({ path: workspaces.worktreePath })
+				.from(workspaces)
+				.where(eq(workspaces.id, input.workspaceId))
+				.get()?.path;
+			const config = resolveHostAgentConfig(
+				ctx.db,
+				binding.definitionId ?? binding.agentId,
+			);
+			return readHarnessTranscript({
+				agentId: binding.agentId,
+				agentSessionId: binding.agentSessionId,
+				worktreePath,
+				// A pinned provider account keeps its transcript under its own
+				// config directory.
+				env: config
+					? resolveDefaultAccountEnv(ctx.db, config.presetId)
+					: undefined,
+			});
+		}),
+
 	/** See {@link findResumedSuccessor}. */
 	resumedSuccessor: protectedProcedure
 		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
@@ -424,18 +521,7 @@ export const terminalAgentsRouter = router({
 	resume: protectedProcedure
 		.input(z.object({ workspaceId: z.string(), terminalId: z.string() }))
 		.mutation(({ ctx, input }) =>
-			resumeTerminalAgentSession(
-				{
-					db: ctx.db,
-					terminalAgentStore: ctx.terminalAgentStore,
-					runAgent: (runInput) => runAgentInWorkspace(ctx, runInput),
-					disposeSession: (terminalId) =>
-						disposeSessionAndWait(terminalId, ctx.db),
-					hasSession: (binding) => bindingHasHarnessSession(ctx.db, binding),
-					eventBus: ctx.eventBus,
-				},
-				input,
-			),
+			resumeTerminalAgentSession(resumeSessionDepsFor(ctx), input),
 		),
 
 	/**

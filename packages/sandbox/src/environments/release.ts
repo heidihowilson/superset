@@ -275,8 +275,8 @@ const checks: Array<[label: string, command: string, expect: RegExp]> = [
 		/gt is/,
 	],
 	[
-		"dev stack start hook",
-		"test -x /usr/local/bin/superset-dev-stack && test -x /usr/local/bin/superset-workspace-db && echo ok",
+		"the repository's cloud setup and dev stack",
+		"test -x /workspace/.superset/setup.cloud.sh && test -x /workspace/.superset/dev-stack.cloud.sh && echo ok",
 		/ok/,
 	],
 	["neonctl", "neonctl --version", /^\d+\.\d+/m],
@@ -301,6 +301,11 @@ log(`golden: ${golden} stripped, stopped and snapshotted`);
 // 4. probe, as a workspace
 const RESERVED_PREFIXES = ["SUPERSET_", "HOST_SERVICE_", "VERCEL_"];
 const RESERVED_KEYS = new Set([
+	// A box the release throws away must not be able to create a database
+	// branch: setup then keeps the environment's own DATABASE_URL, which is
+	// what a check of the image wants anyway.
+	"NEON_API_KEY",
+	"NEON_PROJECT_ID",
 	"ORGANIZATION_ID",
 	"AUTH_TOKEN",
 	"HOST_DB_PATH",
@@ -327,7 +332,7 @@ if (ENV_FILE) {
 	}
 	// A real workspace branches the database for itself at first start; a
 	// probe must not leave a Neon branch behind.
-	probeEnv.SUPERSET_RELEASE_PROBE = "1";
+
 	log(
 		`probe env: ${Object.keys(probeEnv).length} variables from the env file (reserved names skipped)`,
 	);
@@ -337,7 +342,8 @@ if (ENV_FILE) {
 const probe = `ws-release-probe-${Date.now().toString(36)}`;
 const probeWorkspaceId = randomUUID();
 const probeSecret = await sandboxHostSecretFor(probeWorkspaceId);
-const { networkPolicy, managedEnv } = deriveSandboxCredentials({
+const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+	workspaceId: probeWorkspaceId,
 	environmentEnv: probeEnv,
 	userAgentEnv: {},
 	githubToken: null,

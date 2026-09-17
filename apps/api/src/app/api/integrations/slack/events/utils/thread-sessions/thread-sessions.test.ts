@@ -41,6 +41,8 @@ describe("parseThreadCommand", () => {
 		expect(parseThreadCommand("<@UBOT> !unmute")).toBe("unmute");
 		expect(parseThreadCommand("<@UBOT|superset> !unmute")).toBe("unmute");
 		expect(parseThreadCommand("  !Quiet please")).toBe("mute");
+		expect(parseThreadCommand("<@UBOT> !stop")).toBe("stop");
+		expect(parseThreadCommand("!cancel that")).toBe("stop");
 	});
 	test("leaves prose to the model", () => {
 		expect(parseThreadCommand("only respond when I mention you")).toBeNull();
@@ -48,6 +50,7 @@ describe("parseThreadCommand", () => {
 			parseThreadCommand("build a bot that should only respond when mentioned"),
 		).toBeNull();
 		expect(parseThreadCommand("mute the alerts channel")).toBeNull();
+		expect(parseThreadCommand("stop the deploy automation")).toBeNull();
 	});
 });
 

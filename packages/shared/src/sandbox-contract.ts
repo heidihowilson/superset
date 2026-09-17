@@ -49,7 +49,6 @@ export const SANDBOX_PORTS = {
 /** Ports the platform publishes for every workspace; a repo's `ports` add to these. */
 export const SANDBOX_PUBLISHED_PORTS: readonly number[] = [
 	SANDBOX_PORTS.hostService,
-	SANDBOX_PORTS.desktop,
 ];
 
 export const SANDBOX_DISPLAY = {

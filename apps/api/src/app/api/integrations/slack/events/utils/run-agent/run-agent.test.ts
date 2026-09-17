@@ -21,15 +21,42 @@ const callTool = mock(
 );
 const cleanup = mock(async () => {});
 const listTools = mock(async () => ({
-	tools: ["tasks_create", "tasks_delete", "terminals_send"].map((name) => ({
-		name,
-		inputSchema: { type: "object" },
-	})),
+	tools: ["tasks_create", "tasks_update", "tasks_delete", "terminals_send"].map(
+		(name) => ({
+			name,
+			inputSchema: { type: "object" },
+		}),
+	),
 }));
+const toolConnections = mock(async (_userId: string): Promise<unknown[]> => []);
+const pluginListTools = mock(
+	async (
+		..._args: unknown[]
+	): Promise<Array<{ name: string; inputSchema?: unknown }>> => [],
+);
+const pluginCallTool = mock(
+	async (..._args: unknown[]): Promise<Record<string, unknown>> => ({}),
+);
 mock.module("@/env", () => ({ env: { ANTHROPIC_API_KEY: "test" } }));
+class FakeAPIError extends Error {
+	status?: number;
+	headers?: Headers;
+}
+class FakeConnectionError extends FakeAPIError {}
+class FakeTimeoutError extends FakeConnectionError {}
+mock.module("@superset/trpc/integrations/plugins", () => ({
+	toolConnections,
+	listTools: pluginListTools,
+	callTool: pluginCallTool,
+	templateScope: async (connection: { pluginName: string }) => ({
+		config: { access_token: `${connection.pluginName}-token` },
+	}),
+}));
 mock.module("@anthropic-ai/sdk", () => ({
 	default: class {
-		static APIError = Error;
+		static APIError = FakeAPIError;
+		static APIConnectionError = FakeConnectionError;
+		static APIConnectionTimeoutError = FakeTimeoutError;
 		messages = { create };
 	},
 }));
@@ -58,9 +85,13 @@ mock.module("./mcp-clients", () => ({
 		toolName: name.slice(name.indexOf("_") + 1),
 	}),
 }));
-const { fetchThreadContext, formatErrorForSlack, runSlackAgent } = await import(
-	"./run-agent"
-);
+const {
+	fetchThreadContext,
+	formatErrorForSlack,
+	rateLimitWaitMs,
+	runSlackAgent,
+} = await import("./run-agent");
+const { invalidatePluginToolCache } = await import("./plugin-tools");
 const params = {
 	prompt: "Help",
 	channelId: "C1",
@@ -72,10 +103,34 @@ const params = {
 };
 const toolResponse = (
 	name = "superset_tasks_create",
+	input: Record<string, unknown> = { title: "Task" },
 ): Partial<Anthropic.Message> => ({
 	stop_reason: "tool_use",
-	content: [{ type: "tool_use", id: "tool-1", name, input: { title: "Task" } }],
+	content: [{ type: "tool_use", id: "tool-1", name, input }],
 });
+const pluginContext = (pluginName: string, version = "1.0.0") => ({
+	connection: {
+		id: `${pluginName}-connection`,
+		pluginName,
+		authMethod: "oauth2",
+	},
+	install: {
+		id: `${pluginName}-install`,
+		manifest: { name: pluginName, version },
+		marketplace: "superset",
+	},
+	source: null,
+});
+const textResult = (value: unknown) => ({
+	content: [{ type: "text", text: JSON.stringify(value) }],
+});
+const requestToolNames = (call = 0) =>
+	((create.mock.calls[call]?.[0].tools ?? []) as Array<{ name: string }>).map(
+		(t) => t.name,
+	);
+const contextualSystemText = (call = 0) =>
+	((create.mock.calls[call]?.[0].system ?? []) as Array<{ text: string }>)[1]
+		?.text ?? "";
 
 beforeEach(() => {
 	create.mockReset();
@@ -91,6 +146,13 @@ beforeEach(() => {
 	callTool.mockReset();
 	callTool.mockImplementation(async () => ({}));
 	cleanup.mockClear();
+	toolConnections.mockReset();
+	toolConnections.mockImplementation(async () => []);
+	pluginListTools.mockReset();
+	pluginListTools.mockImplementation(async () => []);
+	pluginCallTool.mockReset();
+	pluginCallTool.mockImplementation(async () => ({}));
+	invalidatePluginToolCache();
 });
 
 describe("thread context", () => {
@@ -168,13 +230,14 @@ describe("agent loop", () => {
 			name: string;
 		}>;
 		expect(requestTools.map((t) => t.name)).toContain("superset_tasks_create");
+		expect(requestTools.map((t) => t.name)).toContain("superset_tasks_update");
 		expect(requestTools.map((t) => t.name)).not.toContain(
 			"superset_tasks_delete",
 		);
 		expect(requestTools).toContainEqual(
 			expect.objectContaining({ type: "web_search_20260209" }),
 		);
-		expect(create.mock.calls[0]?.[1]).toMatchObject({ maxRetries: 1 });
+		expect(create.mock.calls[0]?.[1]).toMatchObject({ maxRetries: 0 });
 		expect(cleanup).toHaveBeenCalledTimes(1);
 	});
 	test("the quiet tool is offered only for a session, states the thread's mode, and flips it", async () => {
@@ -206,6 +269,144 @@ describe("agent loop", () => {
 		expect(first.tools.map((t) => t.name)).toContain("slack_thread_quiet");
 		expect(first.system[1]?.text).toContain("This thread is quiet");
 		expect(set).toHaveBeenCalledWith(false);
+	});
+
+	test("a model request timeout is not retried; a 5xx is retried once", async () => {
+		create.mockImplementationOnce(async () => {
+			throw new FakeTimeoutError("Request timed out.");
+		});
+		await runSlackAgent(params).catch(() => {});
+		// The error rewrite also calls create; count only agent-loop requests.
+		const loopCalls = () =>
+			create.mock.calls.filter(([req]) => "tools" in (req as object)).length;
+		expect(loopCalls()).toBe(1);
+
+		create.mockReset();
+		create.mockImplementationOnce(async () => {
+			throw Object.assign(new FakeAPIError("overloaded"), { status: 500 });
+		});
+		create.mockImplementationOnce(async () => ({
+			stop_reason: "end_turn",
+			content: [{ type: "text", text: "Recovered", citations: [] }],
+		}));
+		const result = await runSlackAgent(params);
+		expect(result.text).toBe("Recovered");
+		expect(loopCalls()).toBe(2);
+
+		create.mockReset();
+		create.mockImplementationOnce(async () => {
+			throw new FakeConnectionError("socket hang up");
+		});
+		create.mockImplementationOnce(async () => ({
+			stop_reason: "end_turn",
+			content: [{ type: "text", text: "Reconnected", citations: [] }],
+		}));
+		expect((await runSlackAgent(params)).text).toBe("Reconnected");
+		expect(loopCalls()).toBe(2);
+	});
+
+	test("rateLimitWaitMs reads delay-seconds or an HTTP-date, bounded", () => {
+		const headers = (v: string | null) => ({ headers: { get: () => v } });
+		const now = Date.parse("2026-09-16T08:00:00Z");
+		expect(rateLimitWaitMs(headers("3"), now)).toBe(3_000);
+		expect(rateLimitWaitMs(headers("Wed, 16 Sep 2026 08:00:04 GMT"), now)).toBe(
+			4_000,
+		);
+		expect(rateLimitWaitMs(headers("Wed, 16 Sep 2026 07:59:00 GMT"), now)).toBe(
+			2_000,
+		);
+		expect(rateLimitWaitMs(headers("120"), now)).toBe(10_000);
+		expect(rateLimitWaitMs(headers(null), now)).toBe(2_000);
+	});
+
+	test("a stop request ends the turn with the stopped copy and keeps completed actions", async () => {
+		create.mockImplementation(async () => toolResponse());
+		callTool.mockImplementation(async ({ name }) =>
+			name === "tasks_create"
+				? {
+						structuredContent: {
+							task: { id: "task", title: "Task", slug: "SUP-1" },
+						},
+					}
+				: {},
+		);
+		// First check (before the first request) passes; the stop lands before
+		// the second request, after one tool call has completed.
+		let checks = 0;
+		const result = await runSlackAgent({
+			...params,
+			shouldStop: async () => ++checks > 2,
+		});
+		expect(result.text).toContain("Stopped");
+		expect(result.actions).toHaveLength(1);
+		expect(
+			create.mock.calls.filter(([req]) => "tools" in (req as object)),
+		).toHaveLength(1);
+	});
+
+	test("a stop that lands mid-batch prevents the next tool call", async () => {
+		create.mockImplementationOnce(async () => ({
+			stop_reason: "tool_use",
+			content: [
+				{
+					type: "tool_use",
+					id: "a",
+					name: "superset_tasks_create",
+					input: { title: "one" },
+				},
+				{
+					type: "tool_use",
+					id: "b",
+					name: "superset_tasks_create",
+					input: { title: "two" },
+				},
+			],
+		}));
+		// The context prefetch also calls tools; only the task call flips the flag.
+		let stop = false;
+		callTool.mockImplementation(async ({ name }) => {
+			if (name !== "tasks_create") return {};
+			stop = true;
+			return {
+				structuredContent: { task: { id: "t", title: "one", slug: "S-1" } },
+			};
+		});
+		const result = await runSlackAgent({
+			...params,
+			shouldStop: async () => stop,
+		});
+		expect(result.text).toContain("Stopped");
+		expect(
+			callTool.mock.calls.filter(([a]) => a.name === "tasks_create"),
+		).toHaveLength(1);
+		expect(result.actions).toHaveLength(1);
+	});
+
+	test("text split around citations comes back as one paragraph", async () => {
+		create.mockImplementationOnce(async () => ({
+			stop_reason: "end_turn",
+			content: [
+				{ type: "text", text: "Bun 1.4.2 fixes 7 issues", citations: [{}] },
+				{ type: "text", text: ", including two regressions", citations: [{}] },
+				{ type: "text", text: ".", citations: [] },
+			],
+		}));
+		const result = await runSlackAgent(params);
+		expect(result.text).toBe(
+			"Bun 1.4.2 fixes 7 issues, including two regressions.",
+		);
+
+		create.mockImplementationOnce(async () => ({
+			stop_reason: "end_turn",
+			content: [
+				{ type: "text", text: "Let me check.", citations: [] },
+				{ type: "text", text: "Bun 1.4.2 is out", citations: [{}] },
+				{ type: "text", text: ".", citations: [] },
+			],
+		}));
+		expect((await runSlackAgent(params)).text).toBe(
+			"Let me check.\n\nBun 1.4.2 is out.",
+		);
 	});
 
 	test("thread memory is user-turn data, never part of the system prompt", async () => {
@@ -383,5 +584,272 @@ describe("agent loop", () => {
 		expect(
 			callTool.mock.calls.filter(([arg]) => arg.name === "tasks_create"),
 		).toHaveLength(10);
+	});
+});
+
+describe("plugin tools", () => {
+	const linearListing = [
+		{ name: "list_issues", inputSchema: { type: "object" } },
+		{ name: "save_issue", inputSchema: { type: "object" } },
+		{ name: "delete_comment", inputSchema: { type: "object" } },
+	];
+	const githubListing = [
+		{ name: "create_pull_request", inputSchema: { type: "object" } },
+		{ name: "merge_pull_request" },
+	];
+	const listingFor = async (manifest: unknown) =>
+		(manifest as { name: string }).name === "linear"
+			? linearListing
+			: githubListing;
+
+	test("registers curated tools for connected plugins only and briefs the model", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(listingFor);
+		const result = await runSlackAgent({
+			...params,
+			prompt: "Find my GitHub PRs and file a Linear issue",
+		});
+		const names = requestToolNames();
+		expect(names).toContain("linear_list_issues");
+		expect(names).toContain("linear_save_issue");
+		expect(names).not.toContain("linear_delete_comment");
+		expect(names.some((name) => name.startsWith("github_"))).toBe(false);
+		expect(names).toContain("superset_tasks_create");
+		expect(contextualSystemText()).toContain("Linear is connected");
+		expect(contextualSystemText()).toContain("GitHub is not connected");
+		expect(result.unconnectedPlugins.map((p) => p.name)).toEqual(["github"]);
+		expect(toolConnections).toHaveBeenCalledWith("user");
+		expect(pluginListTools.mock.calls[0]?.[4]).toMatchObject({
+			signal: expect.any(AbortSignal),
+		});
+	});
+
+	test("says nothing about a plugin that is neither connected nor asked for", async () => {
+		const result = await runSlackAgent(params);
+		expect(contextualSystemText()).not.toContain("connected");
+		expect(result.unconnectedPlugins.map((p) => p.name)).toEqual([
+			"linear",
+			"github",
+		]);
+		expect(pluginListTools).not.toHaveBeenCalled();
+	});
+
+	test("refuses a plugin tool outside the curated subset at execution", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(listingFor);
+		create.mockImplementationOnce(async () =>
+			toolResponse("linear_delete_comment", { id: "c1" }),
+		);
+		await runSlackAgent(params);
+		expect(pluginCallTool).not.toHaveBeenCalled();
+		const messages = create.mock.calls[1]?.[0].messages as Array<{
+			content: unknown;
+		}>;
+		expect(messages.at(-1)?.content).toMatchObject([{ is_error: true }]);
+	});
+
+	test("refuses a curated tool for a plugin the user has not connected", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(listingFor);
+		create.mockImplementationOnce(async () =>
+			toolResponse("github_create_pull_request", { title: "Fix" }),
+		);
+		await runSlackAgent(params);
+		expect(pluginCallTool).not.toHaveBeenCalled();
+	});
+
+	test("routes linear_* calls to that connection with the remaining budget and records the issue", async () => {
+		toolConnections.mockImplementation(async () => [
+			pluginContext("linear"),
+			pluginContext("github"),
+		]);
+		pluginListTools.mockImplementation(listingFor);
+		create.mockImplementationOnce(async () =>
+			toolResponse("linear_save_issue", { team: "SUP", title: "Bug" }),
+		);
+		pluginCallTool.mockImplementation(async () =>
+			textResult({
+				id: "SUP-12",
+				uuid: "uuid",
+				title: "Bug",
+				url: "https://linear.app/acme/issue/SUP-12/bug",
+			}),
+		);
+		const result = await runSlackAgent({
+			...params,
+			deadline: Date.now() + 30_000,
+		});
+		expect(pluginCallTool).toHaveBeenCalledTimes(1);
+		const [manifest, scope, tool, args, method, source, options] =
+			pluginCallTool.mock.calls[0] ?? [];
+		expect(manifest).toMatchObject({ name: "linear" });
+		expect(scope).toEqual({ config: { access_token: "linear-token" } });
+		expect(tool).toBe("save_issue");
+		expect(args).toEqual({ team: "SUP", title: "Bug" });
+		expect(method).toBe("oauth2");
+		expect(source).toBeNull();
+		expect(options).toMatchObject({ signal: expect.any(AbortSignal) });
+		expect(result.actions).toEqual([
+			{
+				type: "issue_created",
+				issues: [
+					{
+						identifier: "SUP-12",
+						title: "Bug",
+						url: "https://linear.app/acme/issue/SUP-12/bug",
+					},
+				],
+			},
+		]);
+	});
+
+	test("an issue update through save_issue is not reported as a creation", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(listingFor);
+		create.mockImplementationOnce(async () =>
+			toolResponse("linear_save_issue", { id: "SUP-12", title: "Renamed" }),
+		);
+		pluginCallTool.mockImplementation(async () =>
+			textResult({ id: "SUP-12", title: "Renamed", url: "https://l/SUP-12" }),
+		);
+		const result = await runSlackAgent(params);
+		expect(pluginCallTool).toHaveBeenCalledTimes(1);
+		expect(result.actions).toEqual([]);
+	});
+
+	test("records an opened pull request from GitHub's minimal response", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("github")]);
+		pluginListTools.mockImplementation(listingFor);
+		create.mockImplementationOnce(async () =>
+			toolResponse("github_create_pull_request", {
+				owner: "acme",
+				repo: "app",
+				title: "Fix login",
+				head: "fix",
+				base: "main",
+			}),
+		);
+		pluginCallTool.mockImplementation(async () =>
+			textResult({ id: "1", url: "https://github.com/acme/app/pull/42" }),
+		);
+		const result = await runSlackAgent(params);
+		expect(requestToolNames()).not.toContain("github_merge_pull_request");
+		expect(result.actions).toEqual([
+			{
+				type: "pr_opened",
+				pullRequests: [
+					{
+						number: 42,
+						title: "Fix login",
+						url: "https://github.com/acme/app/pull/42",
+					},
+				],
+			},
+		]);
+	});
+
+	test("a failure resolving plugin connections leaves the run with Superset tools only", async () => {
+		toolConnections.mockImplementationOnce(async () => {
+			throw new Error("ambiguous install");
+		});
+		const result = await runSlackAgent({
+			...params,
+			prompt: "file this in Linear",
+		});
+		expect(result.text).toBe("Finished");
+		const names = requestToolNames();
+		expect(names.some((n) => n.startsWith("linear_"))).toBe(false);
+		expect(names).toContain("superset_tasks_create");
+		// Unknown is not unconnected: no Connect prompt, no "not connected" line.
+		expect(result.unconnectedPlugins).toEqual([]);
+		expect(contextualSystemText()).not.toContain("is not connected");
+		expect(contextualSystemText()).toContain("Linear could not be checked");
+	});
+
+	test("mentionsPlugin matches whole terms only", async () => {
+		const { mentionsPlugin, SLACK_PLUGINS } = await import("./run-agent");
+		const linear = SLACK_PLUGINS.find((p) => p.name === "linear");
+		if (!linear) throw new Error("linear plugin missing");
+		expect(mentionsPlugin("file it in linear please", linear)).toBe(true);
+		expect(mentionsPlugin("Linear: MOB-1", linear)).toBe(true);
+		expect(mentionsPlugin("this growth is nonlinear", linear)).toBe(false);
+		expect(mentionsPlugin("linearize the model", linear)).toBe(false);
+	});
+	test("a failing plugin listing skips that plugin without failing the run or calling it unconnected", async () => {
+		toolConnections.mockImplementation(async () => [
+			pluginContext("linear"),
+			pluginContext("github"),
+		]);
+		pluginListTools.mockImplementation(async (manifest) => {
+			if ((manifest as { name: string }).name === "github") {
+				throw new Error("Upstream returned 502 Bad Gateway");
+			}
+			return linearListing;
+		});
+		const result = await runSlackAgent(params);
+		expect(result.text).toBe("Finished");
+		const names = requestToolNames();
+		expect(names).toContain("linear_list_issues");
+		expect(names.some((name) => name.startsWith("github_"))).toBe(false);
+		expect(contextualSystemText()).toContain(
+			"GitHub is connected but its tools could not be loaded",
+		);
+		expect(result.unconnectedPlugins).toEqual([]);
+	});
+
+	test("a plugin whose listing hangs costs that plugin, not the turn", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(
+			(
+				_m: unknown,
+				_s: unknown,
+				_a: unknown,
+				_src: unknown,
+				opts?: { signal?: AbortSignal },
+			) =>
+				new Promise((_resolve, reject) => {
+					opts?.signal?.addEventListener("abort", () =>
+						reject(new Error("aborted")),
+					);
+				}),
+		);
+		const started = Date.now();
+		const result = await runSlackAgent({
+			...params,
+			pluginDiscoveryTimeoutMs: 50,
+		});
+		expect(Date.now() - started).toBeLessThan(5_000);
+		expect(result.text).toBe("Finished");
+		expect(requestToolNames()).toContain("superset_tasks_create");
+		expect(requestToolNames()).not.toContain("linear_list_issues");
+	});
+
+	test("the tool cache is per installation, not per plugin name", async () => {
+		const first = pluginContext("linear");
+		const other = {
+			...first,
+			install: { ...first.install, id: "install-2", marketplace: "acme" },
+		};
+		pluginListTools.mockImplementation(listingFor);
+		toolConnections.mockImplementation(async () => [first]);
+		await runSlackAgent(params);
+		toolConnections.mockImplementation(async () => [other]);
+		await runSlackAgent(params);
+		expect(pluginListTools).toHaveBeenCalledTimes(2);
+	});
+
+	test("caches a plugin's tool listing across runs for the same plugin version and auth method", async () => {
+		toolConnections.mockImplementation(async () => [pluginContext("linear")]);
+		pluginListTools.mockImplementation(listingFor);
+		await runSlackAgent(params);
+		await runSlackAgent(params);
+		expect(pluginListTools).toHaveBeenCalledTimes(1);
+		expect(requestToolNames(1)).toContain("linear_list_issues");
+
+		toolConnections.mockImplementation(async () => [
+			pluginContext("linear", "1.1.0"),
+		]);
+		await runSlackAgent(params);
+		expect(pluginListTools).toHaveBeenCalledTimes(2);
 	});
 });

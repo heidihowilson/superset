@@ -2,9 +2,10 @@ import { initSentry } from "./lib/sentry";
 
 initSentry();
 
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
 import ReactDom from "react-dom/client";
 import { BootErrorBoundary } from "./components/BootErrorBoundary";
+import { RendererRouter } from "./components/RendererRouter";
 import {
 	cleanupBootErrorHandling,
 	initBootErrorHandling,
@@ -85,7 +86,7 @@ if (!rootElement) {
 		<BootErrorBoundary
 			onError={(error) => reportBootError("Render failed", error)}
 		>
-			<RouterProvider router={router} />
+			<RendererRouter router={router} />
 		</BootErrorBoundary>,
 	);
 	markBootMounted();

@@ -9,14 +9,17 @@ type Policy = {
 	>;
 };
 const rules = (
-	policy: ReturnType<typeof deriveSandboxCredentials>["networkPolicy"],
+	policy: Awaited<ReturnType<typeof deriveSandboxCredentials>>["networkPolicy"],
 ) => (policy as Policy).allow;
+
+const WORKSPACE_ID = "11111111-2222-4333-8444-555555555555";
 
 const author = { name: "Ada", email: "ada@example.com" };
 
 describe("deriveSandboxCredentials", () => {
-	test("an organization key becomes a header rule and a placeholder", () => {
-		const { networkPolicy, managedEnv } = deriveSandboxCredentials({
+	test("an organization key becomes a header rule and a placeholder", async () => {
+		const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
 			environmentEnv: { FOO: "bar", ANTHROPIC_API_KEY: "sk-org" },
 			userAgentEnv: {},
 			githubToken: null,
@@ -31,8 +34,9 @@ describe("deriveSandboxCredentials", () => {
 		expect(JSON.stringify(managedEnv)).not.toContain("sk-org");
 	});
 
-	test("the person's own sign-in beats the environment's key", () => {
-		const { networkPolicy, managedEnv } = deriveSandboxCredentials({
+	test("the person's own sign-in beats the environment's key", async () => {
+		const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
 			environmentEnv: { ANTHROPIC_API_KEY: "sk-org" },
 			userAgentEnv: { CLAUDE_CODE_OAUTH_TOKEN: "oat-mine" },
 			githubToken: null,
@@ -47,8 +51,9 @@ describe("deriveSandboxCredentials", () => {
 		expect(managedEnv.ANTHROPIC_API_KEY).toBeUndefined();
 	});
 
-	test("the GitHub installation token is a rule for git and the API, never a value on the box", () => {
-		const { networkPolicy, managedEnv } = deriveSandboxCredentials({
+	test("the GitHub installation token is a rule for git and the API, never a value on the box", async () => {
+		const { networkPolicy, managedEnv } = await deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
 			environmentEnv: {},
 			userAgentEnv: {},
 			githubToken: "ghs_token",
@@ -68,8 +73,9 @@ describe("deriveSandboxCredentials", () => {
 		expect(JSON.stringify(managedEnv)).not.toContain("ghs_token");
 	});
 
-	test("a brokered key in the environment's variables never reaches the managed set as itself", () => {
-		const { managedEnv } = deriveSandboxCredentials({
+	test("a brokered key in the environment's variables never reaches the managed set as itself", async () => {
+		const { managedEnv } = await deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
 			environmentEnv: {
 				GH_TOKEN: "leaked",
 				OPENAI_API_KEY: "sk-openai",
@@ -84,8 +90,9 @@ describe("deriveSandboxCredentials", () => {
 		expect(managedEnv.OPENAI_BASE_URL).toBe("https://proxy.example");
 	});
 
-	test("commits on the box are by the given author", () => {
-		const { managedEnv } = deriveSandboxCredentials({
+	test("commits on the box are by the given author", async () => {
+		const { managedEnv } = await deriveSandboxCredentials({
+			workspaceId: WORKSPACE_ID,
 			environmentEnv: { GIT_AUTHOR_NAME: "someone else" },
 			userAgentEnv: {},
 			githubToken: null,

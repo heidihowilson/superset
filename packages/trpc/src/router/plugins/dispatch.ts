@@ -20,6 +20,10 @@ export interface ToolDefinition {
 	annotations?: Record<string, unknown>;
 }
 
+export interface DispatchOptions {
+	signal?: AbortSignal;
+}
+
 const REQUEST_ID = 1;
 
 export class PluginDispatchError extends Error {
@@ -35,6 +39,7 @@ async function post(
 	url: string,
 	headers: Record<string, string>,
 	body: unknown,
+	signal?: AbortSignal,
 ): Promise<Response> {
 	return await credentialFetch(
 		url,
@@ -46,6 +51,7 @@ async function post(
 				...headers,
 			},
 			body: JSON.stringify(body),
+			signal,
 		},
 		"mcp",
 	);
@@ -56,13 +62,14 @@ async function rpc(
 	headers: Record<string, string>,
 	method: string,
 	params: unknown,
+	signal?: AbortSignal,
 ): Promise<{ result: unknown; response: Response }> {
-	const response = await post(url, headers, {
-		jsonrpc: "2.0",
-		id: REQUEST_ID,
-		method,
-		params,
-	});
+	const response = await post(
+		url,
+		headers,
+		{ jsonrpc: "2.0", id: REQUEST_ID, method, params },
+		signal,
+	);
 
 	if (response.status === 401 || response.status === 403) {
 		throw new PluginDispatchError(
@@ -120,12 +127,19 @@ const PROTOCOL_VERSION = "2025-06-18";
 async function initialize(
 	url: string,
 	headers: Record<string, string>,
+	signal?: AbortSignal,
 ): Promise<Record<string, string>> {
-	const { result, response } = await rpc(url, headers, "initialize", {
-		protocolVersion: PROTOCOL_VERSION,
-		capabilities: {},
-		clientInfo: { name: "superset", version: "1.0.0" },
-	});
+	const { result, response } = await rpc(
+		url,
+		headers,
+		"initialize",
+		{
+			protocolVersion: PROTOCOL_VERSION,
+			capabilities: {},
+			clientInfo: { name: "superset", version: "1.0.0" },
+		},
+		signal,
+	);
 
 	const session: Record<string, string> = {
 		"mcp-protocol-version":
@@ -139,6 +153,7 @@ async function initialize(
 		url,
 		{ ...headers, ...session },
 		{ jsonrpc: "2.0", method: "notifications/initialized" },
+		signal,
 	);
 	return session;
 }
@@ -147,18 +162,26 @@ async function mcpCall(
 	target: { url: string; headers: Record<string, string> },
 	method: string,
 	params: unknown,
+	signal?: AbortSignal,
 ): Promise<unknown> {
 	try {
-		return (await rpc(target.url, target.headers, method, params)).result;
+		return (await rpc(target.url, target.headers, method, params, signal))
+			.result;
 	} catch (error) {
 		const wantsSession =
 			error instanceof PluginDispatchError &&
 			(error.status === 400 || error.status === 404);
 		if (!wantsSession) throw error;
 
-		const session = await initialize(target.url, target.headers);
+		const session = await initialize(target.url, target.headers, signal);
 		return (
-			await rpc(target.url, { ...target.headers, ...session }, method, params)
+			await rpc(
+				target.url,
+				{ ...target.headers, ...session },
+				method,
+				params,
+				signal,
+			)
 		).result;
 	}
 }
@@ -359,17 +382,41 @@ function bundledConfig(scope: TemplateScope): Record<string, unknown> {
 	return { ...(scope.inputs ?? {}), ...(scope.config ?? {}) };
 }
 
+function abortable<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
+	if (!signal) return promise;
+	return new Promise<T>((resolve, reject) => {
+		const onAbort = () =>
+			reject(
+				signal.reason instanceof Error
+					? signal.reason
+					: new Error("Plugin call aborted"),
+			);
+		if (signal.aborted) return onAbort();
+		signal.addEventListener("abort", onAbort, { once: true });
+		promise.then(resolve, reject).finally(() => {
+			signal.removeEventListener("abort", onAbort);
+		});
+	});
+}
+
 async function bundledDispatch(
 	manifest: PluginManifest,
 	scope: TemplateScope,
 	source: BundledSource | null,
 	event: "get-tools" | "call-tool",
 	eventBody: Record<string, unknown>,
+	signal?: AbortSignal,
 ): Promise<unknown> {
 	const pluginName = manifest.name;
+	signal?.throwIfAborted();
 	const run = await bundledRun(pluginName, manifest, source);
 	try {
-		return await run({ event, eventBody, config: bundledConfig(scope) });
+		// A bundled server runs in-process and cannot be cancelled; stop
+		// waiting on it when the caller's deadline passes instead.
+		return await abortable(
+			Promise.resolve(run({ event, eventBody, config: bundledConfig(scope) })),
+			signal,
+		);
 	} catch (error) {
 		throw new PluginDispatchError(
 			`Bundled server for "${pluginName}" failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -383,6 +430,7 @@ export async function listTools(
 	scope: TemplateScope,
 	method?: string | null,
 	source?: BundledSource | null,
+	options?: DispatchOptions,
 ): Promise<ToolDefinition[]> {
 	const target = remoteTarget(manifest, scope, method);
 	if (!target) {
@@ -392,11 +440,12 @@ export async function listTools(
 			source ?? null,
 			"get-tools",
 			{},
+			options?.signal,
 		);
 		return Array.isArray(tools) ? (tools as ToolDefinition[]) : [];
 	}
 
-	const result = (await mcpCall(target, "tools/list", {})) as {
+	const result = (await mcpCall(target, "tools/list", {}, options?.signal)) as {
 		tools?: ToolDefinition[];
 	};
 	return result.tools ?? [];
@@ -409,17 +458,24 @@ export async function callTool(
 	args: Record<string, unknown>,
 	method?: string | null,
 	source?: BundledSource | null,
+	options?: DispatchOptions,
 ): Promise<unknown> {
 	const target = remoteTarget(manifest, scope, method);
 	if (!target) {
-		return await bundledDispatch(manifest, scope, source ?? null, "call-tool", {
-			name: tool,
-			arguments: args,
-		});
+		return await bundledDispatch(
+			manifest,
+			scope,
+			source ?? null,
+			"call-tool",
+			{ name: tool, arguments: args },
+			options?.signal,
+		);
 	}
 
-	return await mcpCall(target, "tools/call", {
-		name: tool,
-		arguments: args,
-	});
+	return await mcpCall(
+		target,
+		"tools/call",
+		{ name: tool, arguments: args },
+		options?.signal,
+	);
 }

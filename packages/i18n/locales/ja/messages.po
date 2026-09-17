@@ -660,6 +660,10 @@ msgstr "{distance}前"
 msgid "{duration, plural, one {Thought for # second} other {Thought for # seconds}}"
 msgstr "{duration, plural, one {#秒間思考しました} other {#秒間思考しました}}"
 
+#. js-lingui-explicit-id
+msgid "serverError.page.entryPathHeldByAnotherOrganization"
+msgstr "このワークスペースの {entryPath} は、別の組織のページとしてすでに公開されています。ファイルを移動するか、そのページの ID を指定して公開してください。"
+
 msgid "{failed, plural, one {# failed} other {# failed}}"
 msgstr "{failed, plural, one {#件失敗} other {#件失敗}}"
 
@@ -1048,9 +1052,6 @@ msgstr "今週は約{stars}の見込み"
 msgid "~{totalSeconds}s typical"
 msgstr "通常 約{totalSeconds}秒"
 
-msgid "~{TYPICAL_SECONDS}s typical"
-msgstr "通常約{TYPICAL_SECONDS}秒"
-
 msgid "~/agent $"
 msgstr "~/agent $"
 
@@ -1201,6 +1202,10 @@ msgstr "アプリ内ブラウザを改良します。変更をプレビューし
 
 msgid "A better Superset is ready"
 msgstr "新しいSupersetの準備ができました"
+
+#. js-lingui-explicit-id
+msgid "serverError.common.cloudWorkspaceCannotCallThis"
+msgstr "クラウドワークスペースからは {path} を呼び出せません。サインイン済みのクライアントから実行してください。"
 
 msgid "A delete is already in progress for {workspaceName}."
 msgstr "{workspaceName}の削除はすでに進行中です。"
@@ -2003,6 +2008,9 @@ msgstr "全員"
 msgid "Anyone in your organization"
 msgstr "組織内の全員"
 
+msgid "Anyone with the link"
+msgstr "リンクを知っている全員"
+
 msgid "anything"
 msgstr "何でも"
 
@@ -2409,6 +2417,9 @@ msgstr "Changelogに戻る"
 
 msgid "Back to checklist"
 msgstr "チェックリストに戻る"
+
+msgid "Back to current"
+msgstr "最新に戻る"
 
 msgid "Back to GitHub issues"
 msgstr "GitHub issueに戻る"
@@ -4256,6 +4267,9 @@ msgstr "環境を保存できませんでした"
 
 msgid "Could not rename the session"
 msgstr "セッションの名前を変更できませんでした"
+
+msgid "Could not rename this page"
+msgstr "このページの名前を変更できませんでした"
 
 msgid "Could not reopen"
 msgstr "再オープンできませんでした"
@@ -10688,6 +10702,9 @@ msgstr "ページが見つかりません"
 msgid "Page Not Found"
 msgstr "ページが見つかりません"
 
+msgid "Page title"
+msgstr "ページタイトル"
+
 msgid "Page views"
 msgstr "ページビュー"
 
@@ -11909,6 +11926,9 @@ msgstr "グループ名を変更"
 
 msgid "Rename host"
 msgstr "ホストの名前を変更"
+
+msgid "Rename page"
+msgstr "ページの名前を変更"
 
 msgid "Rename session"
 msgstr "セッションの名前を変更"
@@ -13246,6 +13266,9 @@ msgstr "デザインやレポートを共有しましょう。フィードバッ
 msgid "Share page"
 msgstr "ページを共有"
 
+msgid "Share settings"
+msgstr "共有設定"
+
 msgid "Share this page"
 msgstr "このページを共有"
 
@@ -13266,6 +13289,9 @@ msgstr "Supersetにインポートできる、共有されたテーマJSONファ
 
 msgid "Shared version"
 msgstr "共有バージョン"
+
+msgid "Shared with everyone"
+msgstr "全員と共有中"
 
 msgid "Shares the project's checkout — files, git index and branch — with its other local workspaces"
 msgstr "プロジェクトのチェックアウト（ファイル、git インデックス、ブランチ）を他のローカルワークスペースと共有します"
@@ -13474,6 +13500,9 @@ msgstr "サインインしてSupersetに進む"
 
 msgid "Sign in to get started"
 msgstr "サインインして始めましょう"
+
+msgid "Sign in to view this page"
+msgstr "サインインしてこのページを表示"
 
 msgid "Sign in with email"
 msgstr "メールでサインイン"
@@ -13702,6 +13731,10 @@ msgstr "一部のテーマはスキップされました"
 
 msgid "Some triggers need additional configuration"
 msgstr "一部のトリガーには追加の設定が必要です"
+
+#. js-lingui-explicit-id
+msgid "serverError.page.entryPathHeldByColleague"
+msgstr "このワークスペースの {entryPath} は、他の人がすでに公開しています。ページ ID を明示して相手のページにバージョンを追加するか、ファイルを移動してください。"
 
 msgid "someone external"
 msgstr "社外の人"
@@ -14961,6 +14994,9 @@ msgstr "対象ホスト"
 msgid "The team invitation has either expired or doesn't exist. Request a new link from the team owner or check the URL to make sure it is entered correctly."
 msgstr "チームの招待は期限切れか、存在しません。チームのオーナーに新しいリンクを依頼するか、URLが正しく入力されているか確認してください。"
 
+msgid "The title shows everywhere this page is listed and in its link preview."
+msgstr "タイトルはこのページが一覧表示される場所すべてと、リンクのプレビューに表示されます。"
+
 msgid "The web agents UI is a read-only preview for now."
 msgstr "Web版のエージェントUIは現時点では読み取り専用のプレビューです。"
 
@@ -15159,6 +15195,10 @@ msgstr "このページは別の場所から公開処理中です — 再試行�
 
 msgid "This page is in another organization"
 msgstr "このページは別の組織にあります"
+
+#. placeholder {0}: url.replace(/^https?:\/\//, "")
+msgid "This page is live at <0>{0}</0>"
+msgstr "このページは <0>{0}</0> で公開中です"
 
 msgid "This page isn't here"
 msgstr "このページはありません"
@@ -16762,6 +16802,9 @@ msgstr "他にメンバーがいる組織の唯一のオーナーです。先に
 #. placeholder {0}: String(MIN_ACTIVE_DAYS)
 msgid "You are unranked until {0} days carry usage. Scoring starts once the board can see a full picture."
 msgstr "{0}日分の使用実績がそろうまではランク外です。全体像が見えるようになってからスコアリングが始まります。"
+
+msgid "You are viewing version {version}, read-only"
+msgstr "バージョン {version} を閲覧中です（読み取り専用）"
 
 msgid "You can attach up to {MAX_ATTACHMENTS} files"
 msgstr "添付できるファイルは最大{MAX_ATTACHMENTS}件です"

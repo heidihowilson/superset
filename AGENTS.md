@@ -2,7 +2,9 @@
 
 Superset is an agent-first development platform, with an Electron desktop IDE, Next.js web apps, and an Expo mobile app as the main customer-facing surfaces. It's a Turborepo monorepo, deployed apps are in apps/ and supporting packages are in packages/, and we use tRPC for the api.
 
-You're working inside a Superset workspace, an isolated git-worktree copy of this repo. "Workspace" in a user message means that, not an editor workspace.
+You're working inside a Superset workspace, an isolated checkout of this repo — a git worktree on a
+machine someone owns, a plain clone at `/workspace` in a cloud workspace. "Workspace" in a user
+message means that, not an editor workspace.
 
 ## Project Structure
 

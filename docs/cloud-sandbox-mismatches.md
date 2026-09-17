@@ -118,12 +118,32 @@ a Claude subscription token counts as Anthropic being provided, since a rule
 would otherwise add a second, conflicting auth header to its requests.
 
 **The firewall terminates TLS for the domains it rewrites, and the terminal
-must trust its CA.** The platform mounts a per-sandbox CA and points
-`NODE_EXTRA_CA_CERTS`, `SSL_CERT_FILE` and friends at the system bundle.
+must trust its CA.** The CA is in the image's system bundle, which curl, git,
+gh, python and bun read. Node does not read it, and the platform sets no CA
+variable of its own, so `superset-boot` defaults `NODE_EXTRA_CA_CERTS` to that
+bundle before it builds host-service's environment.
 host-service builds PTY env from a login-shell snapshot, never from its own
 process env, so those variables would be lost and every model call from a
 terminal would fail with a certificate error; the sandbox-mode passthrough
 forwards them (`SANDBOX_FIREWALL_CA_KEYS`).
+
+**`superset` in a box is the workspace, not a person.** The CLI ships as its
+own image asset and sits on PATH. It holds no credential: the firewall adds
+`x-superset-sandbox-credential` to requests for the API the way it adds the
+model and GitHub ones, the API resolves that to the workspace's creator, and
+`SANDBOX_ALLOWED_PROCEDURES` is the list of things it may then call. A header
+rule applies to every process in the box, so that list is the boundary —
+widen it deliberately, and never to a procedure that can grant more access.
+
+**Docker is installed but not started.** An environment whose repository needs
+containers starts it from its own `start` command, which is also where it
+waits for the daemon:
+
+```json
+{ "start": ["sudo dockerd >/var/log/dockerd.log 2>&1 &",
+            "until docker info >/dev/null 2>&1; do sleep 0.2; done",
+            "docker compose up"] }
+```
 
 ## Runtime environment
 

@@ -36,8 +36,7 @@ export async function loadEnvironment(
 	});
 	const visible =
 		row &&
-		(row.organizationId === SHARED_ENVIRONMENT_ORGANIZATION_ID ||
-			ctx.organizationIds.includes(row.organizationId)) &&
+		ctx.organizationIds.includes(row.organizationId) &&
 		(row.scope !== "personal" || row.createdByUserId === ctx.userId);
 	if (!visible) {
 		throw userError({
@@ -184,10 +183,7 @@ export const environmentRouter = {
 				.from(environments)
 				.where(
 					and(
-						inArray(environments.organizationId, [
-							input.organizationId,
-							SHARED_ENVIRONMENT_ORGANIZATION_ID,
-						]),
+						eq(environments.organizationId, input.organizationId),
 						isNull(environments.archivedAt),
 						// A personal environment is its creator's alone.
 						or(

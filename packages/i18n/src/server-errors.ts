@@ -313,6 +313,13 @@ export const serverErrorMessages: Record<
 				message: "Not authenticated. Please sign in.",
 			}),
 		),
+	"serverError.common.cloudWorkspaceCannotCallThis": (params) =>
+		i18n._({
+			id: "serverError.common.cloudWorkspaceCannotCallThis",
+			message:
+				"A cloud workspace cannot call {path}. Run this from a client you are signed into.",
+			values: params,
+		}),
 	"serverError.common.notAuthenticatedProvideABearerJwt": () =>
 		i18n._(
 			msg({
@@ -561,6 +568,20 @@ export const serverErrorMessages: Record<
 				message: "This page is being published from somewhere else — retry",
 			}),
 		),
+	"serverError.page.entryPathHeldByAnotherOrganization": (params) =>
+		i18n._({
+			id: "serverError.page.entryPathHeldByAnotherOrganization",
+			message:
+				"{entryPath} in this workspace is already published as a page in another organization. Move the file, or publish with that page's id.",
+			values: params,
+		}),
+	"serverError.page.entryPathHeldByColleague": (params) =>
+		i18n._({
+			id: "serverError.page.entryPathHeldByColleague",
+			message:
+				"Someone else has already published {entryPath} from this workspace. Publish with an explicit page id to add a version to their page, or move the file.",
+			values: params,
+		}),
 	"serverError.page.workspaceNotFound": () =>
 		i18n._(
 			msg({

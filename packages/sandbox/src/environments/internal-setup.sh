@@ -3,7 +3,7 @@
 # beyond the image. Runs once as the sandbox user, with sudo, in the golden
 # after the boot runner has checked the monorepo out under /workspace; the
 # environment row stores it as its `setup` override, and a fork inherits the
-# result. Its `start` counterpart is superset-dev-stack, written below.
+# result. Its `start` counterpart is the repository's own dev-stack.cloud.sh.
 set -uo pipefail
 
 log() { printf '[internal-setup] %s\n' "$1"; }
@@ -26,103 +26,10 @@ log "shell tooling installed"
 # the same way .superset/setup.sh does on a laptop.
 sudo npm install -g neonctl@2 >/dev/null 2>&1 && log "neonctl $(neonctl --version 2>/dev/null) installed" || { log "neonctl install failed"; exit 1; }
 
-# The managed environment reaches the start hook as process env. The repo's
-# dev scripts read ../../.env (dotenv), so the start hook writes what it was
-# started with to /workspace/.env once. Never runs in the golden: the golden
-# has no DATABASE_URL, so the file only ever exists inside a fork.
-sudo tee /usr/local/bin/superset-materialize-env >/dev/null <<'MATERIALIZE'
-#!/usr/bin/env bash
-set -u
-out="${1:-$PWD/.env}"
-[ -f "$out" ] && exit 0
-[ -n "${DATABASE_URL:-}" ] || exit 0
-tmp="$(mktemp)"
-while IFS= read -r -d '' entry; do
-  key="${entry%%=*}"; value="${entry#*=}"
-  case "$key" in
-    SUPERSET_*|HOST_SERVICE_*|VERCEL_*|IS_SANDBOX|PATH|HOME|PWD|OLDPWD|SHLVL|_|DISPLAY|TERM|SHELL|HOSTNAME|LANG|LC_*|NODE_ENV|PORT|TMUX*|USER|LOGNAME|MAIL|DEBIAN_FRONTEND) continue ;;
-  esac
-  [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
-  if [[ "$value" == *$'\n'* ]]; then
-    # A multi-line value (a PEM key) goes double-quoted with its newlines as
-    # the two characters backslash-n, which dotenv turns back into newlines.
-    escaped="${value//\\/\\\\}"; escaped="${escaped//\"/\\\"}"
-    escaped="${escaped//\$/\\\$}"; escaped="${escaped//\`/\\\`}"
-    escaped="${escaped//$'\n'/\\n}"
-    printf '%s="%s"\n' "$key" "$escaped" >> "$tmp"
-  elif [[ "$value" != *"'"* ]]; then
-    printf "%s='%s'\n" "$key" "$value" >> "$tmp"
-  else
-    escaped="${value//\\/\\\\}"; escaped="${escaped//\"/\\\"}"
-    escaped="${escaped//\$/\\\$}"; escaped="${escaped//\`/\\\`}"
-    printf '%s="%s"\n' "$key" "$escaped" >> "$tmp"
-  fi
-done < <(env -0)
-install -m 600 "$tmp" "$out"; rm -f "$tmp"
-MATERIALIZE
-sudo chmod 755 /usr/local/bin/superset-materialize-env
-
-# First start of a workspace: branch the Neon project for it, point .env at
-# the branch, seed the dev account. Mirrors .superset/setup.sh with the
-# workspace id as the branch name, since cloud workspaces share a display
-# name. Idempotent through the stamp in the state directory; release probes
-# skip it so a pipeline run never leaves a branch behind.
-sudo tee /usr/local/bin/superset-workspace-db >/dev/null <<'WORKSPACEDB'
-#!/usr/bin/env bash
-set -u
-ENV_FILE="${1:-$PWD/.env}"
-STAMP="/var/lib/superset/db-branch"
-[ -f "$ENV_FILE" ] || exit 0
-[ -f "$STAMP" ] && exit 0
-[ "${SUPERSET_RELEASE_PROBE:-}" = "1" ] && exit 0
-set -a; . "$ENV_FILE"; set +a
-if [ -z "${NEON_API_KEY:-}" ] || [ -z "${NEON_PROJECT_ID:-}" ] || [ -z "${SUPERSET_SANDBOX_WORKSPACE_ID:-}" ]; then
-  echo "workspace-db: NEON_API_KEY, NEON_PROJECT_ID or SUPERSET_SANDBOX_WORKSPACE_ID missing; keeping the environment's DATABASE_URL"
-  exit 0
-fi
-name="cloud-${SUPERSET_SANDBOX_WORKSPACE_ID%%-*}"
-export NEON_API_KEY
-existing="$(neonctl branches list --project-id "$NEON_PROJECT_ID" --output json 2>/dev/null | jq -r --arg n "$name" '.[] | select(.name == $n) | .id // empty')"
-if [ -n "$existing" ]; then
-  branch="$existing"
-else
-  created="$(neonctl branches create --project-id "$NEON_PROJECT_ID" --name "$name" --output json)" || { echo "workspace-db: branch create failed"; exit 1; }
-  branch="$(printf '%s' "$created" | jq -r '.branch.id // .id // empty')"
-fi
-[ -n "$branch" ] || { echo "workspace-db: no branch id"; exit 1; }
-direct="$(neonctl connection-string "$branch" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner)" || exit 1
-pooled="$(neonctl connection-string "$branch" --project-id "$NEON_PROJECT_ID" --role-name neondb_owner --pooled)" || exit 1
-tmp="$(mktemp)"
-grep -vE '^(DATABASE_URL|DATABASE_URL_UNPOOLED)=' "$ENV_FILE" > "$tmp"
-printf "DATABASE_URL='%s'\nDATABASE_URL_UNPOOLED='%s'\n" "$pooled" "$direct" >> "$tmp"
-install -m 600 "$tmp" "$ENV_FILE"; rm -f "$tmp"
-echo "workspace-db: branch $name ($branch)"
-( cd "$(dirname "$ENV_FILE")" && set -a && . "$ENV_FILE" && set +a && NODE_ENV=development bun run db:seed-dev ) || { echo "workspace-db: db:seed-dev failed"; exit 1; }
-printf '%s %s\n' "$name" "$branch" > "$STAMP"
-WORKSPACEDB
-sudo chmod 755 /usr/local/bin/superset-workspace-db
-
-# The environment's start hook. With a .env in place it brings the dev stack
-# up on the display: api, web and the Electron desktop, the same tasks
-# `bun dev` runs, in tmux so the logs are reachable from any terminal
-# (`tmux attach -t superset`).
-sudo tee /usr/local/bin/superset-dev-stack >/dev/null <<'DEVSTACK'
-#!/usr/bin/env bash
-# Runs in the checkout: the box's start hook has the hooks repository as cwd.
-ws="$PWD"
-superset-materialize-env "$ws/.env"
-superset-workspace-db "$ws/.env" > /var/log/superset/workspace-db.log 2>&1
-if [ -f "$ws/.env" ] && command -v tmux >/dev/null; then
-  tmux has-session -t superset 2>/dev/null || {
-    tmux new-session -d -s superset -n stack -c "$ws" \
-      "export NODE_ENV=development; set -a; . '$ws/.env'; set +a; bunx turbo run dev --filter=@superset/api --filter=@superset/web --filter=// 2>&1 | tee /var/log/superset/dev-stack.log"
-    tmux new-window -t superset -n desktop -c "$ws/apps/desktop" \
-      "export DISPLAY=${DISPLAY:-:1} NODE_ENV=development; set -a; . '$ws/.env'; set +a; bun run dev 2>&1 | tee /var/log/superset/desktop-dev.log"
-  }
-fi
-DEVSTACK
-sudo chmod 755 /usr/local/bin/superset-dev-stack
-log "dev stack scripts installed"
+# The dev stack and the workspace's database are the repository's own
+# .superset/setup.cloud.sh and .superset/dev-stack.cloud.sh, run by the start
+# hook. This environment only adds what is not in the repository: the shell
+# tooling above, and neonctl, which setup.cloud.sh calls.
 
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \

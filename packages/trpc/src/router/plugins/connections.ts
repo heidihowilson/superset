@@ -354,6 +354,37 @@ export async function installForConnection(
 		: null;
 }
 
+export interface ConnectionContext {
+	connection: SelectPluginConnection;
+	install: InstalledPlugin;
+	source: BundledSource | null;
+}
+
+function exposesTools(manifest: PluginManifest): boolean {
+	const extension = supersetExtension(manifest);
+	return Boolean(extension?.mcp?.url || extension?.server?.path);
+}
+
+export async function toolConnections(
+	userId: string,
+): Promise<ConnectionContext[]> {
+	const connections = await listConnections(userId);
+	const contexts = await Promise.all(
+		connections.map(async (connection) => {
+			const install = await installForConnection(userId, connection);
+			if (!install || !exposesTools(install.manifest)) return null;
+			return {
+				connection,
+				install,
+				source: await bundledSource(userId, install.marketplace),
+			};
+		}),
+	);
+	return contexts.filter(
+		(context): context is ConnectionContext => context !== null,
+	);
+}
+
 export async function installedManifest(
 	userId: string,
 	pluginName: string,
