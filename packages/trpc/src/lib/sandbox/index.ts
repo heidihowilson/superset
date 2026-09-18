@@ -28,6 +28,7 @@ export {
 	sortRepositories,
 	toSandboxRepositories,
 	type WorkspaceRepository,
+	workspaceBranchName,
 	workspaceRepositories,
 } from "./repositories";
 export {

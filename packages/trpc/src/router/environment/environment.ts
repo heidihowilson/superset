@@ -21,6 +21,7 @@ import {
 	promoteSandboxToEnvironment,
 	RepositoryError,
 	sortRepositories,
+	workspaceBranchName,
 	workspaceRepositories,
 } from "../../lib/sandbox";
 import { jwtProcedure, userError } from "../../trpc";
@@ -287,6 +288,7 @@ export const environmentRouter = {
 				cloudWorkspaceId: workspace.id,
 				hooksRepositoryId: source?.hooksRepositoryId ?? null,
 				primaryBranch: workspace.branch,
+				workingBranch: workspaceBranchName(workspace),
 			});
 			const environmentId = crypto.randomUUID();
 			const goldenName = `env-${environmentId.replaceAll("-", "").slice(0, 24)}`;

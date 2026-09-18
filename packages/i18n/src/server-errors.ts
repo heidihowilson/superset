@@ -637,6 +637,13 @@ export const serverErrorMessages: Record<
 				message: "Thread not found",
 			}),
 		),
+	"serverError.plugins.ambiguousConnection": (params) =>
+		i18n._({
+			id: "serverError.plugins.ambiguousConnection",
+			message:
+				"More than one {connector} connection matches; disconnect the one you do not want.",
+			values: params,
+		}),
 	"serverError.plugins.ambiguousPlugin": (params) =>
 		i18n._({
 			id: "serverError.plugins.ambiguousPlugin",

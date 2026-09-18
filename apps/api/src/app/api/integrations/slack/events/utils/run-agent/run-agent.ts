@@ -760,6 +760,7 @@ export async function runSlackAgent(
 
 	let supersetMcp: Client | null = null;
 	let cleanupSuperset: (() => Promise<void>) | null = null;
+	let closePlugins: (() => Promise<void>) | null = null;
 
 	try {
 		const [threadContext, supersetMcpResult] = await Promise.all([
@@ -789,10 +790,12 @@ export async function runSlackAgent(
 			}),
 			loadPluginTools({
 				userId: params.userId,
+				organizationId: params.organizationId,
 				pluginNames: Object.keys(PLUGIN_SLACK_TOOLS),
 				signal: discoverySignal(),
 			}),
 		]);
+		closePlugins = pluginLoad.close;
 		const pluginToolSets = pluginLoad.sets;
 		// Unresolved connections are unknown, not absent: no Connect prompt and
 		// no "not connected" line on a transient failure.
@@ -1150,6 +1153,11 @@ ${agentContext}`;
 		if (cleanupSuperset) {
 			try {
 				await cleanupSuperset();
+			} catch {}
+		}
+		if (closePlugins) {
+			try {
+				await closePlugins();
 			} catch {}
 		}
 	}

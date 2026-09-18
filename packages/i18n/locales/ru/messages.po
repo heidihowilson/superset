@@ -830,6 +830,12 @@ msgstr "{planLabel} · присоединился {joined}"
 msgid "{planLabel} plan"
 msgstr "Тариф {planLabel}"
 
+msgid "{plugin} has no OAuth client configured on this deployment yet."
+msgstr "Для {plugin} в этом развёртывании ещё не настроен клиент OAuth."
+
+msgid "{plugin} is no longer installed."
+msgstr "{plugin} больше не установлен."
+
 msgid "{presetLabel} reset to defaults"
 msgstr "{presetLabel} сброшен к значениям по умолчанию"
 
@@ -1476,9 +1482,6 @@ msgstr "Добавьте агента из меню в боковой панел
 
 msgid "Add photos or files"
 msgstr "Добавить фото или файлы"
-
-msgid "Add plugin"
-msgstr "Добавить плагин"
 
 msgid "Add project"
 msgstr "Добавить проект"
@@ -2249,9 +2252,6 @@ msgstr "Журналы аудита"
 msgid "Aug 2026"
 msgstr "Авг 2026"
 
-msgid "Authenticate your {displayName} account"
-msgstr "Авторизуйте свой аккаунт {displayName}"
-
 msgid "Authentication"
 msgstr "Аутентификация"
 
@@ -2278,6 +2278,12 @@ msgstr "Авторизовать"
 
 msgid "Authorize {displayName}"
 msgstr "Авторизовать {displayName}"
+
+msgid "Authorize Superset so your plugins, automations and triggers can act on your behalf."
+msgstr "Разрешите Superset действовать от вашего имени через плагины, автоматизации и триггеры."
+
+msgid "Authorize Superset to act on your behalf."
+msgstr "Разрешите Superset действовать от вашего имени."
 
 msgid "Authorizing..."
 msgstr "Авторизация..."
@@ -3710,6 +3716,12 @@ msgstr "Подтверждать выход"
 msgid "Connect"
 msgstr "Подключить"
 
+msgid "Connect {displayName}"
+msgstr "Подключить {displayName}"
+
+msgid "Connect {name}"
+msgstr "Подключить {name}"
+
 msgid "Connect a device"
 msgstr "Подключите устройство"
 
@@ -3782,9 +3794,8 @@ msgstr "Подключите рабочее пространство Slack, чт
 msgid "Connected"
 msgstr "Подключено"
 
-#. placeholder {0}: formatDate(new Date(connection.createdAt))
-msgid "connected {0}"
-msgstr "подключено {0}"
+msgid "Connected {label}"
+msgstr "{label} подключено"
 
 msgid "Connected as"
 msgstr "Подключено как"
@@ -3816,6 +3827,9 @@ msgstr "Подключение"
 msgid "Connecting GitHub is not configured on this server"
 msgstr "Подключение GitHub не настроено на этом сервере"
 
+msgid "Connecting lets your agents read and act in {name} on your behalf. Review what you are granting before you continue."
+msgstr "Подключение позволит вашим агентам читать и действовать в {name} от вашего имени. Проверьте, что вы предоставляете, прежде чем продолжить."
+
 msgid "Connecting to the desktop…"
 msgstr "Подключение к рабочему столу…"
 
@@ -3846,6 +3860,18 @@ msgstr "Истекло время ожидания соединения"
 
 msgid "Connections"
 msgstr "Подключения"
+
+msgid "Connector"
+msgstr "Коннектор"
+
+msgid "Connectors carry risk"
+msgstr "Коннекторы несут риск"
+
+msgid "Connects for your whole team."
+msgstr "Подключается для всей команды."
+
+msgid "Connects your account. Teammates connect their own."
+msgstr "Подключает вашу учётную запись. Коллеги подключают свои."
 
 msgid "consecutive active days"
 msgstr "активных дней подряд"
@@ -3903,6 +3929,10 @@ msgstr "Продолжить или форкнуть сессию"
 
 msgid "Continue the session the last run left"
 msgstr "Продолжить сессию, оставшуюся от прошлого запуска"
+
+#. placeholder {0}: connector.displayName
+msgid "Continue to {0}"
+msgstr "Перейти к {0}"
 
 msgid "Continue update"
 msgstr "Продолжить обновление"
@@ -4152,6 +4182,9 @@ msgstr "Не удалось закрыть сессию"
 
 msgid "Could not close the session"
 msgstr "Не удалось закрыть сессию"
+
+msgid "Could not connect {plugin}. Try again."
+msgstr "Не удалось подключить {plugin}. Попробуйте ещё раз."
 
 msgid "Could not copy the link"
 msgstr "Не удалось скопировать ссылку"
@@ -4678,6 +4711,9 @@ msgstr "Создание worktree"
 msgid "Creating..."
 msgstr "Создание..."
 
+msgid "Credentials stay on the server"
+msgstr "Учётные данные остаются на сервере"
+
 msgid "Cross-feature components living outside packages/ui — check here before building a new one"
 msgstr "Кросс-функциональные компоненты вне packages/ui — загляните сюда, прежде чем делать новый"
 
@@ -5135,6 +5171,9 @@ msgstr "Dev-вход"
 msgid "Dev sign-in failed"
 msgstr "Не удалось выполнить dev-вход"
 
+msgid "Developed by {author}"
+msgstr "Разработчик: {author}"
+
 msgid "Developer"
 msgstr "Разработчик"
 
@@ -5252,10 +5291,6 @@ msgstr "Изменения отменены — больше не спросим
 
 msgid "Disconnect"
 msgstr "Отключить"
-
-#. placeholder {0}: connection.account ?? displayName
-msgid "Disconnect {0}"
-msgstr "Отключить {0}"
 
 msgid "Disconnect GitHub?"
 msgstr "Отключить GitHub?"
@@ -7596,6 +7631,9 @@ msgstr "Мысли команды Superset о параллельных кодо�
 msgid "Inspecting {0}"
 msgstr "Инспектируем {0}"
 
+msgid "Install"
+msgstr "Установить"
+
 msgid "Install & restart"
 msgstr "Установить и перезапустить"
 
@@ -7608,11 +7646,17 @@ msgstr "Не удалось установить"
 msgid "Install GitHub App"
 msgstr "Установить GitHub App"
 
+msgid "Install plugin"
+msgstr "Установить плагин"
+
 msgid "Install Superset MCP in your client"
 msgstr "Установите Superset MCP в своём клиенте"
 
 msgid "Install the desktop app"
 msgstr "Установите десктопное приложение"
+
+msgid "Install the plugin to connect"
+msgstr "Установите плагин, чтобы подключиться"
 
 msgid "Install the Superset GitHub App to connect your repositories."
 msgstr "Установите GitHub App Superset, чтобы подключить свои репозитории."
@@ -8884,6 +8928,10 @@ msgstr "Ещё страницы"
 
 msgid "More than half of merged changes are written by agents with zero human edits."
 msgstr "Больше половины объединённых изменений написаны агентами без правок человека."
+
+#. js-lingui-explicit-id
+msgid "serverError.plugins.ambiguousConnection"
+msgstr "Подходит несколько подключений {connector}; отключите ненужное."
 
 msgid "most developers"
 msgstr "большинство разработчиков"
@@ -14282,6 +14330,9 @@ msgstr "Superset Mobile, облачные рабочие пространств�
 msgid "Superset needs Full Disk Access to read another browser's data. Grant it in System Settings, then check again."
 msgstr "Superset нужен полный доступ к диску, чтобы читать данные другого браузера. Выдайте его в Системных настройках и проверьте снова."
 
+msgid "Superset only receives the permissions this connector asks for. Disconnect at any time to revoke them."
+msgstr "Superset получает только те разрешения, которые запрашивает этот коннектор. Отключите его в любой момент, чтобы отозвать их."
+
 msgid "Superset originals"
 msgstr "Оригиналы Superset"
 
@@ -14688,6 +14739,9 @@ msgstr "Текстовое поле"
 msgid "Thanks for reaching out"
 msgstr "Спасибо, что написали"
 
+msgid "That {plugin} sign-in link expired. Try connecting again."
+msgstr "Срок действия ссылки для входа в {plugin} истёк. Попробуйте подключиться снова."
+
 msgid "That endpoint could not be resolved."
 msgstr "Не удалось разрешить эту конечную точку."
 
@@ -15048,6 +15102,12 @@ msgstr "Думает..."
 msgid "Thirty"
 msgstr "Тридцать"
 
+msgid "This {plugin} account is already connected by {owner}. Ask them to disconnect first."
+msgstr "Аккаунт {plugin} уже подключил(а) {owner}. Попросите сначала отключить его."
+
+msgid "This {plugin} account is already connected by another Superset organization."
+msgstr "Этот аккаунт {plugin} уже подключён другой организацией Superset."
+
 msgid "This action is irreversible."
 msgstr "Это действие необратимо."
 
@@ -15211,9 +15271,6 @@ msgstr "Этот путь существует, но это не папка."
 
 msgid "This path is a directory"
 msgstr "Этот путь — папка"
-
-msgid "This plugin needs no account — its skills are ready to use."
-msgstr "Этому плагину не нужен аккаунт — его Навыки готовы к использованию."
 
 msgid "This port is still in use"
 msgstr "Этот порт ещё используется"
@@ -15452,6 +15509,9 @@ msgstr "Использование токенов"
 
 msgid "Tokens"
 msgstr "Токены"
+
+msgid "Tokens are held by Superset and attached to requests there. They are never written into your local agent config."
+msgstr "Токены хранятся в Superset и добавляются к запросам на его стороне. Они никогда не записываются в локальную конфигурацию агента."
 
 msgid "Tokens per session"
 msgstr "Токенов за сессию"
@@ -16816,6 +16876,12 @@ msgstr "Изменить эту подписку в приложении нел�
 msgid "You can't undo this action. Terminal panes will show \"Process exited\" and can be restarted."
 msgstr "Это действие нельзя отменить. В панелях терминала появится «Process exited», их можно перезапустить."
 
+msgid "You control the access"
+msgstr "Вы контролируете доступ"
+
+msgid "You declined the {plugin} authorization request."
+msgstr "Вы отклонили запрос на авторизацию {plugin}."
+
 msgid "You don't have access to this host"
 msgstr "У вас нет доступа к этому хосту"
 
@@ -16824,6 +16890,9 @@ msgstr "У вас нет доступа к этому терминалу."
 
 msgid "You don't have permission to remove this member"
 msgstr "У вас нет прав удалить этого участника"
+
+msgid "You need to be part of an organization to connect accounts."
+msgstr "Чтобы подключать учётные записи, нужно состоять в организации."
 
 msgid "You need to be part of an organization to use integrations."
 msgstr "Чтобы пользоваться интеграциями, нужно состоять в организации."

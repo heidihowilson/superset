@@ -26,6 +26,7 @@ import { readRepoHooks } from "./repo-hooks";
 import {
 	installationTokenFor,
 	toSandboxRepositories,
+	workspaceBranchName,
 	workspaceRepositories,
 } from "./repositories";
 import type { SandboxClaim, SandboxEnvironment } from "./vercel";
@@ -59,6 +60,7 @@ export async function buildSandboxClaim(args: {
 		cloudWorkspaceId: args.row.id,
 		hooksRepositoryId: environment.hooksRepositoryId,
 		primaryBranch: args.row.branch,
+		workingBranch: workspaceBranchName(args.row),
 	});
 	const creator = args.row.createdByUserId;
 	const [userToken, githubAccount, creatorUser] = creator
@@ -81,7 +83,7 @@ export async function buildSandboxClaim(args: {
 		args.withRepoHooks && hooksCheckout
 			? await readRepoHooks({
 					repo: hooksCheckout.repository,
-					branch: hooksCheckout.branch,
+					branch: hooksCheckout.baseBranch,
 					token,
 				})
 			: null;

@@ -51,6 +51,9 @@ const { checkWakeLog, probeBox } = await import("./environments/probe");
 
 const name = `ws-real-check-${Date.now().toString(36)}`;
 const workspaceId = randomUUID();
+// Cut from main the way a real workspace is, so the probe's branch check
+// covers the branching itself and not just that a checkout happened.
+const workingBranch = `superset/real-check-${workspaceId.slice(0, 8)}`;
 const identity: SandboxIdentity = {
 	SUPERSET_SANDBOX_CONTRACT: String(SANDBOX_CONTRACT_VERSION) as "1",
 	SUPERSET_BUNDLE_SHA: bundle.sha256,
@@ -60,7 +63,8 @@ const identity: SandboxIdentity = {
 	SUPERSET_SANDBOX_REPOSITORIES: JSON.stringify([
 		{
 			url: "https://github.com/superset-sh/superset.git",
-			branch: "main",
+			branch: workingBranch,
+			baseBranch: "main",
 			path: ".",
 		},
 	]),
@@ -107,7 +111,7 @@ let failed = await probeBox({
 	credentials,
 	hostSecret,
 	bundleSha: bundle.sha256,
-	branch: "main",
+	branch: workingBranch,
 	primaryPath: ".",
 	gate: process.env.SANDBOX_GATE_ORIGIN
 		? { workspaceId, userId: randomUUID() }

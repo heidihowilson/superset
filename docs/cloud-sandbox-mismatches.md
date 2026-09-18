@@ -192,9 +192,11 @@ id, the others get ids derived from it and the path, so anything keyed on the cl
 desktop route, the agent launch, the terminals) lands in the primary and the rest are
 siblings. The `start` hook runs in the hooks repository's checkout, not in `/workspace`.
 
-**The checkout is the workspace.** No worktrees, no base repo, no branch
-creation — anything assuming a worktree can be created or discarded next to a
-main checkout has nothing to work with.
+**The checkout is the workspace.** No worktrees and no base repo — anything
+assuming a worktree can be created or discarded next to a main checkout has
+nothing to work with. Boot does cut the workspace's own branch: each checkout
+fetches its `baseBranch` and lands on `branch` (`superset/<slug>-<id>`), so an
+agent is never sitting on `main`, and the base is what a pull request targets.
 
 **There is no clipboard where the PTY runs.** Pasting an image into a terminal
 forwards Ctrl+V and lets the TUI (Claude Code, Codex) read the image from the
