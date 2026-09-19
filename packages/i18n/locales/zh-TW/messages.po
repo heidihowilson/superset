@@ -274,6 +274,10 @@ msgstr "{0, plural, one {再顯示#行} other {再顯示#行}}"
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {這會把#個已有worktree作為工作區匯入Superset。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。} other {這會把#個已有worktree作為工作區匯入Superset。磁碟上的每個worktree都會被追蹤並出現在側邊欄裡。不會修改任何檔案。}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, other {查看 # 則已解決的留言}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {正在關注#個頁面的評論} other {正在關注#個頁面的評論}}"
@@ -1043,6 +1047,15 @@ msgstr "此係統未安裝<0>{primaryFont}</0>。將回退到下一個可用字�
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>／排行榜 {1} 人中</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<0>即將上架</0><1>App Store</1>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<0>即將上架</0><1>Google Play</1>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<1>App Store</1><0>下載</0>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · 你在這裡"
 
@@ -1406,6 +1419,9 @@ msgstr "新增"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "新增{0}帳戶"
+
+msgid "Add a comment…"
+msgstr "新增留言…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "在專案設定中新增生命週期執行指令碼，或將某個終端指令碼標記為工作區執行命令。"
@@ -1780,6 +1796,9 @@ msgstr "你的所有資料將在{ACCOUNT_DELETION_GRACE_DAYS}天後被永久刪�
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "所有開啟的終端會話都會被結束，正在執行的主機服務也會停止。如果希望服務繼續執行以便下次啟動，請改用「關閉Superset」。"
 
+msgid "All pages"
+msgstr "所有頁面"
+
 msgid "All plans"
 msgstr "全部方案"
 
@@ -1911,6 +1930,9 @@ msgstr "更新已準備好安裝。"
 
 msgid "Analytics, Ops, and more"
 msgstr "分析、營運及更多功能"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "Android 版即將推出。發布時第一時間通知你。"
 
 msgid "Animate the active terminal cursor."
 msgstr "讓目前終端游標閃爍。"
@@ -2862,6 +2884,9 @@ msgstr "取消編輯"
 msgid "Cancel plan"
 msgstr "取消方案"
 
+msgid "Cancel reply"
+msgstr "取消回覆"
+
 msgid "Canceled"
 msgstr "已取消"
 
@@ -3209,6 +3234,9 @@ msgstr "清除終端歷史"
 
 msgid "Clear terminal history?"
 msgstr "清除終端歷史？"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "清除篩選即可重新排列側邊欄"
 
 msgid "Clear workspace selection"
 msgstr "清除工作區選擇"
@@ -3597,6 +3625,9 @@ msgstr "已評論"
 
 msgid "Comments"
 msgstr "評論"
+
+msgid "Comments could not be loaded"
+msgstr "無法載入留言"
 
 msgid "Comments go to this agent"
 msgstr "評論將傳送給此代理程式"
@@ -6114,6 +6145,9 @@ msgstr "建立任務失敗"
 msgid "Failed to create team"
 msgstr "建立團隊失敗"
 
+msgid "Failed to create terminal"
+msgstr "無法建立終端機"
+
 msgid "Failed to create thread"
 msgstr "建立討論串失敗"
 
@@ -6645,6 +6679,9 @@ msgstr "已完成 · 用時7秒"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "首次登入頁 → 認證 → 引導 → 真實工作區（最近7天，2天視窗）"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "第一次使用？請在桌面應用程式的「設定 → 遠端存取」中開啟遠端存取。"
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "每日首次存取superset.sh的頁面瀏覽數"
 
@@ -6725,6 +6762,9 @@ msgstr "資料夾檢視"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "要檢出到新worktree的資料夾，每行一個，相對於儲存庫根目錄。根目錄下的檔案始終包含在內。留空則檢出全部。"
+
+msgid "Follow every session"
+msgstr "追蹤每個會話"
 
 msgid "FOLLOW ON X"
 msgstr "在X上關注"
@@ -6947,6 +6987,9 @@ msgstr "在Mac上獲取Superset"
 
 msgid "Get Superset Pro"
 msgstr "獲取Superset Pro"
+
+msgid "Get the iPhone app"
+msgstr "取得 iPhone 應用程式"
 
 msgid "Ghost"
 msgstr "幽靈"
@@ -7209,6 +7252,9 @@ msgstr "隱藏拉取請求預覽"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "隱藏已解決 ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "隱藏已解決的留言"
 
 msgid "Hide review comments"
 msgstr "隱藏審查評論"
@@ -8083,6 +8129,9 @@ msgstr "啟動"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "在新功能、缺陷修復和重構上同時啟動代理程式，全部並行。狀態一眼可見：哪些在幹活、哪些被阻塞、哪些在等你。"
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "靈感出現的那一刻，就能在任何已連線的機器上啟動 agent。每個會話都有獨立隔離的工作區。"
+
 msgid "Launch mode"
 msgstr "啟動方式"
 
@@ -8142,6 +8191,9 @@ msgstr "退出團隊"
 
 msgid "Leave the leaderboard?"
 msgstr "退出排行榜？"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "離開座位，<0/>繼續打造。"
 
 msgid "Leaving organization..."
 msgstr "正在退出組織..."
@@ -9077,6 +9129,10 @@ msgstr "網路已變更"
 msgid "Never"
 msgstr "從未"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "新"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "新的{providerLabel}代理程式將使用{accountLabel}。"
 
@@ -9131,6 +9187,9 @@ msgstr "以此工作區新建群組"
 msgid "New issue"
 msgstr "新建議題"
 
+msgid "New page"
+msgstr "新增頁面"
+
 msgid "New password (min 8 characters)"
 msgstr "新密碼（至少8個字元）"
 
@@ -9145,6 +9204,9 @@ msgstr "新版本與產品更新。"
 
 msgid "New session"
 msgstr "新建會話"
+
+msgid "New shell"
+msgstr "新增 Shell"
 
 msgid "New stars"
 msgstr "新增星標"
@@ -10120,6 +10182,9 @@ msgstr "只有討論串的作者或頁面擁有者才能刪除它"
 
 msgid "Only you"
 msgstr "僅你自己"
+
+msgid "Only you can see this page"
+msgstr "僅你可見此頁面"
 
 msgid "open"
 msgstr "開啟"
@@ -11651,6 +11716,9 @@ msgstr "檢視更新日誌"
 msgid "Read the changelog →"
 msgstr "檢視更新日誌 →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "逐一檔案閱讀完整差異，查看 PR 狀態，需要原始輸出時開啟終端機。"
+
 msgid "Read the guide to parallel coding agents"
 msgstr "閱讀並行編碼代理程式指南"
 
@@ -12055,6 +12123,9 @@ msgstr "回覆"
 msgid "Reply to thread…"
 msgstr "回覆討論串…"
 
+msgid "Replying to {replyingTo}"
+msgstr "正在回覆 {replyingTo}"
+
 msgid "repo"
 msgstr "儲存庫"
 
@@ -12108,6 +12179,9 @@ msgstr "必填"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "所需版本：{minimumVersion}+"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "需要 iOS 26 或更新版本。包含於 Superset Pro。"
 
 msgid "Reserved by OS"
 msgstr "已被系統佔用"
@@ -12388,6 +12462,9 @@ msgstr "審查和CI排隊把代理程式帶來的收益吃掉了。"
 msgid "Review becomes the bottleneck"
 msgstr "審查成為瓶頸"
 
+msgid "Review before you merge"
+msgstr "合併前先審查"
+
 msgid "Review Dismissed"
 msgstr "審查已忽略"
 
@@ -12571,6 +12648,9 @@ msgstr "在任何地方執行工作區"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "在桌面、任何終端機或手機上執行你的 agent。"
+
+msgid "Run your agents from your phone."
+msgstr "在手機上執行你的 agent。"
 
 msgid "running"
 msgstr "執行中"
@@ -13204,6 +13284,9 @@ msgstr "網頁端建立會話即將推出"
 msgid "Session details"
 msgstr "會話詳情"
 
+msgid "Session ended"
+msgstr "工作階段已結束"
+
 msgid "Session name"
 msgstr "會話名稱"
 
@@ -13261,6 +13344,9 @@ msgstr "在{hostName}上設定專案"
 
 msgid "Set up project…"
 msgstr "配置專案…"
+
+msgid "Set up remote access"
+msgstr "設定遠端存取"
 
 msgid "Set up this project for Superset"
 msgstr "為Superset配置這個專案"
@@ -13997,11 +14083,17 @@ msgstr "直接從Linear工單啟動工作區。代理程式接手，並以一個
 msgid "Start agent"
 msgstr "啟動代理"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "在手機上啟動 agent、即時追蹤並審查差異。你的程式碼始終留在你的機器上。"
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "啟動一個代理程式或終端，開始在此工作區中工作。"
 
 msgid "Start browsing"
 msgstr "開始瀏覽"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "在手機上啟動程式開發 agent、即時追蹤並審查差異。現已在 App Store 上架；Android 版即將推出。"
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "免費開始。團隊用不夠時再升級。企業方案面向有進階安全與合規需求的組織。"
@@ -14024,6 +14116,9 @@ msgstr "啟動或停止工作區執行命令"
 
 msgid "Start with the work."
 msgstr "從工作本身開始。"
+
+msgid "Start work from anywhere"
+msgstr "隨時隨地開始工作"
 
 msgid "Start Workspace"
 msgstr "啟動工作區"
@@ -14207,6 +14302,9 @@ msgstr "套件，以及共享應用元件。點選任意匯入路徑即可複製
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Superset與受監控的終端處理程序樹佔用的CPU總和。超過100%表示有多個CPU核心處於繁忙狀態。持續偏高通常會導致介面卡頓和耗電增加。"
 
+msgid "Summarize the changes in this workspace"
+msgstr "總結此工作區中的變更"
+
 msgid "Summary"
 msgstr "摘要"
 
@@ -14264,8 +14362,11 @@ msgstr "Superset設計系統"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise是面向團隊的Superset。聯絡我們，瞭解它包含什麼，以及如何適配你的組織。"
 
-msgid "Superset failed to start"
-msgstr "Superset啟動失敗"
+msgid "Superset for iPhone"
+msgstr "Superset iPhone 版"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "Superset iPhone 版即將推出。發布時第一時間通知你。"
 
 msgid "Superset for your team"
 msgstr "為你的團隊準備的Superset"
@@ -14396,6 +14497,9 @@ msgstr "切換登入"
 
 msgid "Switch sign-in…"
 msgstr "切換登入…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "切換到手動排序即可重新排列側邊欄"
 
 msgid "Switch to Tab 1"
 msgstr "切換到分頁1"
@@ -14534,9 +14638,6 @@ msgstr "聯絡Superset"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "點按頁面上的任何元素即可留言"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "點按聚焦按鈕即可留言某個區塊。"
 
 msgid "Target agent"
 msgstr "目標代理程式"
@@ -14978,9 +15079,6 @@ msgstr "恢復期已結束。請聯絡support@superset.sh。"
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "遠端分支已分叉。請先拉取再繼續。"
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "渲染處理程序在啟動時崩潰。請檢視日誌瞭解詳情。"
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "雲端工作區簽出的儲存庫，以及它套用哪個儲存庫的 .superset/config.json。工作區會在設定位置開啟，否則在依名稱排序的第一個儲存庫開啟。"
 
@@ -15144,9 +15242,6 @@ msgstr "這將關閉所選工作區及其終端機。專案的檔案和分支保
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "這將關閉該工作區及其終端機。專案的檔案、分支和其他工作區保持不變。"
-
-msgid "This comment is no longer here"
-msgstr "此留言已不存在"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "這將刪除用於重啟/崩潰恢復的已儲存回滾緩衝。"
@@ -15395,6 +15490,9 @@ msgstr "這將取消暫存並還原所有已暫存的變更。已暫存的新檔
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "這將取消暫存並還原所有已暫存的更改。已暫存的新檔案將被刪除。此操作無法復原。"
+
+msgid "This workspace"
+msgstr "此工作區"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "此工作區可能已被移除，或者你不再擁有它的存取權限。"
@@ -16338,6 +16436,9 @@ msgstr "警告"
 msgid "Warning occurred."
 msgstr "出現了警告。"
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "即時查看 agent 的工作，在它們需要指引時，用後續訊息、照片或語音輸入介入。"
+
 msgid "Watchers"
 msgstr "關注者"
 
@@ -16376,6 +16477,9 @@ msgstr "我們會盡快與你聯絡。"
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "連線恢復後，我們會立即帶你回到工作區。"
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "Superset Android 版準備就緒時，我們會寄電子郵件通知你。"
 
 msgid "We'll get back to you shortly."
 msgstr "我們會盡快回復你。"
@@ -16509,6 +16613,9 @@ msgstr "你想解決什麼問題？"
 
 msgid "What should run on a schedule?"
 msgstr "想讓什麼定時執行？"
+
+msgid "What should the page show?"
+msgstr "頁面應顯示什麼?"
 
 msgid "What should we build next?"
 msgstr "接下來做點什麼？"
@@ -16672,6 +16779,9 @@ msgstr "工作區已建立"
 
 msgid "Workspace created from PR"
 msgstr "已從PR建立工作區"
+
+msgid "Workspace details"
+msgstr "工作區詳細資料"
 
 msgid "Workspace ID copied"
 msgstr "已複製工作區ID"

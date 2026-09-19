@@ -274,6 +274,10 @@ msgstr "{0, plural, one {#줄 더 보기} other {#줄 더 보기}}"
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {기존 worktree #개를 워크스페이스로 Superset에 가져옵니다. 디스크의 각 worktree가 추적되어 사이드바에 표시됩니다. 파일은 변경되지 않습니다.} other {기존 worktree #개를 워크스페이스로 Superset에 가져옵니다. 디스크의 각 worktree가 추적되어 사이드바에 표시됩니다. 파일은 변경되지 않습니다.}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, other {해결된 댓글 #개 보기}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {#개 페이지의 댓글을 감시 중} other {#개 페이지의 댓글을 감시 중}}"
@@ -1043,6 +1047,15 @@ msgstr "이 시스템에 <0>{primaryFont}</0>이(가) 설치되어 있지 않습
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>· 리더보드 {1}명 중</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<1>App Store</1><0>출시 예정</0>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<1>Google Play</1><0>출시 예정</0>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<1>App Store</1><0>에서 다운로드</0>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · 현재 위치"
 
@@ -1406,6 +1419,9 @@ msgstr "추가"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "{0} 계정 추가"
+
+msgid "Add a comment…"
+msgstr "댓글 추가…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "프로젝트 설정에서 라이프사이클 실행 스크립트를 추가하거나, 터미널 스크립트를 워크스페이스 실행으로 지정하세요."
@@ -1780,6 +1796,9 @@ msgstr "모든 데이터가 {ACCOUNT_DELETION_GRACE_DAYS}일 후에 영구적으
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "열려 있는 모든 터미널 세션이 종료되고 실행 중인 호스트 서비스가 모두 중지됩니다. 다음 실행까지 서비스를 계속 실행하려면 “Superset 닫기”를 사용하세요."
 
+msgid "All pages"
+msgstr "모든 페이지"
+
 msgid "All plans"
 msgstr "전체 플랜"
 
@@ -1911,6 +1930,9 @@ msgstr "설치할 업데이트가 준비되었습니다."
 
 msgid "Analytics, Ops, and more"
 msgstr "분석, 운영 등"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "Android 버전이 곧 나옵니다. 출시되면 가장 먼저 알려드릴게요."
 
 msgid "Animate the active terminal cursor."
 msgstr "활성 터미널 커서를 깜박이게 합니다."
@@ -2862,6 +2884,9 @@ msgstr "편집 취소"
 msgid "Cancel plan"
 msgstr "플랜 해지"
 
+msgid "Cancel reply"
+msgstr "답글 취소"
+
 msgid "Canceled"
 msgstr "취소됨"
 
@@ -3209,6 +3234,9 @@ msgstr "터미널 기록 지우기"
 
 msgid "Clear terminal history?"
 msgstr "터미널 기록을 지울까요?"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "사이드바를 다시 정렬하려면 필터를 지우세요"
 
 msgid "Clear workspace selection"
 msgstr "워크스페이스 선택 해제"
@@ -3597,6 +3625,9 @@ msgstr "댓글 남김"
 
 msgid "Comments"
 msgstr "댓글"
+
+msgid "Comments could not be loaded"
+msgstr "댓글을 불러올 수 없습니다"
 
 msgid "Comments go to this agent"
 msgstr "댓글은 이 에이전트에게 전달됩니다"
@@ -6114,6 +6145,9 @@ msgstr "작업을 만들지 못했습니다"
 msgid "Failed to create team"
 msgstr "팀을 만들지 못했습니다"
 
+msgid "Failed to create terminal"
+msgstr "터미널을 만들지 못했습니다"
+
 msgid "Failed to create thread"
 msgstr "스레드를 만들지 못했습니다"
 
@@ -6645,6 +6679,9 @@ msgstr "완료 · 7초 작업"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "첫 로그인 화면 → 인증 → 온보딩 → 실제 워크스페이스 (최근 7일, 2일 윈도우)"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "처음이신가요? 데스크톱 앱의 설정 → 원격 액세스에서 원격 액세스를 켜세요."
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "superset.sh 최초 페이지뷰, 일별"
 
@@ -6725,6 +6762,9 @@ msgstr "폴더 보기"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "새 worktree에 체크아웃할 폴더를 리포지토리 루트 기준으로 한 줄에 하나씩 적습니다. 루트에 있는 파일은 항상 포함됩니다. 비워 두면 전체를 체크아웃합니다."
+
+msgid "Follow every session"
+msgstr "모든 세션을 따라가기"
 
 msgid "FOLLOW ON X"
 msgstr "X에서 팔로우하기"
@@ -6947,6 +6987,9 @@ msgstr "Mac에서 Superset 사용하기"
 
 msgid "Get Superset Pro"
 msgstr "Superset Pro 시작하기"
+
+msgid "Get the iPhone app"
+msgstr "iPhone 앱 받기"
 
 msgid "Ghost"
 msgstr "고스트"
@@ -7209,6 +7252,9 @@ msgstr "풀 리퀘스트 미리보기 숨기기"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "해결된 항목 숨기기 ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "해결된 댓글 숨기기"
 
 msgid "Hide review comments"
 msgstr "리뷰 코멘트 숨기기"
@@ -8083,6 +8129,9 @@ msgstr "실행"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "기능 개발, 버그 수정, 리팩터링에 에이전트를 병렬로 띄우세요. 어떤 에이전트가 작업 중이고, 막혀 있고, 응답을 기다리는지 한눈에 보입니다."
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "아이디어가 떠오르는 순간, 연결된 어떤 머신에서든 에이전트를 실행하세요. 모든 세션은 격리된 자체 워크스페이스를 갖습니다."
+
 msgid "Launch mode"
 msgstr "실행 방식"
 
@@ -8142,6 +8191,9 @@ msgstr "팀 나가기"
 
 msgid "Leave the leaderboard?"
 msgstr "리더보드에서 나갈까요?"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "자리를 떠나도,<0/>개발은 계속됩니다."
 
 msgid "Leaving organization..."
 msgstr "조직에서 나가는 중..."
@@ -9077,6 +9129,10 @@ msgstr "네트워크 변경됨"
 msgid "Never"
 msgstr "없음"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "새 항목"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "새 {providerLabel} 에이전트는 {accountLabel}을(를) 사용합니다."
 
@@ -9131,6 +9187,9 @@ msgstr "워크스페이스로 새 그룹 만들기"
 msgid "New issue"
 msgstr "새 이슈"
 
+msgid "New page"
+msgstr "새 페이지"
+
 msgid "New password (min 8 characters)"
 msgstr "새 비밀번호 (최소 8자)"
 
@@ -9145,6 +9204,9 @@ msgstr "새 릴리스와 제품 업데이트."
 
 msgid "New session"
 msgstr "새 세션"
+
+msgid "New shell"
+msgstr "새 셸"
 
 msgid "New stars"
 msgstr "신규 스타"
@@ -10120,6 +10182,9 @@ msgstr "스레드 작성자 또는 페이지 소유자만 삭제할 수 있습�
 
 msgid "Only you"
 msgstr "나만"
+
+msgid "Only you can see this page"
+msgstr "이 페이지는 나만 볼 수 있습니다"
 
 msgid "open"
 msgstr "열기"
@@ -11651,6 +11716,9 @@ msgstr "변경 로그 읽기"
 msgid "Read the changelog →"
 msgstr "변경 로그 읽기 →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "전체 diff를 파일별로 읽고, PR 상태를 확인하고, 원본 출력이 필요할 땐 터미널을 여세요."
+
 msgid "Read the guide to parallel coding agents"
 msgstr "병렬 코딩 에이전트 가이드 읽기"
 
@@ -12055,6 +12123,9 @@ msgstr "답글"
 msgid "Reply to thread…"
 msgstr "스레드에 답글…"
 
+msgid "Replying to {replyingTo}"
+msgstr "{replyingTo}님에게 답글 작성 중"
+
 msgid "repo"
 msgstr "리포"
 
@@ -12108,6 +12179,9 @@ msgstr "필수"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "필요한 버전: {minimumVersion} 이상"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "iOS 26 이상이 필요합니다. Superset Pro에 포함되어 있습니다."
 
 msgid "Reserved by OS"
 msgstr "OS에서 예약됨"
@@ -12388,6 +12462,9 @@ msgstr "리뷰와 CI 대기열이 에이전트가 만든 이득을 깎아먹습�
 msgid "Review becomes the bottleneck"
 msgstr "리뷰가 병목이 됩니다"
 
+msgid "Review before you merge"
+msgstr "머지 전에 리뷰하기"
+
 msgid "Review Dismissed"
 msgstr "리뷰 무시됨"
 
@@ -12571,6 +12648,9 @@ msgstr "어디서나 워크스페이스 실행"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "데스크톱, 어떤 터미널, 또는 휴대폰에서 에이전트를 실행하세요."
+
+msgid "Run your agents from your phone."
+msgstr "휴대폰에서 에이전트를 실행하세요."
 
 msgid "running"
 msgstr "실행 중"
@@ -13204,6 +13284,9 @@ msgstr "웹에서 세션 만들기는 곧 지원됩니다"
 msgid "Session details"
 msgstr "세션 상세"
 
+msgid "Session ended"
+msgstr "세션 종료"
+
 msgid "Session name"
 msgstr "세션 이름"
 
@@ -13261,6 +13344,9 @@ msgstr "{hostName}에 프로젝트 설정"
 
 msgid "Set up project…"
 msgstr "프로젝트 설정…"
+
+msgid "Set up remote access"
+msgstr "원격 액세스 설정"
 
 msgid "Set up this project for Superset"
 msgstr "이 프로젝트를 Superset에 맞게 설정하기"
@@ -13997,11 +14083,17 @@ msgstr "Linear 티켓에서 바로 워크스페이스를 시작하세요. 에이
 msgid "Start agent"
 msgstr "에이전트 시작"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "휴대폰에서 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. 코드는 내 머신에 그대로 남습니다."
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "에이전트나 터미널을 시작해 이 워크스페이스에서 작업을 시작하세요."
 
 msgid "Start browsing"
 msgstr "탐색 시작"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "휴대폰에서 코딩 에이전트를 시작하고, 실시간으로 따라가고, diff를 리뷰하세요. App Store에서 받을 수 있으며 Android는 출시 예정입니다."
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "무료로 시작하세요. 팀이 커지면 업그레이드하세요. 고급 보안과 규정 준수가 필요한 조직을 위한 엔터프라이즈 플랜도 있습니다."
@@ -14024,6 +14116,9 @@ msgstr "워크스페이스 실행 명령을 시작하거나 중지합니다"
 
 msgid "Start with the work."
 msgstr "할 일에서 시작하세요."
+
+msgid "Start work from anywhere"
+msgstr "어디서든 작업 시작"
 
 msgid "Start Workspace"
 msgstr "워크스페이스 시작"
@@ -14207,6 +14302,9 @@ msgstr "스위트, 그리고 공용 앱 컴포넌트입니다. import 경로를 
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Superset과 모니터링 중인 터미널 프로세스 트리가 사용하는 CPU의 합계입니다. 100%를 넘으면 여러 CPU 코어가 사용 중이라는 뜻입니다. 높은 값이 계속되면 보통 UI가 느려지고 배터리 소모가 커집니다."
 
+msgid "Summarize the changes in this workspace"
+msgstr "이 워크스페이스의 변경 사항을 요약해 줘"
+
 msgid "Summary"
 msgstr "요약"
 
@@ -14264,8 +14362,11 @@ msgstr "Superset 디자인 시스템"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise는 팀을 위한 Superset입니다. 어떤 기능이 포함되고 조직에 어떻게 적용할 수 있는지 문의해 주세요."
 
-msgid "Superset failed to start"
-msgstr "Superset을 시작하지 못했습니다"
+msgid "Superset for iPhone"
+msgstr "iPhone용 Superset"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "iPhone용 Superset이 곧 나옵니다. 출시되면 가장 먼저 알려드릴게요."
 
 msgid "Superset for your team"
 msgstr "팀을 위한 Superset"
@@ -14396,6 +14497,9 @@ msgstr "로그인 전환"
 
 msgid "Switch sign-in…"
 msgstr "로그인 전환…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "사이드바를 다시 정렬하려면 수동 정렬로 전환하세요"
 
 msgid "Switch to Tab 1"
 msgstr "탭 1로 전환"
@@ -14534,9 +14638,6 @@ msgstr "Superset에 문의하기"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "페이지의 아무 곳이나 탭하여 댓글을 남기세요"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "포커스 버튼을 눌러 블록에 댓글을 남기세요."
 
 msgid "Target agent"
 msgstr "대상 에이전트"
@@ -14978,9 +15079,6 @@ msgstr "복구 기간이 끝났습니다. support@superset.sh로 문의하세요
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "원격 브랜치가 갈라졌습니다. 계속하기 전에 pull하세요."
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "시작 중에 렌더러가 충돌했습니다. 자세한 내용은 로그를 확인하세요."
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "클라우드 워크스페이스가 체크아웃하는 리포지토리와 어느 리포지토리의 .superset/config.json을 적용할지 정합니다. 워크스페이스는 구성 위치에서, 없으면 이름순 첫 번째 리포지토리에서 열립니다."
 
@@ -15144,9 +15242,6 @@ msgstr "선택한 워크스페이스와 해당 터미널을 닫습니다. 프로
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "워크스페이스와 해당 터미널을 닫습니다. 프로젝트의 파일, 브랜치, 다른 워크스페이스는 그대로 유지됩니다."
-
-msgid "This comment is no longer here"
-msgstr "이 댓글은 더 이상 없습니다"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "재부팅/충돌 복구에 사용하는 저장된 스크롤백을 삭제합니다."
@@ -15395,6 +15490,9 @@ msgstr "스테이징된 모든 변경을 스테이징 해제하고 되돌립니�
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "스테이징된 변경 사항을 모두 스테이징 해제하고 되돌립니다. 스테이징된 새 파일은 삭제됩니다. 되돌릴 수 없습니다."
+
+msgid "This workspace"
+msgstr "이 워크스페이스"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "이 워크스페이스가 제거되었거나 더 이상 접근 권한이 없을 수 있습니다."
@@ -16338,6 +16436,9 @@ msgstr "경고"
 msgid "Warning occurred."
 msgstr "경고가 발생했습니다."
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "에이전트가 일하는 모습을 실시간으로 지켜보고, 방향이 필요할 때 후속 메시지, 사진, 음성 입력 메시지로 개입하세요."
+
 msgid "Watchers"
 msgstr "관찰자"
 
@@ -16376,6 +16477,9 @@ msgstr "곧 연락드리겠습니다."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "다시 연결되면 원래 화면으로 돌아갈게요."
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "Android용 Superset이 준비되면 이메일로 알려드리겠습니다."
 
 msgid "We'll get back to you shortly."
 msgstr "곧 회신드리겠습니다."
@@ -16509,6 +16613,9 @@ msgstr "어떤 문제를 해결하려고 하시나요?"
 
 msgid "What should run on a schedule?"
 msgstr "어떤 작업을 일정에 따라 실행할까요?"
+
+msgid "What should the page show?"
+msgstr "페이지에 무엇을 표시할까요?"
 
 msgid "What should we build next?"
 msgstr "다음으로 무엇을 만들까요?"
@@ -16672,6 +16779,9 @@ msgstr "워크스페이스를 만들었습니다"
 
 msgid "Workspace created from PR"
 msgstr "PR에서 워크스페이스를 만들었습니다"
+
+msgid "Workspace details"
+msgstr "워크스페이스 세부 정보"
 
 msgid "Workspace ID copied"
 msgstr "워크스페이스 ID 복사됨"

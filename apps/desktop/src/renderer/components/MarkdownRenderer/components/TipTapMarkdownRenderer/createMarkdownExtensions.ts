@@ -242,7 +242,7 @@ export function createMarkdownExtensions({
 		HardBreak,
 		History,
 		Link.configure({
-			openOnClick: !editable,
+			openOnClick: false,
 			HTMLAttributes: {
 				class:
 					"text-primary underline underline-offset-2 hover:text-primary/80",

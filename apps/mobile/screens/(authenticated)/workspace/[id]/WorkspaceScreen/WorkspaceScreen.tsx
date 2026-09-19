@@ -469,6 +469,10 @@ export function WorkspaceScreen() {
 		router.push(`/(authenticated)/workspace/${id}/new-session`);
 	}, [router, id]);
 
+	const openActions = useCallback(() => {
+		router.push(`/(authenticated)/workspace/${id}/actions`);
+	}, [router, id]);
+
 	const openSessions = useCallback(() => {
 		router.push(
 			`/(authenticated)/workspace/${id}/sessions?active=${activeTerminalId ?? ""}`,
@@ -824,17 +828,12 @@ export function WorkspaceScreen() {
 			>
 				{notice ? null : (
 					<Stack.Title asChild>
-						<PressableScale
-							onPress={() =>
-								router.push(`/(authenticated)/workspace/${id}/actions`)
-							}
-							disabled={!workspace}
-						>
-							{/* Width budget: the back capsule leaves ~210pt of bar on a 390pt
-							    screen — wider and the title collides with the back button under
-							    iOS 26's floating bar items. Anything that lands in the bar later
-							    comes out of this. */}
-							<View className="max-w-52">
+						<PressableScale onPress={openActions} disabled={!workspace}>
+							{/* Width budget: the back capsule and the ⋯ button leave ~160pt of
+							    bar on a 390pt screen — wider and the title collides with them
+							    under iOS 26's floating bar items. Anything that lands in the
+							    bar later comes out of this. */}
+							<View className="max-w-40">
 								<Text className="font-semibold text-[17px]" numberOfLines={1}>
 									{workspace?.name ?? cloud?.name ?? ""}
 								</Text>
@@ -843,6 +842,16 @@ export function WorkspaceScreen() {
 					</Stack.Title>
 				)}
 			</Stack.Screen>
+
+			{workspace ? (
+				<Stack.Toolbar placement="right">
+					<Stack.Toolbar.Button
+						icon="ellipsis"
+						accessibilityLabel={t({ message: "Workspace details" })}
+						onPress={openActions}
+					/>
+				</Stack.Toolbar>
+			) : null}
 
 			{banner && activeTerminalId ? (
 				<View className="bg-muted px-3 py-1.5">

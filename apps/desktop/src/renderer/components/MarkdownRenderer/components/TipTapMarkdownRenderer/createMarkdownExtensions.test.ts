@@ -6,7 +6,7 @@ import { GlobalRegistrator } from "@happy-dom/global-registrator";
 const alreadyRegistered = GlobalRegistrator.isRegistered;
 if (!alreadyRegistered) GlobalRegistrator.register();
 
-const { afterAll, describe, expect, it } = await import("bun:test");
+const { afterAll, describe, expect, it, spyOn } = await import("bun:test");
 const { Editor } = await import("@tiptap/core");
 const { createMarkdownExtensions } = await import("./createMarkdownExtensions");
 
@@ -41,6 +41,39 @@ function roundTrip(markdown: string): string {
 		editor.destroy();
 	}
 }
+
+describe("preview links", () => {
+	it.each([
+		true,
+		false,
+	])("never opens a link itself when editable is %p", (editable) => {
+		const editor = new Editor({
+			editable,
+			extensions: createMarkdownExtensions({
+				editable,
+				onSaveRef: { current: undefined },
+			}),
+			content: "[**Example**](https://example.com/)",
+		});
+		const open = spyOn(window, "open").mockReturnValue(null);
+		try {
+			const event = new MouseEvent("click", { button: 0 });
+			Object.defineProperty(event, "target", {
+				value: editor.view.dom.querySelector("strong"),
+			});
+
+			const handled = editor.view.someProp("handleClick", (handler) =>
+				handler(editor.view, 1, event),
+			);
+
+			expect(handled).toBeFalsy();
+			expect(open).not.toHaveBeenCalled();
+		} finally {
+			open.mockRestore();
+			editor.destroy();
+		}
+	});
+});
 
 describe("image attribute parsing", () => {
 	// @tiptap/core's default attribute parser (fromString) coerces

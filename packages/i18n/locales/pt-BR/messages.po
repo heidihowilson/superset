@@ -274,6 +274,10 @@ msgstr "{0, plural, one {Mostrar mais # linha} other {Mostrar mais # linhas}}"
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Isso vai importar # worktree existente para o Superset como área de trabalho. Cada worktree em disco passa a ser monitorada e aparece na sua barra lateral. Nenhum arquivo será alterado.} other {Isso vai importar # worktrees existentes para o Superset como áreas de trabalho. Cada worktree em disco passa a ser monitorada e aparece na sua barra lateral. Nenhum arquivo será alterado.}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, one {Ver # comentário resolvido} other {Ver # comentários resolvidos}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {Observando # página para comentários} other {Observando # páginas para comentários}}"
@@ -1043,6 +1047,15 @@ msgstr "<0>{primaryFont}</0> não está instalada neste sistema. Usando a próxi
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>de {1} no ranking</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<0>Em breve na</0><1>App Store</1>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<0>Em breve no</0><1>Google Play</1>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<0>Baixar na</0><1>App Store</1>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · você está aqui"
 
@@ -1406,6 +1419,9 @@ msgstr "Adicionar"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "Adicionar conta {0}"
+
+msgid "Add a comment…"
+msgstr "Adicione um comentário…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Adicione um script de execução de ciclo de vida nas Configurações do projeto ou marque um script de terminal como a execução da área de trabalho."
@@ -1780,6 +1796,9 @@ msgstr "Todos os seus dados serão excluídos permanentemente depois de {ACCOUNT
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "Todas as sessões de terminal abertas serão encerradas e os serviços de host em execução serão parados. Use “Fechar o Superset” se quiser que os serviços continuem rodando para a próxima abertura."
 
+msgid "All pages"
+msgstr "Todas as páginas"
+
 msgid "All plans"
 msgstr "Todos os planos"
 
@@ -1911,6 +1930,9 @@ msgstr "Há uma atualização pronta para instalar."
 
 msgid "Analytics, Ops, and more"
 msgstr "Análises, operações e mais"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "O Android está a caminho. Seja o primeiro a saber quando for lançado."
 
 msgid "Animate the active terminal cursor."
 msgstr "Anima o cursor do terminal ativo."
@@ -2862,6 +2884,9 @@ msgstr "Cancelar as edições"
 msgid "Cancel plan"
 msgstr "Cancelar plano"
 
+msgid "Cancel reply"
+msgstr "Cancelar resposta"
+
 msgid "Canceled"
 msgstr "Canceladas"
 
@@ -3209,6 +3234,9 @@ msgstr "Limpar o histórico do terminal"
 
 msgid "Clear terminal history?"
 msgstr "Limpar o histórico do terminal?"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "Limpe o filtro para reorganizar a barra lateral"
 
 msgid "Clear workspace selection"
 msgstr "Limpar a seleção de áreas de trabalho"
@@ -3597,6 +3625,9 @@ msgstr "Comentada"
 
 msgid "Comments"
 msgstr "Comentários"
+
+msgid "Comments could not be loaded"
+msgstr "Não foi possível carregar os comentários"
 
 msgid "Comments go to this agent"
 msgstr "Os comentários vão para este agente"
@@ -6114,6 +6145,9 @@ msgstr "Falha ao criar a tarefa"
 msgid "Failed to create team"
 msgstr "Falha ao criar a equipe"
 
+msgid "Failed to create terminal"
+msgstr "Falha ao criar terminal"
+
 msgid "Failed to create thread"
 msgstr "Falha ao criar a thread"
 
@@ -6645,6 +6679,9 @@ msgstr "terminou · trabalhou por 7s"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "Primeira visualização de login → autenticação → introdução → área de trabalho real (últimos 7d, janela de 2d)"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "Primeira vez aqui? Ative o acesso remoto no app de desktop em Configurações → Acesso remoto."
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "Primeiro pageview no superset.sh, por dia"
 
@@ -6725,6 +6762,9 @@ msgstr "Visualização por pastas"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Pastas a incluir nas novas worktrees, uma por linha, relativas à raiz do repositório. Os arquivos da raiz sempre entram. Vazio inclui tudo."
+
+msgid "Follow every session"
+msgstr "Acompanhe cada sessão"
 
 msgid "FOLLOW ON X"
 msgstr "SIGA NO X"
@@ -6947,6 +6987,9 @@ msgstr "Instale o Superset no seu Mac"
 
 msgid "Get Superset Pro"
 msgstr "Assinar o Superset Pro"
+
+msgid "Get the iPhone app"
+msgstr "Baixar o app para iPhone"
 
 msgid "Ghost"
 msgstr "Ghost"
@@ -7209,6 +7252,9 @@ msgstr "Ocultar a prévia do pull request"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "Ocultar os resolvidos ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "Ocultar os comentários resolvidos"
 
 msgid "Hide review comments"
 msgstr "Ocultar os comentários de revisão"
@@ -8083,6 +8129,9 @@ msgstr "Execução"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "Dispare agentes em funcionalidades, correções e refatorações, tudo em paralelo. O status mostra de relance quais agentes estão trabalhando, quais estão travados e quais esperam por você."
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "Inicie um agente em qualquer máquina conectada assim que a ideia surgir. Cada sessão tem sua própria área de trabalho isolada."
+
 msgid "Launch mode"
 msgstr "Modo de execução"
 
@@ -8142,6 +8191,9 @@ msgstr "Sair da equipe"
 
 msgid "Leave the leaderboard?"
 msgstr "Sair do ranking?"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "Saia da mesa.<0/>Continue construindo."
 
 msgid "Leaving organization..."
 msgstr "Saindo da organização..."
@@ -9077,6 +9129,10 @@ msgstr "A rede mudou"
 msgid "Never"
 msgstr "Nunca"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "Nova"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "Os novos agentes {providerLabel} vão usar {accountLabel}."
 
@@ -9131,6 +9187,9 @@ msgstr "Novo grupo a partir da área de trabalho"
 msgid "New issue"
 msgstr "Nova issue"
 
+msgid "New page"
+msgstr "Nova página"
+
 msgid "New password (min 8 characters)"
 msgstr "Nova senha (mín. 8 caracteres)"
 
@@ -9145,6 +9204,9 @@ msgstr "Novas versões e atualizações do produto."
 
 msgid "New session"
 msgstr "Nova sessão"
+
+msgid "New shell"
+msgstr "Novo shell"
 
 msgid "New stars"
 msgstr "Novas estrelas"
@@ -10120,6 +10182,9 @@ msgstr "Só quem criou a thread ou quem é dono da página pode excluí-la"
 
 msgid "Only you"
 msgstr "Só você"
+
+msgid "Only you can see this page"
+msgstr "Só você pode ver esta página"
 
 msgid "open"
 msgstr "abrir"
@@ -11651,6 +11716,9 @@ msgstr "Ler o changelog"
 msgid "Read the changelog →"
 msgstr "Ler o changelog →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "Leia o diff completo arquivo por arquivo, confira o status do PR e abra um terminal quando precisar da saída bruta."
+
 msgid "Read the guide to parallel coding agents"
 msgstr "Leia o guia de agentes de código em paralelo"
 
@@ -12055,6 +12123,9 @@ msgstr "Responder"
 msgid "Reply to thread…"
 msgstr "Responder à thread…"
 
+msgid "Replying to {replyingTo}"
+msgstr "Respondendo a {replyingTo}"
+
 msgid "repo"
 msgstr "repo"
 
@@ -12108,6 +12179,9 @@ msgstr "Obrigatório"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Versão necessária: {minimumVersion}+"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "Requer iOS 26 ou posterior. Incluído no Superset Pro."
 
 msgid "Reserved by OS"
 msgstr "Reservado pelo sistema"
@@ -12388,6 +12462,9 @@ msgstr "As filas de revisão e de CI comem o ganho que os agentes criam."
 msgid "Review becomes the bottleneck"
 msgstr "A revisão vira o gargalo"
 
+msgid "Review before you merge"
+msgstr "Revise antes de fazer o merge"
+
 msgid "Review Dismissed"
 msgstr "Revisão dispensada"
 
@@ -12571,6 +12648,9 @@ msgstr "Rode áreas de trabalho em qualquer lugar"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Execute seus agentes no desktop, em qualquer terminal ou no seu celular."
+
+msgid "Run your agents from your phone."
+msgstr "Execute seus agentes no seu celular."
 
 msgid "running"
 msgstr "em execução"
@@ -13204,6 +13284,9 @@ msgstr "Criar sessões pela web chega em breve"
 msgid "Session details"
 msgstr "Detalhes da sessão"
 
+msgid "Session ended"
+msgstr "Sessão encerrada"
+
 msgid "Session name"
 msgstr "Nome da sessão"
 
@@ -13261,6 +13344,9 @@ msgstr "Configurar o projeto em {hostName}"
 
 msgid "Set up project…"
 msgstr "Configurar projeto…"
+
+msgid "Set up remote access"
+msgstr "Configurar acesso remoto"
 
 msgid "Set up this project for Superset"
 msgstr "Configurar este projeto para o Superset"
@@ -13997,11 +14083,17 @@ msgstr "Crie uma área de trabalho direto de um ticket do Linear. O agente assum
 msgid "Start agent"
 msgstr "Iniciar agente"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "Inicie agentes, acompanhe-os ao vivo e revise o diff no seu celular. Seu código fica nas suas máquinas."
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Inicie um agente ou um terminal para começar a trabalhar nesta área de trabalho."
 
 msgid "Start browsing"
 msgstr "Comece a navegar"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "Inicie agentes de programação, acompanhe-os ao vivo e revise o diff no seu celular. Disponível na App Store; Android em breve."
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "Comece de graça. Faça upgrade quando o time crescer. Planos Enterprise para organizações com necessidades avançadas de segurança e conformidade."
@@ -14024,6 +14116,9 @@ msgstr "Iniciar ou parar o comando de execução da área de trabalho"
 
 msgid "Start with the work."
 msgstr "Comece pelo trabalho."
+
+msgid "Start work from anywhere"
+msgstr "Comece a trabalhar de qualquer lugar"
 
 msgid "Start Workspace"
 msgstr "Iniciar área de trabalho"
@@ -14207,6 +14302,9 @@ msgstr "para interfaces de agente e os componentes compartilhados do app. Clique
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Soma da CPU usada pelo Superset e pelas árvores de processos de terminal monitoradas. Acima de 100% significa que vários núcleos estão ocupados. Valores altos e constantes costumam deixar a interface lenta e consumir mais bateria."
 
+msgid "Summarize the changes in this workspace"
+msgstr "Resuma as alterações desta área de trabalho"
+
 msgid "Summary"
 msgstr "Resumo"
 
@@ -14264,8 +14362,11 @@ msgstr "Design System do Superset"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "O Superset Enterprise é o Superset para times. Fale com a gente para saber o que está incluído e como ele pode funcionar na sua organização."
 
-msgid "Superset failed to start"
-msgstr "O Superset não conseguiu iniciar"
+msgid "Superset for iPhone"
+msgstr "Superset para iPhone"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "O Superset para iPhone está a caminho. Seja o primeiro a saber quando for lançado."
 
 msgid "Superset for your team"
 msgstr "Superset para o seu time"
@@ -14396,6 +14497,9 @@ msgstr "Trocar de login"
 
 msgid "Switch sign-in…"
 msgstr "Trocar de login…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "Mude para a ordem manual para reorganizar a barra lateral"
 
 msgid "Switch to Tab 1"
 msgstr "Ir para a aba 1"
@@ -14534,9 +14638,6 @@ msgstr "Fale com o Superset"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Toque em qualquer elemento da página para comentar"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "Toque no botão de foco para comentar em um bloco."
 
 msgid "Target agent"
 msgstr "Agente de destino"
@@ -14978,9 +15079,6 @@ msgstr "O período de recuperação terminou. Escreva para support@superset.sh."
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "A branch remota divergiu. Faça pull antes de continuar."
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "O renderer travou durante a inicialização. Verifique os logs para mais detalhes."
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "Os repositórios que uma área de trabalho na nuvem faz checkout, e de qual deles o .superset/config.json é aplicado. A área de trabalho abre no local da configuração, ou no primeiro repositório por nome."
 
@@ -15144,9 +15242,6 @@ msgstr "Isso fecha as áreas de trabalho selecionadas e seus terminais. Os arqui
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "Isso fecha a área de trabalho e seus terminais. Os arquivos, as branches e as outras áreas de trabalho do projeto permanecem como estão."
-
-msgid "This comment is no longer here"
-msgstr "Este comentário não está mais aqui"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Isso apaga o scrollback salvo usado para recuperação após reinício ou travamento."
@@ -15395,6 +15490,9 @@ msgstr "Isso removerá da preparação e reverterá todas as alterações prepar
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "Isso remove do stage e reverte todas as alterações no stage. Arquivos novos no stage serão excluídos. Não dá para desfazer."
+
+msgid "This workspace"
+msgstr "Esta área de trabalho"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Esta área de trabalho pode ter sido removida ou você não tem mais acesso a ela."
@@ -16338,6 +16436,9 @@ msgstr "Aviso"
 msgid "Warning occurred."
 msgstr "Houve um aviso."
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "Veja os agentes trabalhando em tempo real e intervenha com uma mensagem de acompanhamento, uma foto ou uma mensagem ditada quando precisarem de direção."
+
 msgid "Watchers"
 msgstr "Observadores"
 
@@ -16376,6 +16477,9 @@ msgstr "Entramos em contato em breve."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Você voltará ao seu espaço assim que a conexão for restabelecida."
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "Enviaremos um e-mail quando o Superset para Android estiver pronto."
 
 msgid "We'll get back to you shortly."
 msgstr "Retornamos em breve."
@@ -16509,6 +16613,9 @@ msgstr "Que problema você quer resolver?"
 
 msgid "What should run on a schedule?"
 msgstr "O que deve rodar em uma agenda?"
+
+msgid "What should the page show?"
+msgstr "O que a página deve mostrar?"
 
 msgid "What should we build next?"
 msgstr "O que vamos construir agora?"
@@ -16672,6 +16779,9 @@ msgstr "Área de trabalho criada"
 
 msgid "Workspace created from PR"
 msgstr "Área de trabalho criada a partir do PR"
+
+msgid "Workspace details"
+msgstr "Detalhes da área de trabalho"
 
 msgid "Workspace ID copied"
 msgstr "ID da área de trabalho copiado"

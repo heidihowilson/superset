@@ -274,6 +274,10 @@ msgstr "{0, plural, one {Show # more line} other {Show # more lines}}"
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
@@ -1043,6 +1047,15 @@ msgstr "<0>{primaryFont}</0> is not installed on this system. Falling back to th
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<0>Coming soon to</0><1>App Store</1>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<0>Coming soon to</0><1>Google Play</1>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<0>Download on the</0><1>App Store</1>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · you are here"
 
@@ -1406,6 +1419,9 @@ msgstr "Add"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "Add {0} account"
+
+msgid "Add a comment…"
+msgstr "Add a comment…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
@@ -1780,6 +1796,9 @@ msgstr "All of your data will be permanently deleted after {ACCOUNT_DELETION_GRA
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 
+msgid "All pages"
+msgstr "All pages"
+
 msgid "All plans"
 msgstr "All plans"
 
@@ -1911,6 +1930,9 @@ msgstr "An update is ready to install."
 
 msgid "Analytics, Ops, and more"
 msgstr "Analytics, Ops, and more"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "Android is on the way. Be first to know when it ships."
 
 msgid "Animate the active terminal cursor."
 msgstr "Animate the active terminal cursor."
@@ -2862,6 +2884,9 @@ msgstr "Cancel edits"
 msgid "Cancel plan"
 msgstr "Cancel plan"
 
+msgid "Cancel reply"
+msgstr "Cancel reply"
+
 msgid "Canceled"
 msgstr "Canceled"
 
@@ -3209,6 +3234,9 @@ msgstr "Clear terminal history"
 
 msgid "Clear terminal history?"
 msgstr "Clear terminal history?"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "Clear the filter to rearrange the sidebar"
 
 msgid "Clear workspace selection"
 msgstr "Clear workspace selection"
@@ -3597,6 +3625,9 @@ msgstr "Commented"
 
 msgid "Comments"
 msgstr "Comments"
+
+msgid "Comments could not be loaded"
+msgstr "Comments could not be loaded"
 
 msgid "Comments go to this agent"
 msgstr "Comments go to this agent"
@@ -6114,6 +6145,9 @@ msgstr "Failed to create task"
 msgid "Failed to create team"
 msgstr "Failed to create team"
 
+msgid "Failed to create terminal"
+msgstr "Failed to create terminal"
+
 msgid "Failed to create thread"
 msgstr "Failed to create thread"
 
@@ -6645,6 +6679,9 @@ msgstr "finished · worked for 7s"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "First-ever pageview on superset.sh, daily"
 
@@ -6725,6 +6762,9 @@ msgstr "Folder view"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
+
+msgid "Follow every session"
+msgstr "Follow every session"
 
 msgid "FOLLOW ON X"
 msgstr "FOLLOW ON X"
@@ -6947,6 +6987,9 @@ msgstr "Get Superset on your Mac"
 
 msgid "Get Superset Pro"
 msgstr "Get Superset Pro"
+
+msgid "Get the iPhone app"
+msgstr "Get the iPhone app"
 
 msgid "Ghost"
 msgstr "Ghost"
@@ -7209,6 +7252,9 @@ msgstr "Hide pull request preview"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "Hide resolved ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "Hide resolved comments"
 
 msgid "Hide review comments"
 msgstr "Hide review comments"
@@ -8083,6 +8129,9 @@ msgstr "Launch"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+
 msgid "Launch mode"
 msgstr "Launch mode"
 
@@ -8142,6 +8191,9 @@ msgstr "Leave team"
 
 msgid "Leave the leaderboard?"
 msgstr "Leave the leaderboard?"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "Leave your desk.<0/>Keep building."
 
 msgid "Leaving organization..."
 msgstr "Leaving organization..."
@@ -9077,6 +9129,10 @@ msgstr "Network Changed"
 msgid "Never"
 msgstr "Never"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "New"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "New {providerLabel} agents will use {accountLabel}."
 
@@ -9131,6 +9187,9 @@ msgstr "New group from workspace"
 msgid "New issue"
 msgstr "New issue"
 
+msgid "New page"
+msgstr "New page"
+
 msgid "New password (min 8 characters)"
 msgstr "New password (min 8 characters)"
 
@@ -9145,6 +9204,9 @@ msgstr "New releases and product updates."
 
 msgid "New session"
 msgstr "New session"
+
+msgid "New shell"
+msgstr "New shell"
 
 msgid "New stars"
 msgstr "New stars"
@@ -10120,6 +10182,9 @@ msgstr "Only the thread's author or the page's owner can delete it"
 
 msgid "Only you"
 msgstr "Only you"
+
+msgid "Only you can see this page"
+msgstr "Only you can see this page"
 
 msgid "open"
 msgstr "open"
@@ -11651,6 +11716,9 @@ msgstr "Read the changelog"
 msgid "Read the changelog →"
 msgstr "Read the changelog →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+
 msgid "Read the guide to parallel coding agents"
 msgstr "Read the guide to parallel coding agents"
 
@@ -12055,6 +12123,9 @@ msgstr "Reply"
 msgid "Reply to thread…"
 msgstr "Reply to thread…"
 
+msgid "Replying to {replyingTo}"
+msgstr "Replying to {replyingTo}"
+
 msgid "repo"
 msgstr "repo"
 
@@ -12108,6 +12179,9 @@ msgstr "Required"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Required version: {minimumVersion}+"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "Requires iOS 26 or later. Included with Superset Pro."
 
 msgid "Reserved by OS"
 msgstr "Reserved by OS"
@@ -12388,6 +12462,9 @@ msgstr "Review and CI queues eat the gains agents create."
 msgid "Review becomes the bottleneck"
 msgstr "Review becomes the bottleneck"
 
+msgid "Review before you merge"
+msgstr "Review before you merge"
+
 msgid "Review Dismissed"
 msgstr "Review Dismissed"
 
@@ -12571,6 +12648,9 @@ msgstr "Run workspaces anywhere"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Run your agents from the desktop, any terminal, or your phone."
+
+msgid "Run your agents from your phone."
+msgstr "Run your agents from your phone."
 
 msgid "running"
 msgstr "running"
@@ -13204,6 +13284,9 @@ msgstr "Session creation on web is coming soon"
 msgid "Session details"
 msgstr "Session details"
 
+msgid "Session ended"
+msgstr "Session ended"
+
 msgid "Session name"
 msgstr "Session name"
 
@@ -13261,6 +13344,9 @@ msgstr "Set up project on {hostName}"
 
 msgid "Set up project…"
 msgstr "Set up project…"
+
+msgid "Set up remote access"
+msgstr "Set up remote access"
 
 msgid "Set up this project for Superset"
 msgstr "Set up this project for Superset"
@@ -13997,11 +14083,17 @@ msgstr "Start a workspace straight from a Linear ticket. The agent picks it up a
 msgid "Start agent"
 msgstr "Start agent"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Start an agent or a terminal to begin working in this workspace."
 
 msgid "Start browsing"
 msgstr "Start browsing"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
@@ -14024,6 +14116,9 @@ msgstr "Start or stop the workspace run command"
 
 msgid "Start with the work."
 msgstr "Start with the work."
+
+msgid "Start work from anywhere"
+msgstr "Start work from anywhere"
 
 msgid "Start Workspace"
 msgstr "Start Workspace"
@@ -14207,6 +14302,9 @@ msgstr "suite for agent UIs, and shared app components. Click any import path to
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 
+msgid "Summarize the changes in this workspace"
+msgstr "Summarize the changes in this workspace"
+
 msgid "Summary"
 msgstr "Summary"
 
@@ -14264,8 +14362,11 @@ msgstr "Superset Design System"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 
-msgid "Superset failed to start"
-msgstr "Superset failed to start"
+msgid "Superset for iPhone"
+msgstr "Superset for iPhone"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "Superset for iPhone is on the way. Be first to know when it ships."
 
 msgid "Superset for your team"
 msgstr "Superset for your team"
@@ -14396,6 +14497,9 @@ msgstr "Switch sign-in"
 
 msgid "Switch sign-in…"
 msgstr "Switch sign-in…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "Switch to manual order to rearrange the sidebar"
 
 msgid "Switch to Tab 1"
 msgstr "Switch to Tab 1"
@@ -14534,9 +14638,6 @@ msgstr "Talk to Superset"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Tap anything on the page to comment on it"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "Tap the focus button to comment on a block."
 
 msgid "Target agent"
 msgstr "Target agent"
@@ -14978,9 +15079,6 @@ msgstr "The recovery period has ended. Contact support@superset.sh."
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "The remote branch has diverged. Pull before continuing."
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "The renderer crashed during startup. Please check logs for details."
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 
@@ -15144,9 +15242,6 @@ msgstr "This closes the selected workspaces and their terminals. The project's f
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
-
-msgid "This comment is no longer here"
-msgstr "This comment is no longer here"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "This deletes the saved scrollback used for reboot/crash recovery."
@@ -15395,6 +15490,9 @@ msgstr "This will unstage and revert all staged changes. Staged new files will b
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
+
+msgid "This workspace"
+msgstr "This workspace"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "This workspace may have been removed, or you no longer have access to it."
@@ -16338,6 +16436,9 @@ msgstr "Warning"
 msgid "Warning occurred."
 msgstr "Warning occurred."
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+
 msgid "Watchers"
 msgstr "Watchers"
 
@@ -16376,6 +16477,9 @@ msgstr "We'll be in touch shortly."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "We'll bring you back as soon as we reconnect."
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "We'll email you when Superset for Android is ready."
 
 msgid "We'll get back to you shortly."
 msgstr "We'll get back to you shortly."
@@ -16509,6 +16613,9 @@ msgstr "What problem are you trying to solve?"
 
 msgid "What should run on a schedule?"
 msgstr "What should run on a schedule?"
+
+msgid "What should the page show?"
+msgstr "What should the page show?"
 
 msgid "What should we build next?"
 msgstr "What should we build next?"
@@ -16672,6 +16779,9 @@ msgstr "Workspace created"
 
 msgid "Workspace created from PR"
 msgstr "Workspace created from PR"
+
+msgid "Workspace details"
+msgstr "Workspace details"
 
 msgid "Workspace ID copied"
 msgstr "Workspace ID copied"

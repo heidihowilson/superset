@@ -18,6 +18,7 @@ import {
 	useSettingsSearchQuery,
 } from "renderer/stores/settings-state";
 import { NavigationControls } from "../_dashboard/components/NavigationControls";
+import { ContentBoundary } from "../components/ContentBoundary";
 import { SearchResultsBanner } from "./components/SearchResultsBanner";
 import {
 	FULL_WIDTH_SECTION_PATHS,
@@ -219,13 +220,15 @@ function SettingsLayout() {
 							onClear={() => setSearchQuery("")}
 						/>
 					)}
-					{usesFullWidthContent ? (
-						<Outlet />
-					) : (
-						<div className="mx-auto max-w-4xl">
+					<ContentBoundary>
+						{usesFullWidthContent ? (
 							<Outlet />
-						</div>
-					)}
+						) : (
+							<div className="mx-auto max-w-4xl">
+								<Outlet />
+							</div>
+						)}
+					</ContentBoundary>
 				</div>
 			</div>
 		</div>

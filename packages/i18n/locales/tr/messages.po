@@ -274,6 +274,10 @@ msgstr "{0, plural, one {# satır daha göster} other {# satır daha göster}}"
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {Bu işlem, mevcut # worktree'yi Superset'e çalışma alanı olarak aktarır. Diskteki her worktree izlenir ve kenar çubuğunuzda görünür. Hiçbir dosya değiştirilmez.} other {Bu işlem, mevcut # worktree'yi Superset'e çalışma alanı olarak aktarır. Diskteki her worktree izlenir ve kenar çubuğunuzda görünür. Hiçbir dosya değiştirilmez.}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, one {# çözülen yorumu göster} other {# çözülen yorumu göster}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {Yorumlar için # sayfa izleniyor} other {Yorumlar için # sayfa izleniyor}}"
@@ -1043,6 +1047,15 @@ msgstr "<0>{primaryFont}</0> bu sistemde kurulu değil. Sıradaki kullanılabili
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>— liderlik tablosundaki {1} kişi arasında</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<1>App Store</1><0>'da yakında</0>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<1>Google Play</1><0>'de yakında</0>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<1>App Store</1><0>'dan indirin</0>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · buradasınız"
 
@@ -1406,6 +1419,9 @@ msgstr "Ekle"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "{0} hesabı ekle"
+
+msgid "Add a comment…"
+msgstr "Yorum ekle…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Proje Ayarları'nda bir yaşam döngüsü çalıştırma betiği ekleyin veya bir terminal betiğini çalışma alanı çalıştırması olarak işaretleyin."
@@ -1780,6 +1796,9 @@ msgstr "Tüm verileriniz {ACCOUNT_DELETION_GRACE_DAYS} gün sonra kalıcı olara
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "Açık tüm terminal oturumları sonlandırılacak ve çalışan host hizmetleri durdurulacak. Hizmetlerin sonraki açılış için çalışmaya devam etmesini istiyorsanız “Superset'i kapat” seçeneğini kullanın."
 
+msgid "All pages"
+msgstr "Tüm sayfalar"
+
 msgid "All plans"
 msgstr "Tüm planlar"
 
@@ -1911,6 +1930,9 @@ msgstr "Yüklenmeye hazır bir güncelleme var."
 
 msgid "Analytics, Ops, and more"
 msgstr "Analiz, operasyonlar ve daha fazlası"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "Android yolda. Çıktığında ilk siz haberdar olun."
 
 msgid "Animate the active terminal cursor."
 msgstr "Etkin terminal imlecini canlandır."
@@ -2862,6 +2884,9 @@ msgstr "Düzenlemeleri iptal et"
 msgid "Cancel plan"
 msgstr "Planı iptal et"
 
+msgid "Cancel reply"
+msgstr "Yanıtı iptal et"
+
 msgid "Canceled"
 msgstr "İptal edildi"
 
@@ -3209,6 +3234,9 @@ msgstr "Terminal geçmişini temizle"
 
 msgid "Clear terminal history?"
 msgstr "Terminal geçmişi temizlensin mi?"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "Kenar çubuğunu yeniden düzenlemek için filtreyi temizleyin"
 
 msgid "Clear workspace selection"
 msgstr "Çalışma alanı seçimini temizle"
@@ -3597,6 +3625,9 @@ msgstr "Yorum yapıldı"
 
 msgid "Comments"
 msgstr "Yorumlar"
+
+msgid "Comments could not be loaded"
+msgstr "Yorumlar yüklenemedi"
 
 msgid "Comments go to this agent"
 msgstr "Yorumlar bu ajana gider"
@@ -6114,6 +6145,9 @@ msgstr "Görev oluşturulamadı"
 msgid "Failed to create team"
 msgstr "Takım oluşturulamadı"
 
+msgid "Failed to create terminal"
+msgstr "Terminal oluşturulamadı"
+
 msgid "Failed to create thread"
 msgstr "Konu oluşturulamadı"
 
@@ -6645,6 +6679,9 @@ msgstr "bitti · 7 sn çalıştı"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "İlk oturum açma görünümü → kimlik doğrulama → ilk kurulum → gerçek çalışma alanı (son 7g, 2g pencere)"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "İlk kez mi buradasınız? Masaüstü uygulamasında Ayarlar → Uzaktan erişim bölümünden uzaktan erişimi açın."
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "superset.sh üzerinde günlük ilk kez sayfa görüntüleme"
 
@@ -6725,6 +6762,9 @@ msgstr "Klasör görünümü"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Yeni worktree'lere checkout edilecek klasörler; her satıra bir tane, depo köküne göre. Kökteki dosyalar her zaman dahildir. Boş bırakılırsa her şey checkout edilir."
+
+msgid "Follow every session"
+msgstr "Her oturumu takip edin"
 
 msgid "FOLLOW ON X"
 msgstr "X'TE TAKİP EDİN"
@@ -6947,6 +6987,9 @@ msgstr "Superset'i Mac'inize alın"
 
 msgid "Get Superset Pro"
 msgstr "Superset Pro'yu edinin"
+
+msgid "Get the iPhone app"
+msgstr "iPhone uygulamasını edinin"
 
 msgid "Ghost"
 msgstr "Hayalet"
@@ -7209,6 +7252,9 @@ msgstr "Pull request önizlemesini gizle"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "Çözülenleri gizle ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "Çözülen yorumları gizle"
 
 msgid "Hide review comments"
 msgstr "İnceleme yorumlarını gizle"
@@ -8083,6 +8129,9 @@ msgstr "Başlatma"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "Özellikler, hata düzeltmeleri ve yeniden düzenlemeler için ajanları paralel başlatın. Tek bakışta durum, hangi ajanların çalıştığını, hangilerinin engellendiğini ve hangilerinin sizi beklediğini gösterir."
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "Aklınıza bir fikir geldiği anda bağlı herhangi bir makinede bir ajan başlatın. Her oturumun kendi izole çalışma alanı olur."
+
 msgid "Launch mode"
 msgstr "Başlatma modu"
 
@@ -8142,6 +8191,9 @@ msgstr "Takımdan ayrıl"
 
 msgid "Leave the leaderboard?"
 msgstr "Lider tablosundan ayrılınsın mı?"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "Masanızdan kalkın.<0/>Geliştirmeye devam edin."
 
 msgid "Leaving organization..."
 msgstr "Kuruluştan ayrılınıyor..."
@@ -9077,6 +9129,10 @@ msgstr "Ağ değişti"
 msgid "Never"
 msgstr "Hiç"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "Yeni"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "Yeni {providerLabel} ajanları {accountLabel} hesabını kullanacak."
 
@@ -9131,6 +9187,9 @@ msgstr "Çalışma alanından yeni grup"
 msgid "New issue"
 msgstr "Yeni issue"
 
+msgid "New page"
+msgstr "Yeni sayfa"
+
 msgid "New password (min 8 characters)"
 msgstr "Yeni parola (en az 8 karakter)"
 
@@ -9145,6 +9204,9 @@ msgstr "Yeni sürümler ve ürün güncellemeleri."
 
 msgid "New session"
 msgstr "Yeni oturum"
+
+msgid "New shell"
+msgstr "Yeni kabuk"
 
 msgid "New stars"
 msgstr "Yeni yıldızlar"
@@ -10120,6 +10182,9 @@ msgstr "Konuyu yalnızca yazarı veya sayfanın sahibi silebilir"
 
 msgid "Only you"
 msgstr "Yalnızca siz"
+
+msgid "Only you can see this page"
+msgstr "Bu sayfayı yalnızca siz görebilirsiniz"
 
 msgid "open"
 msgstr "aç"
@@ -11651,6 +11716,9 @@ msgstr "Değişiklik günlüğünü oku"
 msgid "Read the changelog →"
 msgstr "Değişiklik günlüğünü oku →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "Tüm diff'i dosya dosya okuyun, PR durumunu kontrol edin ve ham çıktıya ihtiyaç duyduğunuzda bir terminal açın."
+
 msgid "Read the guide to parallel coding agents"
 msgstr "Paralel kodlama ajanları rehberini okuyun"
 
@@ -12055,6 +12123,9 @@ msgstr "Yanıtla"
 msgid "Reply to thread…"
 msgstr "Konuya yanıt verin…"
 
+msgid "Replying to {replyingTo}"
+msgstr "{replyingTo} kullanıcısına yanıt veriliyor"
+
 msgid "repo"
 msgstr "depo"
 
@@ -12108,6 +12179,9 @@ msgstr "Gerekli"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Gerekli sürüm: {minimumVersion}+"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "iOS 26 veya sonrası gerekir. Superset Pro'ya dahildir."
 
 msgid "Reserved by OS"
 msgstr "İşletim sistemi tarafından ayrılmış"
@@ -12388,6 +12462,9 @@ msgstr "İnceleme ve CI kuyrukları, ajanların yarattığı kazancı yiyor."
 msgid "Review becomes the bottleneck"
 msgstr "İnceleme darboğaz hâline gelir"
 
+msgid "Review before you merge"
+msgstr "Birleştirmeden önce inceleyin"
+
 msgid "Review Dismissed"
 msgstr "İnceleme yok sayıldı"
 
@@ -12571,6 +12648,9 @@ msgstr "Çalışma alanlarını her yerde çalıştırın"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Ajanlarınızı masaüstünden, herhangi bir terminalden veya telefonunuzdan çalıştırın."
+
+msgid "Run your agents from your phone."
+msgstr "Ajanlarınızı telefonunuzdan çalıştırın."
 
 msgid "running"
 msgstr "çalışıyor"
@@ -13204,6 +13284,9 @@ msgstr "Web'de oturum oluşturma yakında geliyor"
 msgid "Session details"
 msgstr "Oturum ayrıntıları"
 
+msgid "Session ended"
+msgstr "Oturum sona erdi"
+
 msgid "Session name"
 msgstr "Oturum adı"
 
@@ -13261,6 +13344,9 @@ msgstr "{hostName} üzerinde projeyi kur"
 
 msgid "Set up project…"
 msgstr "Projeyi kur…"
+
+msgid "Set up remote access"
+msgstr "Uzaktan erişimi ayarla"
 
 msgid "Set up this project for Superset"
 msgstr "Bu projeyi Superset için kur"
@@ -13997,11 +14083,17 @@ msgstr "Doğrudan bir Linear biletinden çalışma alanı başlatın. Ajan işi 
 msgid "Start agent"
 msgstr "Ajanı başlat"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "Telefonunuzdan ajanları başlatın, canlı takip edin ve diff'i inceleyin. Kodunuz makinelerinizde kalır."
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Bu çalışma alanında çalışmaya başlamak için bir ajan veya terminal başlatın."
 
 msgid "Start browsing"
 msgstr "Taramaya başlayın"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "Telefonunuzdan kodlama ajanlarını başlatın, canlı takip edin ve diff'i inceleyin. App Store'da mevcut; Android yakında geliyor."
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "Ücretsiz başlayın. Takımınız büyüdüğünde yükseltin. Gelişmiş güvenlik ve uyumluluk ihtiyaçları olan kuruluşlar için Enterprise planları."
@@ -14024,6 +14116,9 @@ msgstr "Çalışma alanı çalıştırma komutunu başlat veya durdur"
 
 msgid "Start with the work."
 msgstr "İşle başlayın."
+
+msgid "Start work from anywhere"
+msgstr "Her yerden işe başlayın"
 
 msgid "Start Workspace"
 msgstr "Çalışma alanı başlat"
@@ -14207,6 +14302,9 @@ msgstr "paketi ve paylaşılan uygulama bileşenleri. Kopyalamak için herhangi 
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Superset ve izlenen terminal süreç ağaçlarının kullandığı CPU toplamı. %100'ün üzeri, birden fazla CPU çekirdeğinin meşgul olduğu anlamına gelir. Sürekli yüksek değerler genellikle arayüzde yavaşlığa ve daha hızlı pil tüketimine yol açar."
 
+msgid "Summarize the changes in this workspace"
+msgstr "Bu çalışma alanındaki değişiklikleri özetle"
+
 msgid "Summary"
 msgstr "Özet"
 
@@ -14264,8 +14362,11 @@ msgstr "Superset Tasarım Sistemi"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise, takımlar için Superset'tir. Nelerin dahil olduğunu ve kuruluşunuzda nasıl işleyebileceğini öğrenmek için bize ulaşın."
 
-msgid "Superset failed to start"
-msgstr "Superset başlatılamadı"
+msgid "Superset for iPhone"
+msgstr "iPhone için Superset"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "iPhone için Superset yolda. Çıktığında ilk siz haberdar olun."
 
 msgid "Superset for your team"
 msgstr "Takımınız için Superset"
@@ -14396,6 +14497,9 @@ msgstr "Oturumu değiştir"
 
 msgid "Switch sign-in…"
 msgstr "Oturumu değiştir…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "Kenar çubuğunu yeniden düzenlemek için manuel sıralamaya geçin"
 
 msgid "Switch to Tab 1"
 msgstr "1. sekmeye geç"
@@ -14534,9 +14638,6 @@ msgstr "Superset ile konuşun"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Yorum yapmak için sayfadaki herhangi bir yere dokun"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "Bir bloğa yorum yapmak için odak düğmesine dokun."
 
 msgid "Target agent"
 msgstr "Hedef ajan"
@@ -14978,9 +15079,6 @@ msgstr "Kurtarma süresi sona erdi. support@superset.sh adresine yazın."
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "Uzak dal ayrıştı. Devam etmeden önce pull yapın."
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "Başlangıç sırasında renderer çöktü. Ayrıntılar için günlükleri kontrol edin."
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "Bir bulut çalışma alanının çektiği depolar ve hangisinin .superset/config.json dosyasını uyguladığı. Çalışma alanı yapılandırma konumunda, yoksa ada göre ilk depoda açılır."
 
@@ -15144,9 +15242,6 @@ msgstr "Bu, seçili çalışma alanlarını ve terminallerini kapatır. Projenin
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "Bu, çalışma alanını ve terminallerini kapatır. Projenin dosyaları, dalları ve diğer çalışma alanları olduğu gibi kalır."
-
-msgid "This comment is no longer here"
-msgstr "Bu yorum artık burada değil"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Bu işlem, yeniden başlatma/çökme kurtarma için saklanan kaydırma geçmişini siler."
@@ -15395,6 +15490,9 @@ msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "Bu işlem, hazırlanmış tüm değişiklikleri hazırlıktan çıkarır ve geri alır. Hazırlanmış yeni dosyalar silinir. Bu geri alınamaz."
+
+msgid "This workspace"
+msgstr "Bu çalışma alanı"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Bu çalışma alanı kaldırılmış olabilir ya da artık erişiminiz olmayabilir."
@@ -16338,6 +16436,9 @@ msgstr "Uyarı"
 msgid "Warning occurred."
 msgstr "Bir uyarı oluştu."
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "Ajanların çalışmasını gerçek zamanlı izleyin ve yönlendirmeye ihtiyaç duyduklarında bir takip mesajı, fotoğraf veya dikte edilmiş bir mesajla devreye girin."
+
 msgid "Watchers"
 msgstr "İzleyenler"
 
@@ -16376,6 +16477,9 @@ msgstr "Kısa süre içinde sizinle iletişime geçeceğiz."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Bağlantı yeniden kurulur kurulmaz kaldığınız yere döneceksiniz."
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "Android için Superset hazır olduğunda size e-posta göndereceğiz."
 
 msgid "We'll get back to you shortly."
 msgstr "Kısa süre içinde size döneceğiz."
@@ -16509,6 +16613,9 @@ msgstr "Hangi sorunu çözmeye çalışıyorsunuz?"
 
 msgid "What should run on a schedule?"
 msgstr "Zamanlanmış olarak ne çalışsın?"
+
+msgid "What should the page show?"
+msgstr "Sayfa ne göstermeli?"
 
 msgid "What should we build next?"
 msgstr "Sırada ne geliştirelim?"
@@ -16672,6 +16779,9 @@ msgstr "Çalışma alanı oluşturuldu"
 
 msgid "Workspace created from PR"
 msgstr "PR'dan çalışma alanı oluşturuldu"
+
+msgid "Workspace details"
+msgstr "Çalışma alanı ayrıntıları"
 
 msgid "Workspace ID copied"
 msgstr "Çalışma alanı kimliği kopyalandı"

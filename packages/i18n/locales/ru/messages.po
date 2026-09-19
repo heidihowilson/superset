@@ -274,6 +274,10 @@ msgstr "{0, plural, one {Показать ещё # строку} few {Показ
 msgid "{0, plural, one {This will import # existing worktree into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.} other {This will import # existing worktrees into Superset as workspaces. Each worktree on disk will be tracked and appear in your sidebar. No files will be modified.}}"
 msgstr "{0, plural, one {# существующий worktree будет импортирован в Superset как рабочая область. Каждый worktree на диске будет отслеживаться и появится в боковой панели. Файлы не изменяются.} few {# существующих worktree будут импортированы в Superset как рабочие области. Каждый worktree на диске будет отслеживаться и появится в боковой панели. Файлы не изменяются.} many {# существующих worktree будут импортированы в Superset как рабочие области. Каждый worktree на диске будет отслеживаться и появится в боковой панели. Файлы не изменяются.} other {# существующих worktree будут импортированы в Superset как рабочие области. Каждый worktree на диске будет отслеживаться и появится в боковой панели. Файлы не изменяются.}}"
 
+#. placeholder {0}: resolved.length
+msgid "{0, plural, one {View # resolved comment} other {View # resolved comments}}"
+msgstr "{0, plural, one {Показать # решённый комментарий} few {Показать # решённых комментария} many {Показать # решённых комментариев} other {Показать # решённых комментариев}}"
+
 #. placeholder {0}: mine.length
 msgid "{0, plural, one {Watching # page for comments} other {Watching # pages for comments}}"
 msgstr "{0, plural, one {Следит за комментариями на # странице} few {Следит за комментариями на # страницах} many {Следит за комментариями на # страницах} other {Следит за комментариями на # страницах}}"
@@ -1043,6 +1047,15 @@ msgstr "<0>{primaryFont}</0> не установлен в системе. Исп
 msgid "<0>#{0}</0> <1>of {1} on the leaderboard</1>"
 msgstr "<0>#{0}</0> <1>из {1} в рейтинге</1>"
 
+msgid "<0>Coming soon to</0><1>App Store</1>"
+msgstr "<0>Скоро в</0><1>App Store</1>"
+
+msgid "<0>Coming soon to</0><1>Google Play</1>"
+msgstr "<0>Скоро в</0><1>Google Play</1>"
+
+msgid "<0>Download on the</0><1>App Store</1>"
+msgstr "<0>Загрузите в</0><1>App Store</1>"
+
 msgid "<0>F3</0> · you are here"
 msgstr "<0>F3</0> · вы здесь"
 
@@ -1406,6 +1419,9 @@ msgstr "Добавить"
 #. placeholder {0}: AGENT_LABELS[agent]
 msgid "Add {0} account"
 msgstr "Добавить аккаунт {0}"
+
+msgid "Add a comment…"
+msgstr "Добавьте комментарий…"
 
 msgid "Add a lifecycle run script in Project Settings or mark a terminal script as the workspace run."
 msgstr "Добавьте скрипт запуска в настройках проекта или отметьте скрипт терминала как запуск рабочей области."
@@ -1780,6 +1796,9 @@ msgstr "Все ваши данные будут безвозвратно уда�
 msgid "All open terminal sessions will be killed and any running host-services will be stopped. Use “Close Superset” instead if you want services to keep running for the next launch."
 msgstr "Все открытые сессии терминала будут завершены, а работающие службы хоста остановлены. Если нужно, чтобы службы продолжили работу до следующего запуска, используйте «Закрыть Superset»."
 
+msgid "All pages"
+msgstr "Все страницы"
+
 msgid "All plans"
 msgstr "Все тарифы"
 
@@ -1911,6 +1930,9 @@ msgstr "Обновление готово к установке."
 
 msgid "Analytics, Ops, and more"
 msgstr "Аналитика, операции и другое"
+
+msgid "Android is on the way. Be first to know when it ships."
+msgstr "Версия для Android уже в работе. Узнайте о выходе первыми."
 
 msgid "Animate the active terminal cursor."
 msgstr "Анимировать курсор активного терминала."
@@ -2862,6 +2884,9 @@ msgstr "Отменить правки"
 msgid "Cancel plan"
 msgstr "Отменить тариф"
 
+msgid "Cancel reply"
+msgstr "Отменить ответ"
+
 msgid "Canceled"
 msgstr "Отменена"
 
@@ -3209,6 +3234,9 @@ msgstr "Очистить историю терминала"
 
 msgid "Clear terminal history?"
 msgstr "Очистить историю терминала?"
+
+msgid "Clear the filter to rearrange the sidebar"
+msgstr "Очистите фильтр, чтобы изменить расположение в боковой панели"
 
 msgid "Clear workspace selection"
 msgstr "Снять выделение рабочих областей"
@@ -3597,6 +3625,9 @@ msgstr "Прокомментировано"
 
 msgid "Comments"
 msgstr "Комментарии"
+
+msgid "Comments could not be loaded"
+msgstr "Не удалось загрузить комментарии"
 
 msgid "Comments go to this agent"
 msgstr "Комментарии отправляются этому агенту"
@@ -6114,6 +6145,9 @@ msgstr "Не удалось создать задачу"
 msgid "Failed to create team"
 msgstr "Не удалось создать команду"
 
+msgid "Failed to create terminal"
+msgstr "Не удалось создать терминал"
+
 msgid "Failed to create thread"
 msgstr "Не удалось создать ветку обсуждения"
 
@@ -6645,6 +6679,9 @@ msgstr "завершил · работал 7 с"
 msgid "First sign-in view → auth → onboarding → real workspace (last 7d, 2d window)"
 msgstr "Первый показ экрана входа → аутентификация → онбординг → реальная рабочая область (за 7 дн., окно 2 дн.)"
 
+msgid "First time here? Turn on Remote Access in the desktop app under Settings → Remote Access."
+msgstr "Впервые здесь? Включите удалённый доступ в десктопном приложении: Настройки → Удалённый доступ."
+
 msgid "First-ever pageview on superset.sh, daily"
 msgstr "Первый в истории просмотр страницы на superset.sh, по дням"
 
@@ -6725,6 +6762,9 @@ msgstr "Вид папок"
 
 msgid "Folders to check out into new worktrees, one per line, relative to the repo root. Files at the root are always included. Empty checks out everything."
 msgstr "Папки для выгрузки в новые worktree, по одной в строке, относительно корня репозитория. Файлы в корне включаются всегда. Пусто — выгружается всё."
+
+msgid "Follow every session"
+msgstr "Следите за каждой сессией"
 
 msgid "FOLLOW ON X"
 msgstr "ПОДПИСАТЬСЯ В X"
@@ -6947,6 +6987,9 @@ msgstr "Установите Superset на Mac"
 
 msgid "Get Superset Pro"
 msgstr "Получить Superset Pro"
+
+msgid "Get the iPhone app"
+msgstr "Скачать приложение для iPhone"
 
 msgid "Ghost"
 msgstr "Ghost"
@@ -7209,6 +7252,9 @@ msgstr "Скрыть предпросмотр пул-реквеста"
 
 msgid "Hide resolved ({resolvedCount})"
 msgstr "Скрыть закрытые ({resolvedCount})"
+
+msgid "Hide resolved comments"
+msgstr "Скрыть решённые комментарии"
 
 msgid "Hide review comments"
 msgstr "Скрыть комментарии ревью"
@@ -8083,6 +8129,9 @@ msgstr "Запуск"
 msgid "Launch agents across features, bug fixes, and refactors, all in parallel. Status at a glance shows which agents are working, which are blocked, and which are waiting on you."
 msgstr "Запускайте агентов на фичи, исправления багов и рефакторинги — все параллельно. Статус с одного взгляда показывает, кто работает, кто заблокирован, а кто ждёт вас."
 
+msgid "Launch an agent on any connected machine the moment an idea lands. Every session gets its own isolated workspace."
+msgstr "Запускайте агента на любой подключённой машине, как только появилась идея. У каждой сессии своя изолированная рабочая область."
+
 msgid "Launch mode"
 msgstr "Режим запуска"
 
@@ -8142,6 +8191,9 @@ msgstr "Покинуть команду"
 
 msgid "Leave the leaderboard?"
 msgstr "Выйти из рейтинга?"
+
+msgid "Leave your desk.<0/>Keep building."
+msgstr "Отойдите от стола.<0/>Продолжайте создавать."
 
 msgid "Leaving organization..."
 msgstr "Выход из организации..."
@@ -9077,6 +9129,10 @@ msgstr "Сеть изменилась"
 msgid "Never"
 msgstr "Никогда"
 
+msgctxt "badge on a page published since the menu was last opened"
+msgid "New"
+msgstr "Новая"
+
 msgid "New {providerLabel} agents will use {accountLabel}."
 msgstr "Новые агенты {providerLabel} будут использовать {accountLabel}."
 
@@ -9131,6 +9187,9 @@ msgstr "Новая группа из рабочей области"
 msgid "New issue"
 msgstr "Новая задача"
 
+msgid "New page"
+msgstr "Новая страница"
+
 msgid "New password (min 8 characters)"
 msgstr "Новый пароль (мин. 8 символов)"
 
@@ -9145,6 +9204,9 @@ msgstr "Новые релизы и обновления продукта."
 
 msgid "New session"
 msgstr "Новая сессия"
+
+msgid "New shell"
+msgstr "Новая оболочка"
 
 msgid "New stars"
 msgstr "Новые звёзды"
@@ -10120,6 +10182,9 @@ msgstr "Удалить может только автор ветки или вл
 
 msgid "Only you"
 msgstr "Только вы"
+
+msgid "Only you can see this page"
+msgstr "Эту страницу видите только вы"
 
 msgid "open"
 msgstr "открыть"
@@ -11651,6 +11716,9 @@ msgstr "Читать changelog"
 msgid "Read the changelog →"
 msgstr "Читать changelog →"
 
+msgid "Read the full diff file by file, check the PR status, and open a terminal when you need the raw output."
+msgstr "Читайте полный diff файл за файлом, проверяйте статус PR и открывайте терминал, когда нужен необработанный вывод."
+
 msgid "Read the guide to parallel coding agents"
 msgstr "Читать руководство по параллельным кодовым агентам"
 
@@ -12055,6 +12123,9 @@ msgstr "Ответить"
 msgid "Reply to thread…"
 msgstr "Ответить в ветке…"
 
+msgid "Replying to {replyingTo}"
+msgstr "Ответ для {replyingTo}"
+
 msgid "repo"
 msgstr "репозиторий"
 
@@ -12108,6 +12179,9 @@ msgstr "Обязательное"
 
 msgid "Required version: {minimumVersion}+"
 msgstr "Требуемая версия: {minimumVersion}+"
+
+msgid "Requires iOS 26 or later. Included with Superset Pro."
+msgstr "Требуется iOS 26 или новее. Входит в Superset Pro."
 
 msgid "Reserved by OS"
 msgstr "Занято ОС"
@@ -12388,6 +12462,9 @@ msgstr "Очереди ревью и CI съедают выигрыш, кото�
 msgid "Review becomes the bottleneck"
 msgstr "Ревью становится узким местом"
 
+msgid "Review before you merge"
+msgstr "Проверяйте перед слиянием"
+
 msgid "Review Dismissed"
 msgstr "Ревью отклонено"
 
@@ -12571,6 +12648,9 @@ msgstr "Запускайте рабочие области где угодно"
 
 msgid "Run your agents from the desktop, any terminal, or your phone."
 msgstr "Запускайте агентов с десктопа, из любого терминала или с телефона."
+
+msgid "Run your agents from your phone."
+msgstr "Запускайте агентов с телефона."
 
 msgid "running"
 msgstr "работает"
@@ -13204,6 +13284,9 @@ msgstr "Создание сессий в вебе скоро появится"
 msgid "Session details"
 msgstr "Детали сессии"
 
+msgid "Session ended"
+msgstr "Сеанс завершён"
+
 msgid "Session name"
 msgstr "Имя сессии"
 
@@ -13261,6 +13344,9 @@ msgstr "Настроить проект на {hostName}"
 
 msgid "Set up project…"
 msgstr "Настроить проект…"
+
+msgid "Set up remote access"
+msgstr "Настроить удалённый доступ"
 
 msgid "Set up this project for Superset"
 msgstr "Настроить этот проект под Superset"
@@ -13997,11 +14083,17 @@ msgstr "Запускайте рабочую область прямо из ти�
 msgid "Start agent"
 msgstr "Запустить агента"
 
+msgid "Start agents, follow them live, and review the diff from your phone. Your code stays on your machines."
+msgstr "Запускайте агентов, следите за ними в реальном времени и проверяйте diff с телефона. Ваш код остаётся на ваших машинах."
+
 msgid "Start an agent or a terminal to begin working in this workspace."
 msgstr "Запустите агента или терминал, чтобы начать работу в этой рабочей области."
 
 msgid "Start browsing"
 msgstr "Начните просмотр"
+
+msgid "Start coding agents, follow them live, and review the diff from your phone. Available on the App Store; Android is coming soon."
+msgstr "Запускайте агентов для программирования, следите за ними в реальном времени и проверяйте diff с телефона. Доступно в App Store; версия для Android скоро появится."
 
 msgid "Start free. Upgrade when your team outgrows it. Enterprise plans for organizations with advanced security and compliance needs."
 msgstr "Начните бесплатно. Переходите на платный, когда команда вырастет. Enterprise — для организаций с повышенными требованиями к безопасности и соответствию."
@@ -14024,6 +14116,9 @@ msgstr "Запустить или остановить команду запус
 
 msgid "Start with the work."
 msgstr "Начните с работы."
+
+msgid "Start work from anywhere"
+msgstr "Начинайте работу откуда угодно"
 
 msgid "Start Workspace"
 msgstr "Запустить рабочую область"
@@ -14207,6 +14302,9 @@ msgstr "для интерфейсов агентов и общие компон�
 msgid "Sum of CPU used by Superset and monitored terminal process trees. Over 100% means multiple CPU cores are busy. Sustained high values usually cause UI sluggishness and higher battery drain."
 msgstr "Суммарная загрузка CPU от Superset и отслеживаемых деревьев процессов терминала. Больше 100% означает, что заняты несколько ядер. Долго держащиеся высокие значения обычно вызывают подтормаживание интерфейса и ускоренный разряд батареи."
 
+msgid "Summarize the changes in this workspace"
+msgstr "Кратко опиши изменения в этой рабочей области"
+
 msgid "Summary"
 msgstr "Сводка"
 
@@ -14264,8 +14362,11 @@ msgstr "Дизайн-система Superset"
 msgid "Superset Enterprise is Superset for teams. Reach out to learn more about what's included and how it can work for your organization."
 msgstr "Superset Enterprise — это Superset для команд. Напишите нам, чтобы узнать, что входит и как это подойдёт вашей организации."
 
-msgid "Superset failed to start"
-msgstr "Не удалось запустить Superset"
+msgid "Superset for iPhone"
+msgstr "Superset для iPhone"
+
+msgid "Superset for iPhone is on the way. Be first to know when it ships."
+msgstr "Superset для iPhone уже в работе. Узнайте о выходе первыми."
 
 msgid "Superset for your team"
 msgstr "Superset для вашей команды"
@@ -14396,6 +14497,9 @@ msgstr "Сменить вход"
 
 msgid "Switch sign-in…"
 msgstr "Сменить вход…"
+
+msgid "Switch to manual order to rearrange the sidebar"
+msgstr "Переключитесь на ручной порядок, чтобы изменить расположение в боковой панели"
 
 msgid "Switch to Tab 1"
 msgstr "Перейти на вкладку 1"
@@ -14534,9 +14638,6 @@ msgstr "Напишите в Superset"
 
 msgid "Tap anything on the page to comment on it"
 msgstr "Коснитесь любого элемента страницы, чтобы прокомментировать его"
-
-msgid "Tap the focus button to comment on a block."
-msgstr "Нажмите кнопку фокуса, чтобы прокомментировать блок."
 
 msgid "Target agent"
 msgstr "Целевой агент"
@@ -14978,9 +15079,6 @@ msgstr "Период восстановления истёк. Напишите �
 msgid "The remote branch has diverged. Pull before continuing."
 msgstr "Удалённая ветка разошлась. Получите изменения, прежде чем продолжать."
 
-msgid "The renderer crashed during startup. Please check logs for details."
-msgstr "Рендерер аварийно завершился при запуске. Подробности — в логах."
-
 msgid "The repositories a cloud workspace checks out, and which one's .superset/config.json it acts on. The workspace opens on the config location, or on the first repository by name."
 msgstr "Репозитории, которые извлекает облачная рабочая область, и чей .superset/config.json она применяет. Рабочая область открывается в расположении конфигурации или в первом репозитории по имени."
 
@@ -15144,9 +15242,6 @@ msgstr "Выбранные рабочие области и их термина�
 
 msgid "This closes the workspace and its terminals. The project's files, branches and other workspaces stay as they are."
 msgstr "Рабочая область и её терминалы будут закрыты. Файлы, ветки и другие рабочие области проекта останутся без изменений."
-
-msgid "This comment is no longer here"
-msgstr "Этого комментария больше нет"
 
 msgid "This deletes the saved scrollback used for reboot/crash recovery."
 msgstr "Это удалит сохранённую прокрутку, используемую для восстановления после перезагрузки или сбоя."
@@ -15395,6 +15490,9 @@ msgstr "Все индексированные изменения будут уд
 
 msgid "This will unstage and revert all staged changes. Staged new files will be deleted. This cannot be undone."
 msgstr "Это снимет индексацию и откатит все проиндексированные изменения. Проиндексированные новые файлы будут удалены. Отменить нельзя."
+
+msgid "This workspace"
+msgstr "Эта рабочая область"
 
 msgid "This workspace may have been removed, or you no longer have access to it."
 msgstr "Возможно, эта рабочая область удалена или у вас больше нет к ней доступа."
@@ -16338,6 +16436,9 @@ msgstr "Предупреждение"
 msgid "Warning occurred."
 msgstr "Возникло предупреждение."
 
+msgid "Watch agents work in real time and step in with a follow-up, a photo, or a dictated message when they need direction."
+msgstr "Наблюдайте за работой агентов в реальном времени и вмешивайтесь уточняющим сообщением, фото или надиктованным сообщением, когда им нужно направление."
+
 msgid "Watchers"
 msgstr "Наблюдатели"
 
@@ -16376,6 +16477,9 @@ msgstr "Скоро свяжемся."
 
 msgid "We'll bring you back as soon as we reconnect."
 msgstr "Вы вернётесь к работе, как только связь восстановится."
+
+msgid "We'll email you when Superset for Android is ready."
+msgstr "Мы напишем вам, когда Superset для Android будет готов."
 
 msgid "We'll get back to you shortly."
 msgstr "Скоро ответим."
@@ -16509,6 +16613,9 @@ msgstr "Какую задачу вы решаете?"
 
 msgid "What should run on a schedule?"
 msgstr "Что запускать по расписанию?"
+
+msgid "What should the page show?"
+msgstr "Что должна показывать страница?"
 
 msgid "What should we build next?"
 msgstr "Что будем делать дальше?"
@@ -16672,6 +16779,9 @@ msgstr "Рабочая область создана"
 
 msgid "Workspace created from PR"
 msgstr "Рабочая область создана из PR"
+
+msgid "Workspace details"
+msgstr "Сведения о рабочей области"
 
 msgid "Workspace ID copied"
 msgstr "ID рабочей области скопирован"
